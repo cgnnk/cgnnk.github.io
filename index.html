@@ -1,0 +1,716 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mamoball Turkey League</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --primary-red: #cc0000;
+            --dark-bg: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --text-main: #e0e0e0;
+            --text-dim: #b0b0b0;
+            --danger: #ff4444;
+            --success: #00c851;
+            --border: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            background: var(--dark-bg);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        header {
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 0;
+            border-bottom: 2px solid var(--primary-red);
+            position: sticky;
+            top: 0;
+            z-index: 2000;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .main-logo {
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-red);
+            background: white;
+        }
+
+        nav {
+            display: flex;
+        }
+
+            nav a {
+                color: var(--text-main);
+                text-decoration: none;
+                font-weight: 600;
+                margin-left: 20px;
+                cursor: pointer;
+                font-size: 0.85rem;
+                text-transform: uppercase;
+                transition: 0.3s;
+            }
+
+                nav a:hover {
+                    color: var(--primary-red);
+                }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+            .hamburger span {
+                width: 25px;
+                height: 3px;
+                background: white;
+                border-radius: 2px;
+            }
+
+        @media (max-width: 768px) {
+            nav {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 70%;
+                height: 100vh;
+                background: var(--card-bg);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                transition: 0.4s;
+                gap: 30px;
+                z-index: 2500;
+            }
+
+                nav.active {
+                    right: 0;
+                }
+
+            .hamburger {
+                display: flex;
+            }
+        }
+
+        .admin-section, .league-card, .news-card, .stats-card, .week-container {
+            background: var(--card-bg);
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .news-img {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            height: auto;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            background: #222;
+            border: 1px solid #333;
+            display: block;
+        }
+
+        h2 {
+            border-left: 4px solid var(--primary-red);
+            padding-left: 15px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            color: var(--primary-red);
+            margin: 0 0 15px 0;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+        }
+
+        input, textarea, select {
+            background: #252525;
+            border: 1px solid var(--border);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            width: 100%;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: var(--primary-red);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: bold;
+            width: 100%;
+            transition: 0.3s;
+        }
+
+            button:hover {
+                opacity: 0.8;
+            }
+
+        .btn-danger {
+            background: var(--danger) !important;
+        }
+
+        .btn-small {
+            width: auto !important;
+            padding: 5px 10px !important;
+            font-size: 11px;
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        /* YENİ TASARIM: SONUÇLAR VE FİKSTÜR HİZALAMA */
+        .match-row, .fixture-item {
+            display: grid;
+            grid-template-columns: 40px 1fr 60px 1fr 40px;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+        }
+
+        .score-container, .tire-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--primary-red);
+        }
+
+        .score-box {
+            background: #2a2a2a;
+            color: white;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        .team-home {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 12px;
+            font-weight: 600;
+        }
+
+        .team-away {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        td, th {
+            padding: 10px 5px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+
+        .team-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .team-logo-small {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        .week-title {
+            background: var(--primary-red);
+            padding: 8px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            font-weight: bold;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loader">Veriler Yükleniyor...</div>
+
+    <header>
+        <div class="container header-content">
+            <div class="logo-box">
+                <img src="logo.png" alt="MBTL" class="main-logo" onerror="this.src='https://via.placeholder.com/45?text=MB'">
+                <h1 style="margin:0; font-size: 1rem; color: white;">MB LEAGUE</h1>
+            </div>
+            <div class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+            <nav id="nav-menu">
+                <a onclick="handleNav('news')">Haberler</a>
+                <a onclick="handleNav('standings')">Puan Durumu</a>
+                <a onclick="handleNav('fixture')">Fikstür</a>
+                <a onclick="handleNav('stats')">Krallık</a>
+                <a onclick="handleNav('matches')">Sonuçlar</a>
+                <a onclick="handleNav('admin')">Admin</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <section id="admin-auth" class="admin-section" style="display:none;">
+            <h2>Yönetici Girişi</h2>
+            <input type="password" id="admin-pass" placeholder="Şifre">
+            <button onclick="checkPassword()">Giriş Yap</button>
+        </section>
+
+        <section id="admin-panel" class="admin-section" style="display:none;">
+            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom:20px;">
+                <h2 style="margin:0; border:none;">Yönetim Paneli</h2>
+                <button onclick="logout()" style="width:auto; background:var(--danger);">Çıkış</button>
+            </div>
+
+            <div class="admin-grid">
+                <div>
+                    <h3>Haber Yönetimi</h3>
+                    <input type="text" id="news-title" placeholder="Başlık">
+                    <input type="text" id="news-image" placeholder="Fotoğraf Linki (URL)">
+                    <textarea id="news-content" placeholder="İçerik..." rows="2"></textarea>
+                    <button onclick="publishNews()">Yayınla</button>
+                </div>
+
+                <div>
+                    <h3>Lig & Takım Yönetimi</h3>
+                    <input type="text" id="league-name-input" placeholder="Yeni Lig Adı">
+                    <button onclick="addLeague()" style="margin-bottom:10px;">Lig Ekle</button>
+                    <select id="team-league-select"><option value="">Lig Seçin</option></select>
+                    <input type="text" id="team-name" placeholder="Takım Adı">
+                    <input type="text" id="team-logo-input" placeholder="Logo Linki (URL)">
+                    <button onclick="addTeam()" style="margin-bottom:5px;">Takım Ekle</button>
+                    <button onclick="deleteLeague()" class="btn-danger">Ligi Sil</button>
+                </div>
+
+                <div>
+                    <h3>Fikstür Yönetimi</h3>
+                    <select id="fixture-league-select"><option value="">Lig Seçin</option></select>
+                    <button onclick="generateFixture()" style="background: #6a1b9a; margin-bottom:5px;">Fikstür Oluştur</button>
+                    <button onclick="deleteFixture()" class="btn-danger">Fikstürü Temizle</button>
+                </div>
+
+                <div>
+                    <h3>Krallık Girişi</h3>
+                    <select id="stats-league-select" onchange="updateStatsTeams()"><option value="">Lig Seçin</option></select>
+                    <select id="stats-team-select"><option value="">Takım Seçin</option></select>
+                    <input type="text" id="player-name" placeholder="Oyuncu Adı">
+                    <div style="display: flex; gap: 5px;">
+                        <input type="number" id="plus-goal" placeholder="Gol">
+                        <input type="number" id="plus-assist" placeholder="Asist">
+                        <input type="number" id="plus-cs" placeholder="CS">
+                    </div>
+                    <button onclick="updatePlayerStats()" style="background:var(--success);">Kaydet</button>
+                </div>
+
+                <div>
+                    <h3>Skor Girişi</h3>
+                    <select id="match-league-select" onchange="updateMatchTeams()"><option value="">Lig Seçin</option></select>
+                    <select id="match-week-select"><option value="">Hafta Seçin</option></select>
+                    <div style="display:flex; flex-direction: column; gap:5px;">
+                        <select id="team-1-select"><option value="">Ev Sahibi Seçin</option></select>
+                        <div style="display:flex; gap:5px;">
+                            <input type="number" id="score-1" placeholder="0">
+                            <input type="number" id="score-2" placeholder="0">
+                        </div>
+                        <select id="team-2-select"><option value="">Deplasman Seçin</option></select>
+                    </div>
+                    <button onclick="addMatch()" style="background:var(--success); margin-top:10px;">Onayla</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="news-section"><h2>Haberler</h2><div id="news-container" class="news-grid"></div></section>
+        <section id="standings-section" style="display:none;"><h2>Puan Durumu</h2><div id="leagues-container"></div></section>
+        <section id="fixture-section" style="display:none;"><h2>Fikstür</h2><div id="fixture-display-container"></div></section>
+        <section id="stats-section" style="display:none;"><h2>İstatistikler</h2><div id="stats-display-container"></div></section>
+        <section id="matches-section" style="display:none;"><h2>Maç Sonuçları</h2><div id="matches-display-container"></div></section>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5pvFMZ7PXZ5jHsRvMr5hBCHYYumnqq_A",
+            authDomain: "mamoball-turkey-league.firebaseapp.com",
+            databaseURL: "https://mamoball-turkey-league-default-rtdb.europe-west1.firebasedatabase.app/",
+            projectId: "mamoball-turkey-league",
+            storageBucket: "mamoball-turkey-league.firebasestorage.app",
+            messagingSenderId: "648815784565",
+            appId: "1:648815784565:web:5d82e86c1db870cd53fe3c"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        const ADMIN_PASSWORD = "cagan6161.";
+        let newsData = [], leagues = {}, matches = [], players = [], fixtures = {}, isAdmin = false;
+
+        db.ref('/').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                newsData = data.news || [];
+                leagues = data.leagues || {};
+                matches = data.matches || [];
+                players = data.players || [];
+                fixtures = data.fixtures || {};
+            }
+            renderAll();
+            updateLeagueSelects();
+            document.getElementById('loader').style.display = 'none';
+        });
+
+        function save() { db.ref('/').set({ news: newsData, leagues: leagues, matches: matches, players: players, fixtures: fixtures }); }
+
+        function toggleMenu() {
+            document.querySelector('.hamburger').classList.toggle('active');
+            document.getElementById('nav-menu').classList.toggle('active');
+        }
+
+        function handleNav(tab) {
+            document.querySelector('.hamburger').classList.remove('active');
+            document.getElementById('nav-menu').classList.remove('active');
+            ['news', 'standings', 'fixture', 'stats', 'matches', 'admin'].forEach(t => {
+                const sec = document.getElementById(t + '-section');
+                if (sec) sec.style.display = 'none';
+            });
+            document.getElementById('admin-auth').style.display = 'none';
+            document.getElementById('admin-panel').style.display = 'none';
+            if (tab === 'admin') isAdmin ? document.getElementById('admin-panel').style.display = 'block' : document.getElementById('admin-auth').style.display = 'block';
+            else document.getElementById(tab + '-section').style.display = 'block';
+        }
+
+        function checkPassword() { if (document.getElementById('admin-pass').value === ADMIN_PASSWORD) { isAdmin = true; handleNav('admin'); renderAll(); } else alert("Hatalı!"); }
+        function logout() { isAdmin = false; location.reload(); }
+
+        function addLeague() {
+            const name = document.getElementById('league-name-input').value.trim();
+            if (name && !leagues[name]) { leagues[name] = [{ id: "dummy", name: "Takım Ekleyin", logo: "", puan: 0, averaj: 0 }]; save(); }
+        }
+
+        function addTeam() {
+            const l = document.getElementById('team-league-select').value;
+            const n = document.getElementById('team-name').value.trim();
+            const logo = document.getElementById('team-logo-input').value.trim();
+            if (!l || !n) return;
+            leagues[l] = leagues[l].filter(x => x.id !== "dummy");
+            leagues[l].push({ id: "T" + Date.now(), name: n, logo: logo || 'https://via.placeholder.com/30?text=?', puan: 0, averaj: 0 });
+            save(); alert("Takım Eklendi!");
+        }
+
+        function deleteLeague() {
+            const l = document.getElementById('team-league-select').value;
+            if (l && confirm(`${l} silinsin mi?`)) { delete leagues[l]; if (fixtures[l]) delete fixtures[l]; save(); }
+        }
+
+        function renderStandings() {
+            const container = document.getElementById('leagues-container'); container.innerHTML = "";
+            Object.keys(leagues).forEach(l => {
+                let teams = leagues[l].filter(t => t.id !== "dummy").sort((a, b) => b.puan - a.puan || b.averaj - a.averaj);
+                let html = `<div class="league-card"><h3>${l}</h3><table><tr><th>#</th><th>Takım</th><th>AV</th><th>P</th></tr>`;
+                teams.forEach((t, i) => {
+                    html += `<tr><td>${i + 1}</td><td class="team-cell"><img src="${t.logo}" class="team-logo-small"> ${t.name}</td><td>${t.averaj}</td><td><b>${t.puan}</b></td></tr>`;
+                });
+                container.innerHTML += html + `</table></div>`;
+            });
+        }
+
+        /* SONUÇLAR KANALI - LOGOLAR KÖŞEDE, TİRELER ALT ALTA */
+        function renderMatches() {
+            const container = document.getElementById('matches-display-container'); container.innerHTML = "";
+            const grouped = matches.reduce((acc, m) => { (acc[m.week] = acc[m.week] || []).push(m); return acc; }, {});
+            Object.keys(grouped).sort((a, b) => b - a).forEach(w => {
+                let html = `<div class="week-container"><div class="week-title">${w}. Hafta</div>`;
+                grouped[w].slice().reverse().forEach(m => {
+                    const lData = leagues[m.league] || [];
+                    const t1 = lData.find(x => x.name === m.t1Name) || {};
+                    const t2 = lData.find(x => x.name === m.t2Name) || {};
+
+                    html += `<div class="match-row">
+                                    <div style="display:flex; justify-content:center;">
+                                        ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteMatch(${m.id})">X</button>` : ''}
+                                    </div>
+                                    <div class="team-home">
+                                        <img src="${t1.logo}" class="team-logo-small">
+                                        <span>${m.t1Name}</span>
+                                    </div>
+                                    <div class="score-container">
+                                        <div class="score-box">${m.s1}</div>
+                                        <span>-</span>
+                                        <div class="score-box">${m.s2}</div>
+                                    </div>
+                                    <div class="team-away">
+                                        <span>${m.t2Name}</span>
+                                        <img src="${t2.logo}" class="team-logo-small">
+                                    </div>
+                                    <div></div>
+                                </div>`;
+                });
+                container.innerHTML += html + `</div>`;
+            });
+        }
+
+        /* FİKSTÜR KANALI - TİRELER ALT ALTA */
+        function renderFixture() {
+            const container = document.getElementById('fixture-display-container'); container.innerHTML = "";
+            Object.keys(fixtures).forEach(l => {
+                let html = `<div class="league-card"><h3>${l} Fikstürü</h3>`;
+                fixtures[l].forEach((round, i) => {
+                    html += `<div class="week-title" style="margin-top:10px">${i + 1}. Hafta</div>`;
+                    round.forEach(m => {
+                        const lData = leagues[l] || [];
+                        const t1 = lData.find(x => x.name === m.home) || {};
+                        const t2 = lData.find(x => x.name === m.away) || {};
+                        html += `<div class="fixture-item">
+                                        <div></div>
+                                        <div class="team-home">
+                                            <img src="${t1.logo}" class="team-logo-small">
+                                            <span>${m.home}</span>
+                                        </div>
+                                        <div class="tire-container">-</div>
+                                        <div class="team-away">
+                                            <span>${m.away}</span>
+                                            <img src="${t2.logo}" class="team-logo-small">
+                                        </div>
+                                        <div></div>
+                                    </div>`;
+                    });
+                });
+                container.innerHTML += html + `</div>`;
+            });
+        }
+
+        function renderStats() {
+            const container = document.getElementById('stats-display-container'); container.innerHTML = "";
+            Object.keys(leagues).forEach(l => {
+                const lp = players.filter(p => p.league === l);
+                if (lp.length === 0) return;
+
+                let html = `<h2>${l} - İstatistikler</h2><div class="stats-grid">`;
+
+                const goals = [...lp].filter(p => (p.goals || 0) > 0).sort((a, b) => b.goals - a.goals).slice(0, 5);
+                html += `<div class="stats-card"><h3>Gol Krallığı</h3><table>`;
+                goals.forEach(p => {
+                    const t = leagues[l].find(x => x.name === p.team) || {};
+                    html += `<tr><td class="team-cell"><img src="${t.logo}" class="team-logo-small"> ${p.name}</td><td style="text-align:right"><b>${p.goals}</b></td></tr>`;
+                });
+                html += `</table></div>`;
+
+                const assists = [...lp].filter(p => (p.assists || 0) > 0).sort((a, b) => b.assists - a.assists).slice(0, 5);
+                html += `<div class="stats-card"><h3>Asist Krallığı</h3><table>`;
+                assists.forEach(p => {
+                    const t = leagues[l].find(x => x.name === p.team) || {};
+                    html += `<tr><td class="team-cell"><img src="${t.logo}" class="team-logo-small"> ${p.name}</td><td style="text-align:right"><b>${p.assists}</b></td></tr>`;
+                });
+                html += `</table></div>`;
+
+                const cs = [...lp].filter(p => (p.cs || 0) > 0).sort((a, b) => b.cs - a.cs).slice(0, 5);
+                html += `<div class="stats-card"><h3>Cs Krallığı</h3><table>`;
+                cs.forEach(p => {
+                    const t = leagues[l].find(x => x.name === p.team) || {};
+                    html += `<tr><td class="team-cell"><img src="${t.logo}" class="team-logo-small"> ${p.name}</td><td style="text-align:right"><b>${p.cs}</b></td></tr>`;
+                });
+                html += `</table></div>`;
+
+                html += `</div>`;
+                if (isAdmin) html += `<button class="btn-danger btn-small" onclick="clearStats('${l}')" style="margin-top:10px">İstatistikleri Sıfırla</button>`;
+
+                container.innerHTML += html;
+            });
+        }
+
+        function updatePlayerStats() {
+            const l = document.getElementById('stats-league-select').value;
+            const t = document.getElementById('stats-team-select').value;
+            const n = document.getElementById('player-name').value.trim();
+            const g = parseInt(document.getElementById('plus-goal').value) || 0;
+            const a = parseInt(document.getElementById('plus-assist').value) || 0;
+            const cs = parseInt(document.getElementById('plus-cs').value) || 0;
+            if (!l || !n) return;
+            let p = players.find(x => x.name.toLowerCase() === n.toLowerCase() && x.league === l);
+            if (p) {
+                p.goals = (p.goals || 0) + g;
+                p.assists = (p.assists || 0) + a;
+                p.cs = (p.cs || 0) + cs;
+            } else {
+                players.push({ id: Date.now(), name: n, team: t, league: l, goals: g, assists: a, cs: cs });
+            }
+            save(); alert("Başarıyla Kaydedildi!");
+        }
+
+        function clearStats(league) {
+            if (confirm(league + " ligine ait tüm istatistikler silinsin mi?")) {
+                players = players.filter(p => p.league !== league);
+                save();
+            }
+        }
+
+        function generateFixture() {
+            const l = document.getElementById('fixture-league-select').value;
+            if (!l) return alert("Lig seçin!");
+            let teams = leagues[l].filter(t => t.id !== "dummy").map(t => t.name);
+            if (teams.length < 2) return;
+            if (teams.length % 2 !== 0) teams.push("BAY");
+            let totalRounds = teams.length - 1, rounds = [];
+            for (let r = 0; r < totalRounds; r++) {
+                let roundMatches = [];
+                for (let m = 0; m < teams.length / 2; m++) {
+                    let h = teams[m], a = teams[teams.length - 1 - m];
+                    if (h !== "BAY" && a !== "BAY") roundMatches.push({ home: h, away: a });
+                }
+                rounds.push(roundMatches);
+                teams.splice(1, 0, teams.pop());
+            }
+            fixtures[l] = [...rounds, ...rounds.map(rd => rd.map(m => ({ home: m.away, away: m.home })))];
+            save(); alert("Fikstür Hazır!");
+        }
+
+        function deleteFixture() { const l = document.getElementById('fixture-league-select').value; if (l && confirm("Silinsin mi?")) { delete fixtures[l]; save(); } }
+
+        function publishNews() {
+            const t = document.getElementById('news-title').value, c = document.getElementById('news-content').value, img = document.getElementById('news-image').value;
+            if (t && c) { newsData.push({ id: Date.now(), title: t, content: c, image: img, date: new Date().toLocaleDateString('tr-TR') }); save(); }
+        }
+
+        function addMatch() {
+            const l = document.getElementById('match-league-select').value, w = document.getElementById('match-week-select').value, t1Id = document.getElementById('team-1-select').value, t2Id = document.getElementById('team-2-select').value, s1 = parseInt(document.getElementById('score-1').value), s2 = parseInt(document.getElementById('score-2').value);
+            if (!l || !t1Id || !t2Id) return;
+            const t1 = leagues[l].find(x => x.id === t1Id), t2 = leagues[l].find(x => x.id === t2Id);
+            t1.averaj += (s1 - s2); t2.averaj += (s2 - s1);
+            if (s1 > s2) t1.puan += 3; else if (s2 > s1) t2.puan += 3; else { t1.puan += 1; t2.puan += 1; }
+            matches.push({ id: Date.now(), league: l, week: w, t1Name: t1.name, t2Name: t2.name, s1, s2 });
+            save(); alert("Skor Kaydedildi!");
+        }
+
+        function renderNews() {
+            document.getElementById('news-container').innerHTML = newsData.slice().reverse().map(n => `
+                            <div class="news-card">
+                                ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteNews(${n.id})" style="float:right">Sil</button>` : ''}
+                                <h3>${n.title}</h3>
+                                ${n.image ? `<img src="${n.image}" class="news-img" onerror="this.style.display='none'">` : ''}
+                                <p>${n.content}</p>
+                                <small>${n.date}</small>
+                            </div>`).join('');
+        }
+
+        function deleteNews(id) { if (confirm("Silinsin mi?")) { newsData = newsData.filter(n => n.id !== id); save(); } }
+        function deleteMatch(id) { if (confirm("Silinsin mi?")) { matches = matches.filter(m => m.id !== id); save(); } }
+
+        function renderAll() { renderNews(); renderStandings(); renderMatches(); renderStats(); renderFixture(); }
+
+        function updateLeagueSelects() {
+            ['team-league-select', 'match-league-select', 'stats-league-select', 'fixture-league-select'].forEach(id => {
+                const s = document.getElementById(id); if (s) { const val = s.value; s.innerHTML = '<option value="">Lig Seçin</option>' + Object.keys(leagues).map(l => `<option value="${l}">${l}</option>`).join(''); s.value = val; }
+            });
+        }
+
+        function updateMatchTeams() {
+            const l = document.getElementById('match-league-select').value;
+            const s1 = document.getElementById('team-1-select');
+            const s2 = document.getElementById('team-2-select');
+
+            s1.innerHTML = '<option value="">Ev Sahibi Seçin</option>';
+            s2.innerHTML = '<option value="">Deplasman Seçin</option>';
+
+            if (leagues[l]) {
+                leagues[l].forEach(t => {
+                    if (t.id !== "dummy") {
+                        const option = `<option value="${t.id}">${t.name}</option>`;
+                        s1.innerHTML += option;
+                        s2.innerHTML += option;
+                    }
+                });
+            }
+        }
+
+        function updateStatsTeams() {
+            const l = document.getElementById('stats-league-select').value, s = document.getElementById('stats-team-select');
+            s.innerHTML = '<option value="">Takım Seçin</option>';
+            if (leagues[l]) leagues[l].forEach(t => { if (t.id !== "dummy") s.innerHTML += `<option value="${t.name}">${t.name}</option>`; });
+        }
+
+        (function init() { const s = document.getElementById('match-week-select'); for (let i = 1; i <= 30; i++) s.innerHTML += `<option value="${i}">${i}</option>`; })();
+    </script>
+</body>
+</html>
