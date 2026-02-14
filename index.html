@@ -1,8 +1,8 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mamoball Turkey League</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -20,39 +20,39 @@
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
             margin: 0;
             background: var(--dark-bg);
             color: var(--text-main);
-            line-height: 1.6;
+            line-height: 1.6
         }
 
         .container {
             width: 92%;
             max-width: 1200px;
-            margin: auto;
+            margin: auto
         }
 
         header {
-            background: rgba(15, 15, 15, 0.95);
+            background: rgba(15,15,15,.95);
             backdrop-filter: blur(10px);
             padding: 12px 0;
             border-bottom: 2px solid var(--primary-red);
             position: sticky;
             top: 0;
-            z-index: 2000;
+            z-index: 2000
         }
 
         .header-content {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: space-between
         }
 
         .logo-box {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 12px
         }
 
         .main-logo {
@@ -60,11 +60,11 @@
             width: 40px;
             border-radius: 50%;
             border: 2px solid var(--primary-red);
-            background: white;
+            background: white
         }
 
         nav {
-            display: flex;
+            display: flex
         }
 
             nav a {
@@ -73,30 +73,30 @@
                 font-weight: 600;
                 margin-left: 20px;
                 cursor: pointer;
-                font-size: 0.85rem;
+                font-size: .85rem;
                 text-transform: uppercase;
-                transition: 0.3s;
+                transition: .3s
             }
 
                 nav a:hover {
-                    color: var(--primary-red);
+                    color: var(--primary-red)
                 }
 
         .hamburger {
             display: none;
             flex-direction: column;
             gap: 5px;
-            cursor: pointer;
+            cursor: pointer
         }
 
             .hamburger span {
                 width: 25px;
                 height: 3px;
                 background: white;
-                border-radius: 2px;
+                border-radius: 2px
             }
 
-        @media (max-width: 768px) {
+        @media (max-width:768px) {
             nav {
                 position: fixed;
                 top: 0;
@@ -107,17 +107,17 @@
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
-                transition: 0.4s;
+                transition: .4s;
                 gap: 30px;
-                z-index: 2500;
+                z-index: 2500
             }
 
                 nav.active {
-                    right: 0;
+                    right: 0
                 }
 
             .hamburger {
-                display: flex;
+                display: flex
             }
         }
 
@@ -127,40 +127,40 @@
             margin-top: 20px;
             border-radius: 12px;
             border: 1px solid var(--border);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,.5);
             width: 100%;
-            box-sizing: border-box;
+            box-sizing: border-box
         }
 
         .news-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill,minmax(350px,1fr));
+            gap: 20px
         }
 
         .news-img {
             width: 100%;
-            aspect-ratio: 16 / 9;
+            aspect-ratio: 16/9;
             height: auto;
             object-fit: cover;
             border-radius: 8px;
             margin-bottom: 6px;
             background: #222;
             border: 1px solid #333;
-            display: block;
+            display: block
         }
 
         h2 {
             border-left: 4px solid var(--primary-red);
             padding-left: 15px;
-            margin-top: 40px;
+            margin-top: 40px
         }
 
         h3 {
             color: var(--primary-red);
             margin: 0 0 15px 0;
             font-size: 1.2rem;
-            text-transform: uppercase;
+            text-transform: uppercase
         }
 
         input, textarea, select {
@@ -171,7 +171,7 @@
             border-radius: 8px;
             width: 100%;
             margin-bottom: 10px;
-            box-sizing: border-box;
+            box-sizing: border-box
         }
 
         button {
@@ -183,38 +183,37 @@
             border-radius: 8px;
             font-weight: bold;
             width: 100%;
-            transition: 0.3s;
+            transition: .3s
         }
 
             button:hover {
-                opacity: 0.8;
+                opacity: .8
             }
 
         .btn-danger {
-            background: var(--danger) !important;
+            background: var(--danger) !important
         }
 
         .btn-small {
             width: auto !important;
             padding: 5px 10px !important;
-            font-size: 11px;
+            font-size: 11px
         }
 
         .admin-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill,minmax(300px,1fr));
+            gap: 20px
         }
 
-        /* YENİ TASARIM: SONUÇLAR VE FİKSTÜR HİZALAMA */
         .match-row, .fixture-item {
             display: grid;
             grid-template-columns: 40px 1fr 60px 1fr 40px;
             align-items: center;
             margin-bottom: 15px;
             padding: 10px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 8px;
+            background: rgba(255,255,255,.03);
+            border-radius: 8px
         }
 
         .score-container, .tire-container {
@@ -224,7 +223,7 @@
             gap: 5px;
             font-weight: 800;
             font-size: 1.1rem;
-            color: var(--primary-red);
+            color: var(--primary-red)
         }
 
         .score-box {
@@ -237,7 +236,7 @@
             align-items: center;
             border-radius: 6px;
             border: 1px solid var(--border);
-            font-size: 0.9rem;
+            font-size: .9rem
         }
 
         .team-home {
@@ -245,7 +244,7 @@
             align-items: center;
             justify-content: flex-start;
             gap: 12px;
-            font-weight: 600;
+            font-weight: 600
         }
 
         .team-away {
@@ -253,33 +252,33 @@
             align-items: center;
             justify-content: flex-end;
             gap: 12px;
-            font-weight: 600;
+            font-weight: 600
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
-            font-size: 0.9rem;
+            font-size: .9rem
         }
 
         td, th {
             padding: 10px 5px;
             border-bottom: 1px solid var(--border);
-            text-align: left;
+            text-align: left
         }
 
         .team-cell {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 10px
         }
 
         .team-logo-small {
             width: 30px;
             height: 30px;
             object-fit: contain;
-            border-radius: 4px;
+            border-radius: 4px
         }
 
         .week-title {
@@ -288,7 +287,7 @@
             border-radius: 5px;
             margin-bottom: 15px;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: .9rem
         }
 
         #loader {
@@ -302,25 +301,69 @@
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            font-weight: bold;
+            font-weight: bold
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit,minmax(300px,1fr));
+            gap: 20px
+        }
+
+        .mini-card {
+            background: rgba(255,255,255,.03);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: .2s
+        }
+
+            .mini-card:hover {
+                transform: translateY(-1px);
+                border-color: #444
+            }
+
+        .muted {
+            color: var(--text-dim);
+            font-size: .9rem
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap
+        }
+
+        .pill {
+            padding: 3px 8px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            font-size: 12px;
+            color: var(--text-dim)
+        }
+
+        .linkbtn {
+            width: auto !important;
+            padding: 8px 12px !important;
+            font-size: 12px;
+            background: #2a2a2a !important;
+            border: 1px solid var(--border)
         }
     </style>
 </head>
-<body>
 
+<body>
     <div id="loader">Veriler Yükleniyor...</div>
 
     <header>
         <div class="container header-content">
             <div class="logo-box">
                 <img src="logo.png" alt="MBTL" class="main-logo" onerror="this.src='https://via.placeholder.com/45?text=MB'">
-                <h1 style="margin:0; font-size: 1rem; color: white;">MAMOBALL TURKEY LEAGUE</h1>
+                <h1 style="margin:0;font-size:1rem;color:white;">MB LEAGUE</h1>
             </div>
             <div class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
             <nav id="nav-menu">
@@ -329,22 +372,27 @@
                 <a onclick="handleNav('fixture')">Fikstür</a>
                 <a onclick="handleNav('stats')">Krallık</a>
                 <a onclick="handleNav('matches')">Sonuçlar</a>
+                <a onclick="handleNav('teams')">Takımlar</a>
+                <a onclick="handleNav('players')">Oyuncular</a>
                 <a onclick="handleNav('admin')">Admin</a>
             </nav>
         </div>
     </header>
 
     <div class="container">
+
+        <!-- Admin Auth -->
         <section id="admin-auth" class="admin-section" style="display:none;">
             <h2>Yönetici Girişi</h2>
             <input type="password" id="admin-pass" placeholder="Şifre">
             <button onclick="checkPassword()">Giriş Yap</button>
         </section>
 
+        <!-- Admin Panel (Sadece Haber Yönetimi) -->
         <section id="admin-panel" class="admin-section" style="display:none;">
-            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom:20px;">
-                <h2 style="margin:0; border:none;">Yönetim Paneli</h2>
-                <button onclick="logout()" style="width:auto; background:var(--danger);">Çıkış</button>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                <h2 style="margin:0;border:none;">Yönetim Paneli</h2>
+                <button onclick="logout()" style="width:auto;background:var(--danger);">Çıkış</button>
             </div>
 
             <div class="admin-grid">
@@ -352,63 +400,125 @@
                     <h3>Haber Yönetimi</h3>
                     <input type="text" id="news-title" placeholder="Başlık">
                     <input type="text" id="news-image" placeholder="Fotoğraf Linki (URL)">
-                    <textarea id="news-content" placeholder="İçerik..." rows="2"></textarea>
+                    <textarea id="news-content" placeholder="İçerik... (Enter veya <br> kullanabilirsin)" rows="3"></textarea>
                     <button onclick="publishNews()">Yayınla</button>
-                </div>
-
-                <div>
-                    <h3>Lig & Takım Yönetimi</h3>
-                    <input type="text" id="league-name-input" placeholder="Yeni Lig Adı">
-                    <button onclick="addLeague()" style="margin-bottom:10px;">Lig Ekle</button>
-                    <select id="team-league-select"><option value="">Lig Seçin</option></select>
-                    <input type="text" id="team-name" placeholder="Takım Adı">
-                    <input type="text" id="team-logo-input" placeholder="Logo Linki (URL)">
-                    <button onclick="addTeam()" style="margin-bottom:5px;">Takım Ekle</button>
-                    <button onclick="deleteLeague()" class="btn-danger">Ligi Sil</button>
-                </div>
-
-                <div>
-                    <h3>Fikstür Yönetimi</h3>
-                    <select id="fixture-league-select"><option value="">Lig Seçin</option></select>
-                    <button onclick="generateFixture()" style="background: #6a1b9a; margin-bottom:5px;">Fikstür Oluştur</button>
-                    <button onclick="deleteFixture()" class="btn-danger">Fikstürü Temizle</button>
-                </div>
-
-                <div>
-                    <h3>Krallık Girişi</h3>
-                    <select id="stats-league-select" onchange="updateStatsTeams()"><option value="">Lig Seçin</option></select>
-                    <select id="stats-team-select"><option value="">Takım Seçin</option></select>
-                    <input type="text" id="player-name" placeholder="Oyuncu Adı">
-                    <div style="display: flex; gap: 5px;">
-                        <input type="number" id="plus-goal" placeholder="Gol">
-                        <input type="number" id="plus-assist" placeholder="Asist">
-                        <input type="number" id="plus-cs" placeholder="CS">
-                    </div>
-                    <button onclick="updatePlayerStats()" style="background:var(--success);">Kaydet</button>
-                </div>
-
-                <div>
-                    <h3>Skor Girişi</h3>
-                    <select id="match-league-select" onchange="updateMatchTeams()"><option value="">Lig Seçin</option></select>
-                    <select id="match-week-select"><option value="">Hafta Seçin</option></select>
-                    <div style="display:flex; flex-direction: column; gap:5px;">
-                        <select id="team-1-select"><option value="">Ev Sahibi Seçin</option></select>
-                        <div style="display:flex; gap:5px;">
-                            <input type="number" id="score-1" placeholder="0">
-                            <input type="number" id="score-2" placeholder="0">
-                        </div>
-                        <select id="team-2-select"><option value="">Deplasman Seçin</option></select>
-                    </div>
-                    <button onclick="addMatch()" style="background:var(--success); margin-top:10px;">Onayla</button>
                 </div>
             </div>
         </section>
 
-        <section id="news-section"><h2>Haberler</h2><div id="news-container" class="news-grid"></div></section>
-        <section id="standings-section" style="display:none;"><h2>Puan Durumu</h2><div id="leagues-container"></div></section>
-        <section id="fixture-section" style="display:none;"><h2>Fikstür</h2><div id="fixture-display-container"></div></section>
-        <section id="stats-section" style="display:none;"><h2>İstatistikler</h2><div id="stats-display-container"></div></section>
-        <section id="matches-section" style="display:none;"><h2>Maç Sonuçları</h2><div id="matches-display-container"></div></section>
+        <!-- Haberler -->
+        <section id="news-section">
+            <h2>Haberler</h2>
+            <div id="news-container" class="news-grid"></div>
+        </section>
+
+        <!-- Puan Durumu -->
+        <section id="standings-section" style="display:none;">
+            <h2>Puan Durumu</h2>
+            <div id="leagues-container"></div>
+
+            <!-- Admin: Lig & Takım Yönetimi -->
+            <div id="admin-standings-tools" class="league-card" style="display:none;">
+                <h3>Lig & Takım Yönetimi</h3>
+                <input type="text" id="league-name-input" placeholder="Yeni Lig Adı (örn: World Cup [Sezon 1])">
+                <button onclick="addLeague()" style="margin-bottom:10px;">Lig Ekle</button>
+
+                <select id="team-league-select"><option value="">Lig Seçin</option></select>
+                <input type="text" id="team-name" placeholder="Takım Adı">
+                <input type="text" id="team-id-input" placeholder="Takım ID (Örn: #TUR123) - opsiyonel">
+                <input type="text" id="team-logo-input" placeholder="Logo Linki (URL)">
+                <button onclick="addTeam()" style="margin-bottom:5px;">Takım Ekle</button>
+                <button onclick="deleteLeague()" class="btn-danger">Ligi Sil</button>
+            </div>
+        </section>
+
+        <!-- Fikstür -->
+        <section id="fixture-section" style="display:none;">
+            <h2>Fikstür</h2>
+            <div id="fixture-display-container"></div>
+
+            <div id="admin-fixture-tools" class="league-card" style="display:none;">
+                <h3>Fikstür Yönetimi</h3>
+                <select id="fixture-league-select"><option value="">Lig Seçin</option></select>
+                <button onclick="generateFixture()" style="background:#6a1b9a;margin-bottom:5px;">Fikstür Oluştur</button>
+                <button onclick="deleteFixture()" class="btn-danger">Fikstürü Temizle</button>
+            </div>
+        </section>
+
+        <!-- İstatistikler -->
+        <section id="stats-section" style="display:none;">
+            <h2>İstatistikler</h2>
+            <div id="stats-display-container"></div>
+
+            <div id="admin-stats-tools" class="league-card" style="display:none;">
+                <h3>İstatistik Girişi</h3>
+                <select id="stats-league-select" onchange="updateStatsTeams()"><option value="">Lig Seçin</option></select>
+                <select id="stats-team-select"><option value="">Takım Seçin</option></select>
+
+                <input type="text" id="stats-player-id" placeholder="Oyuncu ID (Örn: #P9A2X7)">
+                <input type="text" id="stats-player-name" placeholder="Oyuncu Adı (opsiyonel / günceller)">
+                <div style="display:flex;gap:5px;">
+                    <input type="number" id="plus-goal" placeholder="Gol">
+                    <input type="number" id="plus-assist" placeholder="Asist">
+                    <input type="number" id="plus-cs" placeholder="CS">
+                </div>
+                <button onclick="updatePlayerStatsById()" style="background:var(--success);">Kaydet</button>
+                <div class="muted" style="margin-top:6px">Not: Aynı #ID farklı liglerde ayrı istatistik tutar.</div>
+            </div>
+        </section>
+
+        <!-- Maç Sonuçları -->
+        <section id="matches-section" style="display:none;">
+            <h2>Maç Sonuçları</h2>
+            <div id="matches-display-container"></div>
+
+            <div id="admin-matches-tools" class="league-card" style="display:none;">
+                <h3>Skor Girişi</h3>
+                <select id="match-league-select" onchange="updateMatchTeams()"><option value="">Lig Seçin</option></select>
+                <select id="match-week-select"><option value="">Hafta Seçin</option></select>
+                <div style="display:flex;flex-direction:column;gap:5px;">
+                    <select id="team-1-select"><option value="">Ev Sahibi Seçin</option></select>
+                    <div style="display:flex;gap:5px;">
+                        <input type="number" id="score-1" placeholder="0">
+                        <input type="number" id="score-2" placeholder="0">
+                    </div>
+                    <select id="team-2-select"><option value="">Deplasman Seçin</option></select>
+                </div>
+                <button onclick="addMatch()" style="background:var(--success);margin-top:10px;">Onayla</button>
+            </div>
+        </section>
+
+        <!-- Takımlar -->
+        <section id="teams-section" style="display:none;">
+            <h2>Takımlar</h2>
+            <input id="team-search" placeholder="Takım ara (isim / #ID)..." oninput="renderTeamsList()">
+            <div id="teams-list"></div>
+            <div id="teams-detail" class="league-card" style="display:none;"></div>
+        </section>
+
+        <!-- Oyuncular -->
+        <section id="players-section" style="display:none;">
+            <h2>Oyuncular</h2>
+
+            <div id="admin-players-tools" class="league-card" style="display:none;">
+                <h3>Oyuncu Yönetimi (ID)</h3>
+
+                <select id="player-create-league"><option value="">Lig Seçin</option></select>
+                <input type="text" id="player-id-input" placeholder="Oyuncu ID (Örn: #P9A2X7)">
+                <input type="text" id="player-name-input" placeholder="Oyuncu Adı">
+                <button onclick="createOrOverwritePlayer()" style="margin-bottom:10px;">Oyuncu Oluştur / Üzerine Yaz</button>
+
+                <select id="player-assign-league" onchange="updateAssignTeams()"><option value="">Lig Seçin</option></select>
+                <select id="player-assign-team"><option value="">Takım Seçin</option></select>
+                <input type="text" id="player-assign-id" placeholder="Oyuncu ID ile ekle (Örn: #P9A2X7)">
+                <button onclick="assignPlayerToTeam()" style="background:var(--success);">Takıma Ekle</button>
+            </div>
+
+            <input id="player-search" placeholder="Oyuncu ara (isim / #ID)..." oninput="renderPlayersList()">
+            <div id="players-list"></div>
+            <div id="players-detail" class="league-card" style="display:none;"></div>
+        </section>
+
     </div>
 
     <script>
@@ -425,23 +535,43 @@
         const db = firebase.database();
 
         const ADMIN_PASSWORD = "cagan6161.";
-        let newsData = [], leagues = {}, matches = [], players = [], fixtures = {}, isAdmin = false;
+        let newsData = [], leagues = {}, leaguesMeta = {}, matches = [], players = [], fixtures = {}, isAdmin = false;
 
-        db.ref('/').on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                newsData = data.news || [];
-                leagues = data.leagues || {};
-                matches = data.matches || [];
-                players = data.players || [];
-                fixtures = data.fixtures || {};
-            }
-            renderAll();
-            updateLeagueSelects();
-            document.getElementById('loader').style.display = 'none';
-        });
+        // ---------- Helpers ----------
+        function normalizeHashId(input) {
+            if (!input) return null;
+            let v = String(input).trim();
+            if (!v.startsWith('#')) v = '#' + v;
+            return v;
+        }
+        function isValidHashId(input) {
+            const v = normalizeHashId(input);
+            return !!v && /^#[A-Za-z0-9]+$/.test(v);
+        }
+        function makeId(prefix) {
+            const rand = Math.random().toString(36).slice(2, 8).toUpperCase();
+            return '#' + prefix + Date.now().toString(36).toUpperCase().slice(-4) + rand;
+        }
+        function esc(s) {
+            return String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+        }
 
-        function save() { db.ref('/').set({ news: newsData, leagues: leagues, matches: matches, players: players, fixtures: fixtures }); }
+        // ✅ Firebase key safe (lig key'i)
+        function makeSafeKey(s) {
+            return String(s || "")
+                .trim()
+                .replace(/[.#$\/\[\]]/g, " ")
+                .replace(/\s+/g, " ")
+                .trim();
+        }
+
+        // Haberlerde <br> ve Enter çalışsın (diğer her şey escape)
+        function renderNewsContent(content) {
+            let safe = esc(content || '');
+            safe = safe.replace(/&lt;br\s*\/?&gt;/gi, '<br>');
+            safe = safe.replace(/\n/g, '<br>');
+            return safe;
+        }
 
         function toggleMenu() {
             document.querySelector('.hamburger').classList.toggle('active');
@@ -451,181 +581,264 @@
         function handleNav(tab) {
             document.querySelector('.hamburger').classList.remove('active');
             document.getElementById('nav-menu').classList.remove('active');
-            ['news', 'standings', 'fixture', 'stats', 'matches', 'admin'].forEach(t => {
+
+            ['news', 'standings', 'fixture', 'stats', 'matches', 'admin', 'teams', 'players'].forEach(t => {
                 const sec = document.getElementById(t + '-section');
                 if (sec) sec.style.display = 'none';
             });
+
             document.getElementById('admin-auth').style.display = 'none';
             document.getElementById('admin-panel').style.display = 'none';
-            if (tab === 'admin') isAdmin ? document.getElementById('admin-panel').style.display = 'block' : document.getElementById('admin-auth').style.display = 'block';
-            else document.getElementById(tab + '-section').style.display = 'block';
+
+            if (tab === 'admin') {
+                isAdmin ? (document.getElementById('admin-panel').style.display = 'block')
+                    : (document.getElementById('admin-auth').style.display = 'block');
+            } else {
+                document.getElementById(tab + '-section').style.display = 'block';
+            }
         }
 
-        function checkPassword() { if (document.getElementById('admin-pass').value === ADMIN_PASSWORD) { isAdmin = true; handleNav('admin'); renderAll(); } else alert("Hatalı!"); }
+        function checkPassword() {
+            if (document.getElementById('admin-pass').value === ADMIN_PASSWORD) {
+                isAdmin = true;
+                refreshAdminVisibility();
+                handleNav('admin');
+                renderAll();
+            } else alert("Hatalı!");
+        }
         function logout() { isAdmin = false; location.reload(); }
 
+        function refreshAdminVisibility() {
+            const show = isAdmin ? 'block' : 'none';
+            document.getElementById('admin-standings-tools').style.display = show;
+            document.getElementById('admin-fixture-tools').style.display = show;
+            document.getElementById('admin-stats-tools').style.display = show;
+            document.getElementById('admin-matches-tools').style.display = show;
+            document.getElementById('admin-players-tools').style.display = show;
+        }
+
+        // ---------- Standings recalculation from matches ----------
+        function recalcStandingsFromMatches() {
+            Object.keys(leagues).forEach(l => {
+                if (!Array.isArray(leagues[l])) return;
+                leagues[l].forEach(t => {
+                    if (t && t.id !== "dummy") {
+                        t.puan = 0; t.averaj = 0;
+                        if (!t.teamId || !isValidHashId(t.teamId)) t.teamId = makeId('T');
+                        if (!Array.isArray(t.roster)) t.roster = [];
+                    }
+                });
+            });
+
+            matches.forEach(m => {
+                const l = m.league;
+                const lData = leagues[l];
+                if (!lData) return;
+
+                const s1 = parseInt(m.s1), s2 = parseInt(m.s2);
+                if (Number.isNaN(s1) || Number.isNaN(s2)) return;
+
+                const t1 = lData.find(x => x.id !== "dummy" && ((m.t1Id && x.id === m.t1Id) || x.name === m.t1Name));
+                const t2 = lData.find(x => x.id !== "dummy" && ((m.t2Id && x.id === m.t2Id) || x.name === m.t2Name));
+                if (!t1 || !t2) return;
+
+                t1.averaj += (s1 - s2);
+                t2.averaj += (s2 - s1);
+
+                if (s1 > s2) t1.puan += 3;
+                else if (s2 > s1) t2.puan += 3;
+                else { t1.puan += 1; t2.puan += 1; }
+            });
+        }
+
+        async function save() {
+            recalcStandingsFromMatches();
+            try {
+                await db.ref('/').set({
+                    news: newsData,
+                    leagues: leagues,
+                    leaguesMeta: leaguesMeta,
+                    matches: matches,
+                    players: players,
+                    fixtures: fixtures
+                });
+                renderAll();
+                updateLeagueSelects();
+                renderTeamsList();
+                renderPlayersList();
+            } catch (e) {
+                console.error("Firebase write error:", e);
+                alert("Kaydedilemedi! Firebase hatası: " + (e?.message || e));
+            }
+        }
+
+        // ---------- Firebase load ----------
+        db.ref('/').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                newsData = data.news || [];
+                leagues = data.leagues || {};
+                leaguesMeta = data.leaguesMeta || {};
+                matches = data.matches || [];
+                players = data.players || [];
+                fixtures = data.fixtures || {};
+            }
+
+            // ✅ FIX: Object gelen ligleri array'e çevir (eski veri uyumu)
+            Object.keys(leagues).forEach(k => {
+                if (Array.isArray(leagues[k])) return;
+                if (leagues[k] && typeof leagues[k] === "object") {
+                    const arr = Object.values(leagues[k]).filter(v => v && typeof v === "object" && !Array.isArray(v));
+                    leagues[k] = arr;
+                }
+            });
+
+            // meta yoksa key'i göster
+            Object.keys(leagues).forEach(k => {
+                if (!leaguesMeta[k]) leaguesMeta[k] = k;
+            });
+
+            // migration normalize: players
+            players.forEach(p => {
+                if (!p.playerId || !isValidHashId(p.playerId)) p.playerId = makeId('P');
+                else p.playerId = normalizeHashId(p.playerId);
+                if (!p.name) p.name = "Oyuncu";
+                if (!p.team) p.team = "";
+                if (!p.league) p.league = "";
+                if (p.goals == null) p.goals = 0;
+                if (p.assists == null) p.assists = 0;
+                if (p.cs == null) p.cs = 0;
+            });
+
+            // migration normalize: teams
+            Object.keys(leagues).forEach(l => {
+                if (!Array.isArray(leagues[l])) return;
+                leagues[l].forEach(t => {
+                    if (t && t.id !== "dummy") {
+                        if (!t.teamId || !isValidHashId(t.teamId)) t.teamId = makeId('T');
+                        else t.teamId = normalizeHashId(t.teamId);
+                        if (!Array.isArray(t.roster)) t.roster = [];
+                    }
+                });
+            });
+
+            recalcStandingsFromMatches();
+
+            renderAll();
+            updateLeagueSelects();
+            renderTeamsList();
+            renderPlayersList();
+            refreshAdminVisibility();
+
+            document.getElementById('loader').style.display = 'none';
+        });
+
+        // ---------- News ----------
+        function publishNews() {
+            const t = document.getElementById('news-title').value;
+            const c = document.getElementById('news-content').value;
+            const img = document.getElementById('news-image').value;
+            if (t && c) {
+                newsData.push({ id: Date.now(), title: t, content: c, image: img, date: new Date().toLocaleDateString('tr-TR') });
+                save();
+            }
+        }
+        function deleteNews(id) {
+            if (confirm("Silinsin mi?")) {
+                newsData = newsData.filter(n => n.id !== id);
+                save();
+            }
+        }
+        function renderNews() {
+            document.getElementById('news-container').innerHTML = newsData.slice().reverse().map(n => `
+            <div class="news-card">
+              ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteNews(${n.id})" style="float:right">Sil</button>` : ''}
+              <h3>${esc(n.title)}</h3>
+              ${n.image ? `<img src="${esc(n.image)}" class="news-img" onerror="this.style.display='none'">` : ''}
+              <p>${renderNewsContent(n.content)}</p>
+              <small>${esc(n.date)}</small>
+            </div>
+          `).join('');
+        }
+
+        // ---------- League / Team ----------
         function addLeague() {
-            const name = document.getElementById('league-name-input').value.trim();
-            if (name && !leagues[name]) { leagues[name] = [{ id: "dummy", name: "Takım Ekleyin", logo: "", puan: 0, averaj: 0 }]; save(); }
+            const inp = document.getElementById('league-name-input');
+            const displayName = (inp?.value || "").trim();
+            if (!displayName) return alert("Lig adı boş olamaz!");
+
+            const key = makeSafeKey(displayName);
+            if (!key) return alert("Lig adı geçersiz!");
+
+            if (leagues[key] && !Array.isArray(leagues[key])) {
+                if (leagues[key] && typeof leagues[key] === "object") {
+                    const arr = Object.values(leagues[key]).filter(v => v && typeof v === "object" && !Array.isArray(v));
+                    leagues[key] = arr;
+                }
+            }
+
+            if (leagues[key]) return alert("Bu lig zaten var!");
+
+            leagues[key] = [{
+                id: "dummy", name: "Takım Ekleyin", logo: "", puan: 0, averaj: 0, teamId: "#DUMMY", roster: []
+            }];
+            leaguesMeta[key] = displayName;
+
+            inp.value = "";
+            save();
         }
 
         function addTeam() {
             const l = document.getElementById('team-league-select').value;
             const n = document.getElementById('team-name').value.trim();
+            const rawTeamId = document.getElementById('team-id-input').value.trim();
+            const teamId = rawTeamId ? normalizeHashId(rawTeamId) : makeId('T');
             const logo = document.getElementById('team-logo-input').value.trim();
+
             if (!l || !n) return;
+            if (rawTeamId && !isValidHashId(rawTeamId)) return alert("Takım ID geçersiz! (# ile başlayacak, sadece harf/rakam).");
+
+            const allTeams = Object.values(leagues).flat().filter(x => x && x.id && x.id !== "dummy");
+            if (allTeams.some(t => t.teamId === teamId)) return alert("Bu takım ID zaten kullanılıyor!");
+
             leagues[l] = leagues[l].filter(x => x.id !== "dummy");
-            leagues[l].push({ id: "T" + Date.now(), name: n, logo: logo || 'https://via.placeholder.com/30?text=?', puan: 0, averaj: 0 });
+            leagues[l].push({ id: "T" + Date.now(), teamId, name: n, logo: logo || 'https://via.placeholder.com/30?text=?', puan: 0, averaj: 0, roster: [] });
             save(); alert("Takım Eklendi!");
         }
 
         function deleteLeague() {
             const l = document.getElementById('team-league-select').value;
-            if (l && confirm(`${l} silinsin mi?`)) { delete leagues[l]; if (fixtures[l]) delete fixtures[l]; save(); }
+            const dn = leaguesMeta[l] || l;
+            if (l && confirm(`${dn} silinsin mi?`)) {
+                delete leagues[l];
+                delete leaguesMeta[l];
+                if (fixtures[l]) delete fixtures[l];
+                save();
+            }
         }
 
         function renderStandings() {
             const container = document.getElementById('leagues-container'); container.innerHTML = "";
             Object.keys(leagues).forEach(l => {
+                if (!Array.isArray(leagues[l])) return;
+
+                const displayName = leaguesMeta[l] || l;
                 let teams = leagues[l].filter(t => t.id !== "dummy").sort((a, b) => b.puan - a.puan || b.averaj - a.averaj);
-                let html = `<div class="league-card"><h3>${l}</h3><table><tr><th>#</th><th>Takım</th><th>AV</th><th>P</th></tr>`;
+
+                let html = `<div class="league-card"><h3>${esc(displayName)}</h3><table><tr><th>#</th><th>Takım</th><th>AV</th><th>P</th></tr>`;
                 teams.forEach((t, i) => {
-                    html += `<tr><td>${i + 1}</td><td class="team-cell"><img src="${t.logo}" class="team-logo-small"> ${t.name}</td><td>${t.averaj}</td><td><b>${t.puan}</b></td></tr>`;
+                    html += `<tr>
+                <td>${i + 1}</td>
+                <td class="team-cell"><img src="${esc(t.logo)}" class="team-logo-small"> ${esc(t.name)} <span class="pill">${esc(t.teamId)}</span></td>
+                <td>${t.averaj}</td>
+                <td><b>${t.puan}</b></td>
+              </tr>`;
                 });
                 container.innerHTML += html + `</table></div>`;
             });
         }
 
-        /* SONUÇLAR KANALI - LOGOLAR KÖŞEDE, TİRELER ALT ALTA */
-        function renderMatches() {
-            const container = document.getElementById('matches-display-container'); container.innerHTML = "";
-            const grouped = matches.reduce((acc, m) => { (acc[m.week] = acc[m.week] || []).push(m); return acc; }, {});
-            Object.keys(grouped).sort((a, b) => b - a).forEach(w => {
-                let html = `<div class="week-container"><div class="week-title">${w}. Hafta</div>`;
-                grouped[w].slice().reverse().forEach(m => {
-                    const lData = leagues[m.league] || [];
-                    const t1 = lData.find(x => x.name === m.t1Name) || {};
-                    const t2 = lData.find(x => x.name === m.t2Name) || {};
-
-                    html += `<div class="match-row">
-                                    <div style="display:flex; justify-content:center;">
-                                        ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteMatch(${m.id})">X</button>` : ''}
-                                    </div>
-                                    <div class="team-home">
-                                        <img src="${t1.logo}" class="team-logo-small">
-                                        <span>${m.t1Name}</span>
-                                    </div>
-                                    <div class="score-container">
-                                        <div class="score-box">${m.s1}</div>
-                                        <span>-</span>
-                                        <div class="score-box">${m.s2}</div>
-                                    </div>
-                                    <div class="team-away">
-                                        <span>${m.t2Name}</span>
-                                        <img src="${t2.logo}" class="team-logo-small">
-                                    </div>
-                                    <div></div>
-                                </div>`;
-                });
-                container.innerHTML += html + `</div>`;
-            });
-        }
-
-        /* FİKSTÜR KANALI - TİRELER ALT ALTA */
-        function renderFixture() {
-            const container = document.getElementById('fixture-display-container'); container.innerHTML = "";
-            Object.keys(fixtures).forEach(l => {
-                let html = `<div class="league-card"><h3>${l} Fikstürü</h3>`;
-                fixtures[l].forEach((round, i) => {
-                    html += `<div class="week-title" style="margin-top:10px">${i + 1}. Hafta</div>`;
-                    round.forEach(m => {
-                        const lData = leagues[l] || [];
-                        const t1 = lData.find(x => x.name === m.home) || {};
-                        const t2 = lData.find(x => x.name === m.away) || {};
-                        html += `<div class="fixture-item">
-                                        <div></div>
-                                        <div class="team-home">
-                                            <img src="${t1.logo}" class="team-logo-small">
-                                            <span>${m.home}</span>
-                                        </div>
-                                        <div class="tire-container">-</div>
-                                        <div class="team-away">
-                                            <span>${m.away}</span>
-                                            <img src="${t2.logo}" class="team-logo-small">
-                                        </div>
-                                        <div></div>
-                                    </div>`;
-                    });
-                });
-                container.innerHTML += html + `</div>`;
-            });
-        }
-
-        function renderStats() {
-            const container = document.getElementById('stats-display-container'); container.innerHTML = "";
-            Object.keys(leagues).forEach(l => {
-                const lp = players.filter(p => p.league === l);
-                if (lp.length === 0) return;
-
-                let html = `<h2>${l} - İstatistikler</h2><div class="stats-grid">`;
-
-                const goals = [...lp].filter(p => (p.goals || 0) > 0).sort((a, b) => b.goals - a.goals).slice(0, 5);
-                html += `<div class="stats-card"><h3>Gol Krallığı</h3><table>`;
-                goals.forEach(p => {
-                    const t = leagues[l].find(x => x.name === p.team) || {};
-                    html += `<tr><td class="team-cell"><img src="${t.logo}" class="team-logo-small"> ${p.name}</td><td style="text-align:right"><b>${p.goals}</b></td></tr>`;
-                });
-                html += `</table></div>`;
-
-                const assists = [...lp].filter(p => (p.assists || 0) > 0).sort((a, b) => b.assists - a.assists).slice(0, 5);
-                html += `<div class="stats-card"><h3>Asist Krallığı</h3><table>`;
-                assists.forEach(p => {
-                    const t = leagues[l].find(x => x.name === p.team) || {};
-                    html += `<tr><td class="team-cell"><img src="${t.logo}" class="team-logo-small"> ${p.name}</td><td style="text-align:right"><b>${p.assists}</b></td></tr>`;
-                });
-                html += `</table></div>`;
-
-                const cs = [...lp].filter(p => (p.cs || 0) > 0).sort((a, b) => b.cs - a.cs).slice(0, 5);
-                html += `<div class="stats-card"><h3>Cs Krallığı</h3><table>`;
-                cs.forEach(p => {
-                    const t = leagues[l].find(x => x.name === p.team) || {};
-                    html += `<tr><td class="team-cell"><img src="${t.logo}" class="team-logo-small"> ${p.name}</td><td style="text-align:right"><b>${p.cs}</b></td></tr>`;
-                });
-                html += `</table></div>`;
-
-                html += `</div>`;
-                if (isAdmin) html += `<button class="btn-danger btn-small" onclick="clearStats('${l}')" style="margin-top:10px">İstatistikleri Sıfırla</button>`;
-
-                container.innerHTML += html;
-            });
-        }
-
-        function updatePlayerStats() {
-            const l = document.getElementById('stats-league-select').value;
-            const t = document.getElementById('stats-team-select').value;
-            const n = document.getElementById('player-name').value.trim();
-            const g = parseInt(document.getElementById('plus-goal').value) || 0;
-            const a = parseInt(document.getElementById('plus-assist').value) || 0;
-            const cs = parseInt(document.getElementById('plus-cs').value) || 0;
-            if (!l || !n) return;
-            let p = players.find(x => x.name.toLowerCase() === n.toLowerCase() && x.league === l);
-            if (p) {
-                p.goals = (p.goals || 0) + g;
-                p.assists = (p.assists || 0) + a;
-                p.cs = (p.cs || 0) + cs;
-            } else {
-                players.push({ id: Date.now(), name: n, team: t, league: l, goals: g, assists: a, cs: cs });
-            }
-            save(); alert("Başarıyla Kaydedildi!");
-        }
-
-        function clearStats(league) {
-            if (confirm(league + " ligine ait tüm istatistikler silinsin mi?")) {
-                players = players.filter(p => p.league !== league);
-                save();
-            }
-        }
-
+        // ---------- Fixture ----------
         function generateFixture() {
             const l = document.getElementById('fixture-league-select').value;
             if (!l) return alert("Lig seçin!");
@@ -645,73 +858,531 @@
             fixtures[l] = [...rounds, ...rounds.map(rd => rd.map(m => ({ home: m.away, away: m.home })))];
             save(); alert("Fikstür Hazır!");
         }
-
-        function deleteFixture() { const l = document.getElementById('fixture-league-select').value; if (l && confirm("Silinsin mi?")) { delete fixtures[l]; save(); } }
-
-        function publishNews() {
-            const t = document.getElementById('news-title').value, c = document.getElementById('news-content').value, img = document.getElementById('news-image').value;
-            if (t && c) { newsData.push({ id: Date.now(), title: t, content: c, image: img, date: new Date().toLocaleDateString('tr-TR') }); save(); }
+        function deleteFixture() {
+            const l = document.getElementById('fixture-league-select').value;
+            if (l && confirm("Silinsin mi?")) { delete fixtures[l]; save(); }
         }
-
-        function addMatch() {
-            const l = document.getElementById('match-league-select').value, w = document.getElementById('match-week-select').value, t1Id = document.getElementById('team-1-select').value, t2Id = document.getElementById('team-2-select').value, s1 = parseInt(document.getElementById('score-1').value), s2 = parseInt(document.getElementById('score-2').value);
-            if (!l || !t1Id || !t2Id) return;
-            const t1 = leagues[l].find(x => x.id === t1Id), t2 = leagues[l].find(x => x.id === t2Id);
-            t1.averaj += (s1 - s2); t2.averaj += (s2 - s1);
-            if (s1 > s2) t1.puan += 3; else if (s2 > s1) t2.puan += 3; else { t1.puan += 1; t2.puan += 1; }
-            matches.push({ id: Date.now(), league: l, week: w, t1Name: t1.name, t2Name: t2.name, s1, s2 });
-            save(); alert("Skor Kaydedildi!");
-        }
-
-        function renderNews() {
-            document.getElementById('news-container').innerHTML = newsData.slice().reverse().map(n => `
-                            <div class="news-card">
-                                ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteNews(${n.id})" style="float:right">Sil</button>` : ''}
-                                <h3>${n.title}</h3>
-                                ${n.image ? `<img src="${n.image}" class="news-img" onerror="this.style.display='none'">` : ''}
-                                <p>${n.content}</p>
-                                <small>${n.date}</small>
-                            </div>`).join('');
-        }
-
-        function deleteNews(id) { if (confirm("Silinsin mi?")) { newsData = newsData.filter(n => n.id !== id); save(); } }
-        function deleteMatch(id) { if (confirm("Silinsin mi?")) { matches = matches.filter(m => m.id !== id); save(); } }
-
-        function renderAll() { renderNews(); renderStandings(); renderMatches(); renderStats(); renderFixture(); }
-
-        function updateLeagueSelects() {
-            ['team-league-select', 'match-league-select', 'stats-league-select', 'fixture-league-select'].forEach(id => {
-                const s = document.getElementById(id); if (s) { const val = s.value; s.innerHTML = '<option value="">Lig Seçin</option>' + Object.keys(leagues).map(l => `<option value="${l}">${l}</option>`).join(''); s.value = val; }
+        function renderFixture() {
+            const container = document.getElementById('fixture-display-container'); container.innerHTML = "";
+            Object.keys(fixtures).forEach(l => {
+                let html = `<div class="league-card"><h3>${esc((leaguesMeta[l] || l))} Fikstürü</h3>`;
+                fixtures[l].forEach((round, i) => {
+                    html += `<div class="week-title" style="margin-top:10px">${i + 1}. Hafta</div>`;
+                    round.forEach(m => {
+                        const lData = leagues[l] || [];
+                        const t1 = lData.find(x => x.name === m.home) || {};
+                        const t2 = lData.find(x => x.name === m.away) || {};
+                        html += `<div class="fixture-item">
+                  <div></div>
+                  <div class="team-home"><img src="${esc(t1.logo || '')}" class="team-logo-small"><span>${esc(m.home)}</span></div>
+                  <div class="tire-container">-</div>
+                  <div class="team-away"><span>${esc(m.away)}</span><img src="${esc(t2.logo || '')}" class="team-logo-small"></div>
+                  <div></div>
+                </div>`;
+                    });
+                });
+                container.innerHTML += html + `</div>`;
             });
         }
 
+        // ---------- Matches ----------
+        function addMatch() {
+            const l = document.getElementById('match-league-select').value;
+            const w = document.getElementById('match-week-select').value;
+            const t1Id = document.getElementById('team-1-select').value;
+            const t2Id = document.getElementById('team-2-select').value;
+            const s1 = parseInt(document.getElementById('score-1').value);
+            const s2 = parseInt(document.getElementById('score-2').value);
+            if (!l || !t1Id || !t2Id) return;
+            if (Number.isNaN(s1) || Number.isNaN(s2)) return alert("Skor girin!");
+            const t1 = leagues[l].find(x => x.id === t1Id), t2 = leagues[l].find(x => x.id === t2Id);
+            matches.push({ id: Date.now(), league: l, week: w, t1Id: t1.id, t2Id: t2.id, t1Name: t1.name, t2Name: t2.name, s1, s2 });
+            save(); alert("Skor Kaydedildi!");
+        }
+        function deleteMatch(id) {
+            if (confirm("Silinsin mi?")) {
+                matches = matches.filter(m => m.id !== id);
+                save();
+            }
+        }
+        function renderMatches() {
+            const container = document.getElementById('matches-display-container'); container.innerHTML = "";
+            const grouped = matches.reduce((acc, m) => { (acc[m.week] = acc[m.week] || []).push(m); return acc; }, {});
+            Object.keys(grouped).sort((a, b) => b - a).forEach(w => {
+                let html = `<div class="week-container"><div class="week-title">${w}. Hafta</div>`;
+                grouped[w].slice().reverse().forEach(m => {
+                    const lData = leagues[m.league] || [];
+                    const t1 = lData.find(x => x.id !== "dummy" && ((m.t1Id && x.id === m.t1Id) || x.name === m.t1Name)) || {};
+                    const t2 = lData.find(x => x.id !== "dummy" && ((m.t2Id && x.id === m.t2Id) || x.name === m.t2Name)) || {};
+                    html += `<div class="match-row">
+                <div style="display:flex;justify-content:center;">
+                  ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteMatch(${m.id})">X</button>` : ''}
+                </div>
+                <div class="team-home"><img src="${esc(t1.logo || '')}" class="team-logo-small"><span>${esc(m.t1Name)}</span></div>
+                <div class="score-container"><div class="score-box">${esc(m.s1)}</div><span>-</span><div class="score-box">${esc(m.s2)}</div></div>
+                <div class="team-away"><span>${esc(m.t2Name)}</span><img src="${esc(t2.logo || '')}" class="team-logo-small"></div>
+                <div></div>
+              </div>`;
+                });
+                container.innerHTML += html + `</div>`;
+            });
+        }
+
+        // ---------- Select updates ----------
+        function updateLeagueSelects() {
+            const leagueKeys = Object.keys(leagues).filter(k => Array.isArray(leagues[k]));
+            ['team-league-select', 'match-league-select', 'stats-league-select', 'fixture-league-select', 'player-create-league', 'player-assign-league'].forEach(id => {
+                const s = document.getElementById(id);
+                if (s) {
+                    const val = s.value;
+                    s.innerHTML = '<option value="">Lig Seçin</option>' + leagueKeys.map(l => {
+                        const dn = leaguesMeta[l] || l;
+                        return `<option value="${esc(l)}">${esc(dn)}</option>`;
+                    }).join('');
+                    s.value = val;
+                }
+            });
+        }
         function updateMatchTeams() {
             const l = document.getElementById('match-league-select').value;
             const s1 = document.getElementById('team-1-select');
             const s2 = document.getElementById('team-2-select');
-
             s1.innerHTML = '<option value="">Ev Sahibi Seçin</option>';
             s2.innerHTML = '<option value="">Deplasman Seçin</option>';
-
             if (leagues[l]) {
                 leagues[l].forEach(t => {
                     if (t.id !== "dummy") {
-                        const option = `<option value="${t.id}">${t.name}</option>`;
-                        s1.innerHTML += option;
-                        s2.innerHTML += option;
+                        const opt = `<option value="${esc(t.id)}">${esc(t.name)}</option>`;
+                        s1.innerHTML += opt;
+                        s2.innerHTML += opt;
                     }
                 });
             }
         }
-
         function updateStatsTeams() {
-            const l = document.getElementById('stats-league-select').value, s = document.getElementById('stats-team-select');
+            const l = document.getElementById('stats-league-select').value;
+            const s = document.getElementById('stats-team-select');
             s.innerHTML = '<option value="">Takım Seçin</option>';
-            if (leagues[l]) leagues[l].forEach(t => { if (t.id !== "dummy") s.innerHTML += `<option value="${t.name}">${t.name}</option>`; });
+            if (leagues[l]) leagues[l].forEach(t => { if (t.id !== "dummy") s.innerHTML += `<option value="${esc(t.name)}">${esc(t.name)}</option>`; });
+        }
+        function updateAssignTeams() {
+            const l = document.getElementById('player-assign-league').value;
+            const s = document.getElementById('player-assign-team');
+            s.innerHTML = '<option value="">Takım Seçin</option>';
+            if (leagues[l]) leagues[l].forEach(t => { if (t.id !== "dummy") s.innerHTML += `<option value="${esc(t.id)}">${esc(t.name)}</option>`; });
         }
 
-        (function init() { const s = document.getElementById('match-week-select'); for (let i = 1; i <= 30; i++) s.innerHTML += `<option value="${i}">${i}</option>`; })();
+        // ---------- Players / Stats helpers ----------
+        function getAllRecordsByPlayerId(pid) {
+            pid = normalizeHashId(pid);
+            return (players || []).filter(p => normalizeHashId(p.playerId) === pid);
+        }
+        function getRecordByIdAndLeague(pid, league) {
+            pid = normalizeHashId(pid);
+            return (players || []).find(p => normalizeHashId(p.playerId) === pid && p.league === league) || null;
+        }
+
+        function createOrOverwritePlayer() {
+            const l = document.getElementById('player-create-league').value;
+            const rawId = document.getElementById('player-id-input').value.trim();
+            const name = document.getElementById('player-name-input').value.trim();
+            if (!l) return alert("Lig seçin!");
+            if (!rawId || !isValidHashId(rawId)) return alert("Oyuncu ID geçersiz! (# ile başlayacak, sadece harf/rakam).");
+            if (!name) return alert("Oyuncu adı girin!");
+
+            const pid = normalizeHashId(rawId);
+            const existing = getAllRecordsByPlayerId(pid);
+
+            if (existing.length) {
+                existing.forEach(r => { r.name = name; });
+                if (!existing.some(r => r.league === l)) {
+                    players.push({ id: Date.now(), playerId: pid, name, league: l, team: "", goals: 0, assists: 0, cs: 0 });
+                }
+                save();
+                alert("Oyuncu güncellendi (üzerine yazıldı)!");
+            } else {
+                players.push({ id: Date.now(), playerId: pid, name, league: l, team: "", goals: 0, assists: 0, cs: 0 });
+                save();
+                alert("Oyuncu oluşturuldu!");
+            }
+
+            document.getElementById('player-id-input').value = "";
+            document.getElementById('player-name-input').value = "";
+            renderPlayersList();
+        }
+
+        function assignPlayerToTeam() {
+            const l = document.getElementById('player-assign-league').value;
+            const teamId = document.getElementById('player-assign-team').value;
+            const rawPid = document.getElementById('player-assign-id').value.trim();
+            if (!l || !teamId) return alert("Lig ve takım seçin!");
+            if (!rawPid || !isValidHashId(rawPid)) return alert("Oyuncu ID geçersiz!");
+            const pid = normalizeHashId(rawPid);
+
+            const team = (leagues[l] || []).find(t => t.id === teamId);
+            if (!team) return alert("Takım bulunamadı!");
+
+            let rec = getRecordByIdAndLeague(pid, l);
+            if (!rec) {
+                const any = getAllRecordsByPlayerId(pid)[0];
+                const nm = any ? any.name : "Oyuncu";
+                rec = { id: Date.now(), playerId: pid, name: nm, league: l, team: "", goals: 0, assists: 0, cs: 0 };
+                players.push(rec);
+            }
+
+            if (rec.team) {
+                const oldTeam = (leagues[l] || []).find(t => t.id !== "dummy" && t.name === rec.team);
+                if (oldTeam && Array.isArray(oldTeam.roster)) {
+                    oldTeam.roster = oldTeam.roster.filter(x => normalizeHashId(x) !== pid);
+                }
+            }
+
+            rec.team = team.name;
+            if (!Array.isArray(team.roster)) team.roster = [];
+            if (!team.roster.some(x => normalizeHashId(x) === pid)) team.roster.push(pid);
+
+            save();
+            alert("Oyuncu takıma eklendi!");
+            document.getElementById('player-assign-id').value = "";
+            renderPlayersList();
+            renderTeamsList();
+        }
+
+        function updatePlayerStatsById() {
+            const l = document.getElementById('stats-league-select').value;
+            const teamName = document.getElementById('stats-team-select').value;
+            const rawPid = document.getElementById('stats-player-id').value.trim();
+            const maybeName = document.getElementById('stats-player-name').value.trim();
+            const g = parseInt(document.getElementById('plus-goal').value) || 0;
+            const a = parseInt(document.getElementById('plus-assist').value) || 0;
+            const cs = parseInt(document.getElementById('plus-cs').value) || 0;
+
+            if (!l) return alert("Lig seçin!");
+            if (!rawPid || !isValidHashId(rawPid)) return alert("Oyuncu ID geçersiz!");
+            const pid = normalizeHashId(rawPid);
+
+            if (maybeName) {
+                getAllRecordsByPlayerId(pid).forEach(r => { r.name = maybeName; });
+            }
+
+            let rec = getRecordByIdAndLeague(pid, l);
+            if (!rec) {
+                const any = getAllRecordsByPlayerId(pid)[0];
+                const nm = maybeName || (any ? any.name : "Oyuncu");
+                rec = { id: Date.now(), playerId: pid, name: nm, league: l, team: teamName || "", goals: 0, assists: 0, cs: 0 };
+                players.push(rec);
+            }
+
+            rec.goals = (rec.goals || 0) + g;
+            rec.assists = (rec.assists || 0) + a;
+            rec.cs = (rec.cs || 0) + cs;
+            if (teamName) rec.team = teamName;
+
+            save();
+            alert("İstatistik kaydedildi!");
+
+            document.getElementById('plus-goal').value = "";
+            document.getElementById('plus-assist').value = "";
+            document.getElementById('plus-cs').value = "";
+            renderPlayersList();
+            renderStats();
+        }
+
+        function uniquePlayersIndex() {
+            const map = new Map();
+            (players || []).forEach(p => {
+                const pid = normalizeHashId(p.playerId);
+                if (!map.has(pid)) {
+                    map.set(pid, { playerId: pid, name: p.name || "Oyuncu" });
+                } else {
+                    if (p.name) map.get(pid).name = p.name;
+                }
+            });
+            return Array.from(map.values());
+        }
+
+        function renderPlayersList() {
+            const wrap = document.getElementById('players-list');
+            if (!wrap) return;
+            const q = (document.getElementById('player-search')?.value || '').toLowerCase().trim();
+
+            const uniq = uniquePlayersIndex().filter(x => {
+                const name = (x.name || '').toLowerCase();
+                const id = (x.playerId || '').toLowerCase();
+                return !q || name.includes(q) || id.includes(q);
+            });
+
+            wrap.innerHTML = uniq.map(p => `
+            <div class="mini-card" onclick="showPlayersDetail('${esc(p.playerId)}')">
+              <div class="row">
+                <div style="font-weight:800">${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></div>
+                ${isAdmin ? `<button class="btn-danger btn-small" onclick="event.stopPropagation(); deletePlayerById('${esc(p.playerId)}')">Sil</button>` : ``}
+              </div>
+              <div class="muted">Detay için tıkla</div>
+            </div>
+          `).join('') || `<div class="muted">Oyuncu bulunamadı.</div>`;
+        }
+
+        function showPlayersDetail(playerId) {
+            const box = document.getElementById('players-detail');
+            const pid = normalizeHashId(playerId);
+            const recs = getAllRecordsByPlayerId(pid);
+            if (!recs.length) return;
+
+            const byLeague = {};
+            recs.forEach(r => {
+                const key = r.league || '—';
+                if (!byLeague[key]) byLeague[key] = { league: key, team: r.team || "", goals: 0, assists: 0, cs: 0 };
+                byLeague[key].goals += (r.goals || 0);
+                byLeague[key].assists += (r.assists || 0);
+                byLeague[key].cs += (r.cs || 0);
+                if (r.team) byLeague[key].team = r.team;
+            });
+
+            const leaguesList = Object.values(byLeague).sort((a, b) => String(a.league).localeCompare(String(b.league)));
+            const name = recs.find(x => x.name)?.name || "Oyuncu";
+
+            box.style.display = 'block';
+            box.innerHTML = `
+            <div class="row" style="margin-bottom:10px">
+              <div>
+                <div style="font-size:1.1rem;font-weight:800">${esc(name)} <span class="pill">${esc(pid)}</span></div>
+                <div class="muted">Liglere göre istatistik</div>
+              </div>
+              <div class="row">
+                <button class="linkbtn" onclick="document.getElementById('players-detail').style.display='none'">Kapat</button>
+                ${isAdmin ? `<button class="btn-danger btn-small" onclick="deletePlayerById('${esc(pid)}')">Oyuncuyu Sil</button>` : ``}
+              </div>
+            </div>
+
+            <h3>Lig Bazlı İstatistik</h3>
+            <table>
+              <tr><th>Lig</th><th>Takım</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
+              ${leaguesList.map(x => `
+                <tr>
+                  <td>${esc(leaguesMeta[x.league] || x.league)}</td>
+                  <td>${esc(x.team || '—')}</td>
+                  <td><b>${x.goals}</b></td>
+                  <td><b>${x.assists}</b></td>
+                  <td><b>${x.cs}</b></td>
+                </tr>
+              `).join('')}
+            </table>
+          `;
+            box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function deletePlayerById(playerId) {
+            const pid = normalizeHashId(playerId);
+            if (!confirm("Bu oyuncu ID'ye ait TÜM lig kayıtları silinsin mi?")) return;
+
+            players = (players || []).filter(p => normalizeHashId(p.playerId) !== pid);
+
+            Object.keys(leagues).forEach(l => {
+                if (!Array.isArray(leagues[l])) return;
+                leagues[l].forEach(t => {
+                    if (t && t.id !== "dummy" && Array.isArray(t.roster)) {
+                        t.roster = t.roster.filter(x => normalizeHashId(x) !== pid);
+                    }
+                });
+            });
+
+            save();
+            alert("Oyuncu silindi!");
+            document.getElementById('players-detail').style.display = 'none';
+            renderPlayersList();
+            renderTeamsList();
+            renderStats();
+        }
+
+        // ---------- Teams ----------
+        function findTeamByTeamId(teamId) {
+            const tid = normalizeHashId(teamId);
+            for (const l of Object.keys(leagues)) {
+                if (!Array.isArray(leagues[l])) continue;
+                const t = (leagues[l] || []).find(x => x && x.id !== "dummy" && normalizeHashId(x.teamId) === tid);
+                if (t) return { leagueKey: l, leagueName: leaguesMeta[l] || l, team: t };
+            }
+            return null;
+        }
+
+        function renderTeamsList() {
+            const wrap = document.getElementById('teams-list');
+            if (!wrap) return;
+            const q = (document.getElementById('team-search')?.value || '').toLowerCase().trim();
+
+            let all = [];
+            Object.keys(leagues).forEach(l => {
+                if (!Array.isArray(leagues[l])) return;
+                leagues[l].filter(t => t.id !== "dummy").forEach(t => all.push({ leagueKey: l, leagueName: leaguesMeta[l] || l, team: t }));
+            });
+
+            const filtered = all.filter(x => {
+                const name = (x.team.name || '').toLowerCase();
+                const id = (x.team.teamId || '').toLowerCase();
+                return !q || name.includes(q) || id.includes(q);
+            });
+
+            wrap.innerHTML = filtered.map(x => `
+            <div class="mini-card" onclick="showTeamDetail('${esc(x.team.teamId)}')">
+              <div class="row">
+                <div class="team-cell">
+                  <img class="team-logo-small" src="${esc(x.team.logo || '')}" onerror="this.style.display='none'">
+                  <div>
+                    <div style="font-weight:700">${esc(x.team.name)}</div>
+                    <div class="muted">${esc(x.leagueName)} • <span class="pill">${esc(x.team.teamId)}</span></div>
+                  </div>
+                </div>
+                <div class="pill">P: ${x.team.puan} • AV: ${x.team.averaj}</div>
+              </div>
+              <div class="muted" style="margin-top:6px">Kadro için tıkla</div>
+            </div>
+          `).join('') || `<div class="muted">Takım bulunamadı.</div>`;
+        }
+
+        function showTeamDetail(teamId) {
+            const box = document.getElementById('teams-detail');
+            const found = findTeamByTeamId(teamId);
+            if (!found) {
+                box.style.display = 'block';
+                box.innerHTML = `<h3>Takım bulunamadı</h3><div class="muted">Bu ID ile takım yok.</div>`;
+                return;
+            }
+
+            const { leagueKey, leagueName, team } = found;
+            const roster = Array.isArray(team.roster) ? team.roster.map(normalizeHashId).filter(Boolean) : [];
+
+            const rosterRows = roster.map(pid => {
+                const rec = getRecordByIdAndLeague(pid, leagueKey) || getAllRecordsByPlayerId(pid)[0] || null;
+                const nm = rec ? rec.name : "Oyuncu";
+                const g = rec ? (rec.goals || 0) : 0;
+                const a = rec ? (rec.assists || 0) : 0;
+                const cs = rec ? (rec.cs || 0) : 0;
+                return { pid, nm, g, a, cs };
+            });
+
+            box.style.display = 'block';
+            box.innerHTML = `
+            <div class="row" style="margin-bottom:10px">
+              <div class="team-cell">
+                <img class="team-logo-small" src="${esc(team.logo || '')}" onerror="this.style.display='none'">
+                <div>
+                  <div style="font-size:1.1rem;font-weight:800">${esc(team.name)} <span class="pill">${esc(team.teamId)}</span></div>
+                  <div class="muted">${esc(leagueName)} • P: <b>${team.puan}</b> • AV: <b>${team.averaj}</b></div>
+                </div>
+              </div>
+              <div class="row">
+                <button class="linkbtn" onclick="document.getElementById('teams-detail').style.display='none'">Kapat</button>
+                ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteTeamById('${esc(team.teamId)}')">Takımı Sil</button>` : ``}
+              </div>
+            </div>
+
+            <h3>Kadro</h3>
+            ${rosterRows.length ? `
+              <table>
+                <tr><th>Oyuncu</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
+                ${rosterRows.map(r => `
+                  <tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(r.pid)}')">
+                    <td>${esc(r.nm)} <span class="pill">${esc(r.pid)}</span></td>
+                    <td><b>${r.g}</b></td>
+                    <td><b>${r.a}</b></td>
+                    <td><b>${r.cs}</b></td>
+                  </tr>
+                `).join('')}
+              </table>
+              <div class="muted" style="margin-top:8px">Not: Oyuncuya tıklayınca oyuncu detayına gider.</div>
+            ` : `<div class="muted">Kadro boş.</div>`}
+          `;
+            box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // ✅ TEAM DELETE (admin only)
+        function deleteTeamById(teamId) {
+            const found = findTeamByTeamId(teamId);
+            if (!found) return alert("Takım bulunamadı!");
+            const { leagueKey, team } = found;
+
+            if (!confirm(`${team.name} takımı tamamen silinsin mi?`)) return;
+
+            // oyuncuları takımsız yap (aynı ligdeki kaydı)
+            const roster = Array.isArray(team.roster) ? team.roster.map(normalizeHashId).filter(Boolean) : [];
+            roster.forEach(pid => {
+                const rec = getRecordByIdAndLeague(pid, leagueKey);
+                if (rec) rec.team = "";
+            });
+
+            // takım sil
+            leagues[leagueKey] = (leagues[leagueKey] || []).filter(t => t.id !== team.id);
+
+            save();
+            alert("Takım silindi!");
+            renderTeamsList();
+            document.getElementById('teams-detail').style.display = 'none';
+        }
+
+        // ---------- Stats ----------
+        function renderStats() {
+            const container = document.getElementById('stats-display-container'); container.innerHTML = "";
+            Object.keys(leagues).forEach(l => {
+                if (!Array.isArray(leagues[l])) return;
+                const lp = (players || []).filter(p => p.league === l);
+                if (lp.length === 0) return;
+
+                const dn = leaguesMeta[l] || l;
+                let html = `<h2>${esc(dn)} - İstatistikler</h2><div class="stats-grid">`;
+
+                const goals = [...lp].filter(p => (p.goals || 0) > 0).sort((a, b) => b.goals - a.goals).slice(0, 5);
+                html += `<div class="stats-card"><h3>Gol Krallığı</h3><table>`;
+                goals.forEach(p => {
+                    const t = (leagues[l] || []).find(x => x.name === p.team) || {};
+                    html += `<tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(p.playerId)}')">
+                <td class="team-cell"><img src="${esc(t.logo || '')}" class="team-logo-small"> ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></td>
+                <td style="text-align:right"><b>${p.goals}</b></td>
+              </tr>`;
+                });
+                html += `</table></div>`;
+
+                const assists = [...lp].filter(p => (p.assists || 0) > 0).sort((a, b) => b.assists - a.assists).slice(0, 5);
+                html += `<div class="stats-card"><h3>Asist Krallığı</h3><table>`;
+                assists.forEach(p => {
+                    const t = (leagues[l] || []).find(x => x.name === p.team) || {};
+                    html += `<tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(p.playerId)}')">
+                <td class="team-cell"><img src="${esc(t.logo || '')}" class="team-logo-small"> ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></td>
+                <td style="text-align:right"><b>${p.assists}</b></td>
+              </tr>`;
+                });
+                html += `</table></div>`;
+
+                const clean = [...lp].filter(p => (p.cs || 0) > 0).sort((a, b) => b.cs - a.cs).slice(0, 5);
+                html += `<div class="stats-card"><h3>Cs Krallığı</h3><table>`;
+                clean.forEach(p => {
+                    const t = (leagues[l] || []).find(x => x.name === p.team) || {};
+                    html += `<tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(p.playerId)}')">
+                <td class="team-cell"><img src="${esc(t.logo || '')}" class="team-logo-small"> ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></td>
+                <td style="text-align:right"><b>${p.cs}</b></td>
+              </tr>`;
+                });
+                html += `</table></div>`;
+
+                html += `</div>`;
+                container.innerHTML += html;
+            });
+        }
+
+        // ---------- Render all ----------
+        function renderAll() {
+            renderNews();
+            renderStandings();
+            renderFixture();
+            renderStats();
+            renderMatches();
+        }
+
+        // ---------- Init ----------
+        (function init() {
+            const s = document.getElementById('match-week-select');
+            for (let i = 1; i <= 30; i++) s.innerHTML += `<option value="${i}">${i}</option>`;
+        })();
     </script>
 </body>
-
 </html>
