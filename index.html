@@ -4,117 +4,188 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mamoball Turkey League</title>
+
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <style>
         :root {
             --primary-red: #cc0000;
-            --dark-bg: #0f0f0f;
-            --card-bg: #1a1a1a;
-            --text-main: #e0e0e0;
-            --text-dim: #b0b0b0;
+            --dark-bg: #0b0c10;
+            --card-bg: rgba(255,255,255,.06);
+            --text-main: #eef0f3;
+            --text-dim: rgba(238,240,243,.68);
             --danger: #ff4444;
             --success: #00c851;
-            --border: #333;
+            --border: rgba(255,255,255,.12);
+            --shadow-soft: 0 10px 28px rgba(0,0,0,.35);
+            --radius: 16px;
+            --ring: 0 0 0 3px rgba(204,0,0,.25);
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html {
+            scroll-behavior: smooth
         }
 
         body {
-            font-family: 'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+            font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial;
             margin: 0;
-            background: var(--dark-bg);
+            background: radial-gradient(900px 500px at 18% -10%, rgba(204,0,0,.25), transparent 60%), radial-gradient(800px 520px at 90% 0%, rgba(255,255,255,.10), transparent 60%), linear-gradient(180deg, #08090d 0%, var(--dark-bg) 35%, #07070b 100%);
             color: var(--text-main);
-            line-height: 1.6
+            line-height: 1.6;
+            min-height: 100vh;
         }
 
         .container {
-            width: 92%;
-            max-width: 1200px;
-            margin: auto
+            width: min(1200px, 92%);
+            margin: auto;
+        }
+
+        .page {
+            padding: 18px 0 60px;
         }
 
         header {
-            background: rgba(15,15,15,.95);
-            backdrop-filter: blur(10px);
+            background: rgba(9,10,14,.72);
+            backdrop-filter: blur(14px);
             padding: 12px 0;
-            border-bottom: 2px solid var(--primary-red);
+            border-bottom: 1px solid rgba(204,0,0,.55);
             position: sticky;
             top: 0;
-            z-index: 2000
+            z-index: 2000;
+            box-shadow: 0 10px 28px rgba(0,0,0,.35);
         }
 
         .header-content {
             display: flex;
             align-items: center;
-            justify-content: space-between
+            justify-content: space-between;
+            gap: 14px;
         }
 
         .logo-box {
             display: flex;
             align-items: center;
-            gap: 12px
+            gap: 12px;
+            min-width: 200px;
         }
 
         .main-logo {
-            height: 40px;
-            width: 40px;
+            height: 44px;
+            width: 44px;
             border-radius: 50%;
-            border: 2px solid var(--primary-red);
-            background: white
+            border: 2px solid rgba(204,0,0,.85);
+            background: #fff;
+            box-shadow: 0 10px 25px rgba(0,0,0,.35);
         }
 
+        .brand {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+
+            .brand h1 {
+                margin: 0;
+                font-size: 1.05rem;
+                letter-spacing: .06em;
+                font-weight: 900;
+                text-transform: uppercase;
+            }
+
+            .brand span {
+                font-size: .78rem;
+                color: var(--text-dim);
+                margin-top: 2px;
+            }
+
         nav {
-            display: flex
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
             nav a {
                 color: var(--text-main);
                 text-decoration: none;
-                font-weight: 600;
-                margin-left: 20px;
+                font-weight: 800;
                 cursor: pointer;
-                font-size: .85rem;
+                font-size: .78rem;
                 text-transform: uppercase;
-                transition: .3s
+                letter-spacing: .06em;
+                padding: 10px 10px;
+                border-radius: 999px;
+                transition: .22s ease;
+                border: 1px solid transparent;
+                user-select: none;
             }
 
                 nav a:hover {
-                    color: var(--primary-red)
+                    color: #fff;
+                    border-color: rgba(255,255,255,.12);
+                    background: rgba(255,255,255,.06);
+                    transform: translateY(-1px);
                 }
 
         .hamburger {
             display: none;
             flex-direction: column;
-            gap: 5px;
-            cursor: pointer
+            gap: 6px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,.10);
+            background: rgba(255,255,255,.05);
         }
 
             .hamburger span {
-                width: 25px;
+                width: 24px;
                 height: 3px;
-                background: white;
-                border-radius: 2px
+                background: #fff;
+                border-radius: 2px;
+                transition: .25s ease;
             }
 
-        @media (max-width:768px) {
+        @media (max-width: 768px) {
             nav {
                 position: fixed;
                 top: 0;
                 right: -100%;
-                width: 70%;
+                width: min(360px, 78%);
                 height: 100vh;
-                background: var(--card-bg);
+                background: rgba(20,21,26,.92);
+                backdrop-filter: blur(16px);
+                border-left: 1px solid rgba(255,255,255,.12);
                 flex-direction: column;
                 justify-content: center;
-                align-items: center;
-                transition: .4s;
-                gap: 30px;
-                z-index: 2500
+                align-items: stretch;
+                transition: .35s ease;
+                gap: 12px;
+                padding: 22px;
+                z-index: 2500;
             }
 
                 nav.active {
-                    right: 0
+                    right: 0;
                 }
+
+                nav a {
+                    width: 100%;
+                    text-align: center;
+                    padding: 12px 14px;
+                    border-radius: 14px;
+                    background: rgba(255,255,255,.05);
+                    border: 1px solid rgba(255,255,255,.10);
+                }
+
+                    nav a:hover {
+                        transform: none;
+                        background: rgba(255,255,255,.08);
+                    }
 
             .hamburger {
                 display: flex
@@ -122,212 +193,134 @@
         }
 
         .admin-section, .league-card, .news-card, .stats-card, .week-container {
-            background: var(--card-bg);
-            padding: 20px;
-            margin-top: 20px;
-            border-radius: 12px;
+            background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
             border: 1px solid var(--border);
-            box-shadow: 0 10px 30px rgba(0,0,0,.5);
+            box-shadow: var(--shadow-soft);
+            border-radius: var(--radius);
+            padding: 18px;
+            margin-top: 18px;
             width: 100%;
-            box-sizing: border-box
+        }
+
+        h2 {
+            border-left: 4px solid rgba(204,0,0,.9);
+            padding-left: 15px;
+            margin-top: 36px;
+            margin-bottom: 12px;
+            font-size: clamp(1.1rem, 2.2vw, 1.35rem);
+        }
+
+        h3 {
+            color: rgba(204,0,0,.95);
+            margin: 0 0 14px 0;
+            font-size: 1.05rem;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+        }
+
+        input, textarea, select {
+            background: rgba(10,10,14,.65);
+            border: 1px solid rgba(255,255,255,.14);
+            color: #fff;
+            padding: 12px 12px;
+            border-radius: 12px;
+            width: 100%;
+            margin-bottom: 10px;
+            outline: none;
+            transition: .2s ease;
+        }
+
+            input::placeholder, textarea::placeholder {
+                color: rgba(255,255,255,.45);
+            }
+
+            input:focus, textarea:focus, select:focus {
+                border-color: rgba(204,0,0,.55);
+                box-shadow: var(--ring);
+            }
+
+        textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        button {
+            background: linear-gradient(180deg, rgba(204,0,0,1), rgba(170,0,0,1));
+            color: #fff;
+            border: 1px solid rgba(255,255,255,.12);
+            padding: 12px 14px;
+            cursor: pointer;
+            border-radius: 12px;
+            font-weight: 900;
+            width: 100%;
+            transition: .22s ease;
+            box-shadow: 0 12px 26px rgba(204,0,0,.18);
+        }
+
+            button:hover {
+                opacity: .92;
+                transform: translateY(-1px);
+            }
+
+            button:active {
+                transform: translateY(0px);
+                opacity: .96;
+            }
+
+            button:focus {
+                outline: none;
+                box-shadow: var(--ring);
+            }
+
+        .btn-danger {
+            background: linear-gradient(180deg, rgba(255,68,68,1), rgba(210,45,45,1)) !important;
+            box-shadow: 0 12px 26px rgba(255,68,68,.14);
+        }
+
+        .btn-small {
+            width: auto !important;
+            padding: 6px 10px !important;
+            font-size: 11px;
+            border-radius: 10px;
+        }
+
+        .linkbtn {
+            width: auto !important;
+            padding: 9px 12px !important;
+            font-size: 12px;
+            border-radius: 12px;
+            background: rgba(255,255,255,.06) !important;
+            border: 1px solid rgba(255,255,255,.14);
+            box-shadow: none;
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
         }
 
         .news-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill,minmax(350px,1fr));
-            gap: 20px
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 16px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
         }
 
         .news-img {
             width: 100%;
             aspect-ratio: 16/9;
-            height: auto;
             object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 6px;
-            background: #222;
-            border: 1px solid #333;
-            display: block
-        }
-
-        h2 {
-            border-left: 4px solid var(--primary-red);
-            padding-left: 15px;
-            margin-top: 40px
-        }
-
-        h3 {
-            color: var(--primary-red);
-            margin: 0 0 15px 0;
-            font-size: 1.2rem;
-            text-transform: uppercase
-        }
-
-        input, textarea, select {
-            background: #252525;
-            border: 1px solid var(--border);
-            color: white;
-            padding: 12px;
-            border-radius: 8px;
-            width: 100%;
+            border-radius: 12px;
             margin-bottom: 10px;
-            box-sizing: border-box
-        }
-
-        button {
-            background: var(--primary-red);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            cursor: pointer;
-            border-radius: 8px;
-            font-weight: bold;
-            width: 100%;
-            transition: .3s
-        }
-
-            button:hover {
-                opacity: .8
-            }
-
-        .btn-danger {
-            background: var(--danger) !important
-        }
-
-        .btn-small {
-            width: auto !important;
-            padding: 5px 10px !important;
-            font-size: 11px
-        }
-
-        .admin-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill,minmax(300px,1fr));
-            gap: 20px
-        }
-
-        .match-row, .fixture-item {
-            display: grid;
-            grid-template-columns: 40px 1fr 60px 1fr 40px;
-            align-items: center;
-            margin-bottom: 15px;
-            padding: 10px;
             background: rgba(255,255,255,.03);
-            border-radius: 8px
-        }
-
-        .score-container, .tire-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 5px;
-            font-weight: 800;
-            font-size: 1.1rem;
-            color: var(--primary-red)
-        }
-
-        .score-box {
-            background: #2a2a2a;
-            color: white;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-            font-size: .9rem
-        }
-
-        .team-home {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 12px;
-            font-weight: 600
-        }
-
-        .team-away {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 12px;
-            font-weight: 600
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            font-size: .9rem
-        }
-
-        td, th {
-            padding: 10px 5px;
-            border-bottom: 1px solid var(--border);
-            text-align: left
-        }
-
-        .team-cell {
-            display: flex;
-            align-items: center;
-            gap: 10px
-        }
-
-        .team-logo-small {
-            width: 30px;
-            height: 30px;
-            object-fit: contain;
-            border-radius: 4px
-        }
-
-        .week-title {
-            background: var(--primary-red);
-            padding: 8px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            font-weight: bold;
-            font-size: .9rem
-        }
-
-        #loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--dark-bg);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            font-weight: bold
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit,minmax(300px,1fr));
-            gap: 20px
-        }
-
-        .mini-card {
-            background: rgba(255,255,255,.03);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: .2s
-        }
-
-            .mini-card:hover {
-                transform: translateY(-1px);
-                border-color: #444
-            }
-
-        .muted {
-            color: var(--text-dim);
-            font-size: .9rem
+            border: 1px solid rgba(255,255,255,.10);
+            display: block;
         }
 
         .row {
@@ -335,23 +328,197 @@
             align-items: center;
             justify-content: space-between;
             gap: 10px;
-            flex-wrap: wrap
+            flex-wrap: wrap;
         }
 
         .pill {
-            padding: 3px 8px;
-            border: 1px solid var(--border);
+            padding: 4px 10px;
+            border: 1px solid rgba(255,255,255,.16);
             border-radius: 999px;
             font-size: 12px;
-            color: var(--text-dim)
+            color: rgba(255,255,255,.75);
+            background: rgba(255,255,255,.05);
+            white-space: nowrap;
         }
 
-        .linkbtn {
-            width: auto !important;
-            padding: 8px 12px !important;
-            font-size: 12px;
-            background: #2a2a2a !important;
-            border: 1px solid var(--border)
+        .muted {
+            color: var(--text-dim);
+            font-size: .9rem;
+        }
+
+        .mini-card {
+            background: rgba(255,255,255,.05);
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 14px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: .18s ease;
+        }
+
+            .mini-card:hover {
+                transform: translateY(-2px);
+                border-color: rgba(255,255,255,.18);
+                box-shadow: 0 14px 28px rgba(0,0,0,.25);
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: .92rem;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        td, th {
+            padding: 11px 8px;
+            border-bottom: 1px solid rgba(255,255,255,.10);
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        th {
+            color: rgba(255,255,255,.8);
+            font-size: .82rem;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            background: rgba(255,255,255,.03);
+        }
+
+        tr:hover td {
+            background: rgba(255,255,255,.03);
+        }
+
+        .team-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .team-logo-small {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.10);
+            flex: 0 0 auto;
+        }
+
+        .match-row, .fixture-item {
+            display: grid;
+            grid-template-columns: 40px 1fr 70px 1fr 40px;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: rgba(255,255,255,.04);
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,.10);
+        }
+
+        .score-container, .tire-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            font-weight: 900;
+            font-size: 1.05rem;
+            color: rgba(204,0,0,.95);
+        }
+
+        .score-box {
+            background: rgba(255,255,255,.06);
+            color: #fff;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,.12);
+            font-size: .95rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,.25);
+        }
+
+        .team-home, .team-away {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+        }
+
+        .team-home {
+            justify-content: flex-start
+        }
+
+        .team-away {
+            justify-content: flex-end
+        }
+
+        .week-title {
+            background: linear-gradient(180deg, rgba(204,0,0,1), rgba(165,0,0,1));
+            padding: 8px 10px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            font-weight: 900;
+            font-size: .85rem;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            box-shadow: 0 14px 28px rgba(204,0,0,.16);
+        }
+
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(900px 600px at 20% 0%, rgba(204,0,0,.18), transparent 60%), linear-gradient(180deg, #07070b 0%, #0b0c10 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            font-weight: 900;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+        }
+
+            #loader::after {
+                content: "";
+                width: 14px;
+                height: 14px;
+                border-radius: 999px;
+                margin-left: 10px;
+                border: 2px solid rgba(255,255,255,.22);
+                border-top-color: rgba(204,0,0,.95);
+                animation: spin .8s linear infinite;
+            }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        @media (max-width: 560px) {
+            .match-row, .fixture-item {
+                grid-template-columns: 28px 1fr 64px 1fr 10px;
+                padding: 10px;
+            }
+
+            .score-box {
+                width: 32px;
+                height: 32px;
+            }
+
+            .team-logo-small {
+                width: 28px;
+                height: 28px;
+            }
+
+            nav {
+                width: 82%;
+            }
         }
     </style>
 </head>
@@ -362,10 +529,23 @@
     <header>
         <div class="container header-content">
             <div class="logo-box">
-                <img src="logo.png" alt="MBTL" class="main-logo" onerror="this.src='https://via.placeholder.com/45?text=MB'">
-                <h1 style="margin:0;font-size:1rem;color:white;">MAMOBALL TURKEY LEAGUE</h1>
+                <img src="logo.png"
+                     alt="MBTL"
+                     class="main-logo"
+                     loading="lazy"
+                     decoding="async"
+                     referrerpolicy="no-referrer"
+                     onerror="this.src='https://via.placeholder.com/45?text=MB'">
+                <div class="brand">
+                    <h1>MB LEAGUE</h1>
+                    <span>Mamoball Turkey League</span>
+                </div>
             </div>
-            <div class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+
+            <div class="hamburger" onclick="toggleMenu()" aria-label="Menü">
+                <span></span><span></span><span></span>
+            </div>
+
             <nav id="nav-menu">
                 <a onclick="handleNav('news')">Haberler</a>
                 <a onclick="handleNav('standings')">Puan Durumu</a>
@@ -379,7 +559,7 @@
         </div>
     </header>
 
-    <div class="container">
+    <div class="container page">
 
         <!-- Admin Auth -->
         <section id="admin-auth" class="admin-section" style="display:none;">
@@ -390,18 +570,28 @@
 
         <!-- Admin Panel (Sadece Haber Yönetimi) -->
         <section id="admin-panel" class="admin-section" style="display:none;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-                <h2 style="margin:0;border:none;">Yönetim Paneli</h2>
-                <button onclick="logout()" style="width:auto;background:var(--danger);">Çıkış</button>
+            <div class="row" style="margin-bottom:14px;">
+                <h2 style="margin:0;border:none;padding:0;">Yönetim Paneli</h2>
+                <button onclick="logout()" class="btn-danger" style="width:auto;">Çıkış</button>
             </div>
 
             <div class="admin-grid">
                 <div>
                     <h3>Haber Yönetimi</h3>
                     <input type="text" id="news-title" placeholder="Başlık">
-                    <input type="text" id="news-image" placeholder="Fotoğraf Linki (URL)">
+
+                    <!-- ✅ URL yerine direkt upload -->
+                    <input type="file" id="news-image-file" accept="image/*">
+                    <div class="muted" style="margin:-4px 0 10px;">
+                        Fotoğraf yükleyince otomatik olarak Firebase veritabanına kaydedilir.
+                    </div>
+
                     <textarea id="news-content" placeholder="İçerik... (Enter veya <br> kullanabilirsin)" rows="3"></textarea>
                     <button onclick="publishNews()">Yayınla</button>
+
+                    <div class="muted" style="margin-top:10px">
+                        Not: Çok büyük fotoğraflar (özellikle 2-3MB+) Firebase DB’de sorun çıkarabilir. Gerekirse sıkıştır.
+                    </div>
                 </div>
             </div>
         </section>
@@ -417,7 +607,6 @@
             <h2>Puan Durumu</h2>
             <div id="leagues-container"></div>
 
-            <!-- Admin: Lig & Takım Yönetimi -->
             <div id="admin-standings-tools" class="league-card" style="display:none;">
                 <h3>Lig & Takım Yönetimi</h3>
                 <input type="text" id="league-name-input" placeholder="Yeni Lig Adı (örn: World Cup [Sezon 1])">
@@ -427,8 +616,12 @@
                 <input type="text" id="team-name" placeholder="Takım Adı">
                 <input type="text" id="team-id-input" placeholder="Takım ID (Örn: #TUR123) - opsiyonel">
                 <input type="text" id="team-logo-input" placeholder="Logo Linki (URL)">
-                <button onclick="addTeam()" style="margin-bottom:5px;">Takım Ekle</button>
+                <button onclick="addTeam()" style="margin-bottom:6px;">Takım Ekle</button>
                 <button onclick="deleteLeague()" class="btn-danger">Ligi Sil</button>
+
+                <div class="muted" style="margin-top:10px">
+                    Logo linki eklerken: https olmalı ve mümkünse direkt .png/.jpg linki olmalı (bazı siteler hotlink engeller).
+                </div>
             </div>
         </section>
 
@@ -440,7 +633,7 @@
             <div id="admin-fixture-tools" class="league-card" style="display:none;">
                 <h3>Fikstür Yönetimi</h3>
                 <select id="fixture-league-select"><option value="">Lig Seçin</option></select>
-                <button onclick="generateFixture()" style="background:#6a1b9a;margin-bottom:5px;">Fikstür Oluştur</button>
+                <button onclick="generateFixture()" style="background:linear-gradient(180deg,#6a1b9a,#4f1471);margin-bottom:6px;">Fikstür Oluştur</button>
                 <button onclick="deleteFixture()" class="btn-danger">Fikstürü Temizle</button>
             </div>
         </section>
@@ -457,13 +650,13 @@
 
                 <input type="text" id="stats-player-id" placeholder="Oyuncu ID (Örn: #P9A2X7)">
                 <input type="text" id="stats-player-name" placeholder="Oyuncu Adı (opsiyonel / günceller)">
-                <div style="display:flex;gap:5px;">
+                <div style="display:flex;gap:8px;">
                     <input type="number" id="plus-goal" placeholder="Gol">
                     <input type="number" id="plus-assist" placeholder="Asist">
                     <input type="number" id="plus-cs" placeholder="CS">
                 </div>
-                <button onclick="updatePlayerStatsById()" style="background:var(--success);">Kaydet</button>
-                <div class="muted" style="margin-top:6px">Not: Aynı #ID farklı liglerde ayrı istatistik tutar.</div>
+                <button onclick="updatePlayerStatsById()" style="background:linear-gradient(180deg, rgba(0,200,81,1), rgba(0,150,61,1));box-shadow:0 12px 26px rgba(0,200,81,.12);">Kaydet</button>
+                <div class="muted" style="margin-top:8px">Not: Aynı #ID farklı liglerde ayrı istatistik tutar.</div>
             </div>
         </section>
 
@@ -476,22 +669,29 @@
                 <h3>Skor Girişi</h3>
                 <select id="match-league-select" onchange="updateMatchTeams()"><option value="">Lig Seçin</option></select>
                 <select id="match-week-select"><option value="">Hafta Seçin</option></select>
-                <div style="display:flex;flex-direction:column;gap:5px;">
+
+                <div style="display:flex;flex-direction:column;gap:8px;">
                     <select id="team-1-select"><option value="">Ev Sahibi Seçin</option></select>
-                    <div style="display:flex;gap:5px;">
+
+                    <div style="display:flex;gap:8px;">
                         <input type="number" id="score-1" placeholder="0">
                         <input type="number" id="score-2" placeholder="0">
                     </div>
+
                     <select id="team-2-select"><option value="">Deplasman Seçin</option></select>
                 </div>
-                <button onclick="addMatch()" style="background:var(--success);margin-top:10px;">Onayla</button>
+
+                <button onclick="addMatch()"
+                        style="margin-top:10px;background:linear-gradient(180deg, rgba(0,200,81,1), rgba(0,150,61,1));box-shadow:0 12px 26px rgba(0,200,81,.12);">
+                    Onayla
+                </button>
             </div>
         </section>
 
         <!-- Takımlar -->
         <section id="teams-section" style="display:none;">
             <h2>Takımlar</h2>
-            <input id="team-search" placeholder="Takım ara (isim / #ID)..." oninput="renderTeamsList()">
+            <!-- ✅ takım arama kaldırıldı -->
             <div id="teams-list"></div>
             <div id="teams-detail" class="league-card" style="display:none;"></div>
         </section>
@@ -511,10 +711,13 @@
                 <select id="player-assign-league" onchange="updateAssignTeams()"><option value="">Lig Seçin</option></select>
                 <select id="player-assign-team"><option value="">Takım Seçin</option></select>
                 <input type="text" id="player-assign-id" placeholder="Oyuncu ID ile ekle (Örn: #P9A2X7)">
-                <button onclick="assignPlayerToTeam()" style="background:var(--success);">Takıma Ekle</button>
+                <button onclick="assignPlayerToTeam()"
+                        style="background:linear-gradient(180deg, rgba(0,200,81,1), rgba(0,150,61,1));box-shadow:0 12px 26px rgba(0,200,81,.12);">
+                    Takıma Ekle
+                </button>
             </div>
 
-            <input id="player-search" placeholder="Oyuncu ara (isim / #ID)..." oninput="renderPlayersList()">
+            <!-- ✅ oyuncu arama kaldırıldı -->
             <div id="players-list"></div>
             <div id="players-detail" class="league-card" style="display:none;"></div>
         </section>
@@ -735,28 +938,58 @@
 
         // ---------- News ----------
         function publishNews() {
-            const t = document.getElementById('news-title').value;
+            const t = document.getElementById('news-title').value.trim();
             const c = document.getElementById('news-content').value;
-            const img = document.getElementById('news-image').value;
-            if (t && c) {
-                newsData.push({ id: Date.now(), title: t, content: c, image: img, date: new Date().toLocaleDateString('tr-TR') });
+            const file = document.getElementById('news-image-file').files[0];
+
+            if (!t || !c) return alert("Başlık ve içerik zorunlu!");
+
+            // ✅ Fotoğraf upload (base64) -> DB'ye kaydet
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const dataUrl = reader.result; // base64
+                    newsData.push({ id: Date.now(), title: t, content: c, image: dataUrl, date: new Date().toLocaleDateString('tr-TR') });
+                    document.getElementById('news-title').value = "";
+                    document.getElementById('news-content').value = "";
+                    document.getElementById('news-image-file').value = "";
+                    save();
+                };
+                reader.onerror = () => alert("Fotoğraf okunamadı!");
+                reader.readAsDataURL(file);
+            } else {
+                // Fotoğraf yoksa da haber atılabilsin
+                newsData.push({ id: Date.now(), title: t, content: c, image: "", date: new Date().toLocaleDateString('tr-TR') });
+                document.getElementById('news-title').value = "";
+                document.getElementById('news-content').value = "";
+                document.getElementById('news-image-file').value = "";
                 save();
             }
         }
+
         function deleteNews(id) {
             if (confirm("Silinsin mi?")) {
                 newsData = newsData.filter(n => n.id !== id);
                 save();
             }
         }
+
         function renderNews() {
             document.getElementById('news-container').innerHTML = newsData.slice().reverse().map(n => `
             <div class="news-card">
               ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteNews(${n.id})" style="float:right">Sil</button>` : ''}
               <h3>${esc(n.title)}</h3>
-              ${n.image ? `<img src="${esc(n.image)}" class="news-img" onerror="this.style.display='none'">` : ''}
+              ${n.image ? `
+                <img
+                  src="${esc(n.image)}"
+                  class="news-img"
+                  loading="lazy"
+                  decoding="async"
+                  referrerpolicy="no-referrer"
+                  onerror="this.style.display='none'">
+              ` : ''}
               <p>${renderNewsContent(n.content)}</p>
-              <small>${esc(n.date)}</small>
+              <small class="muted">${esc(n.date)}</small>
             </div>
           `).join('');
         }
@@ -829,7 +1062,12 @@
                 teams.forEach((t, i) => {
                     html += `<tr>
                 <td>${i + 1}</td>
-                <td class="team-cell"><img src="${esc(t.logo)}" class="team-logo-small"> ${esc(t.name)} <span class="pill">${esc(t.teamId)}</span></td>
+                <td class="team-cell">
+                  <img src="${esc(t.logo)}" class="team-logo-small"
+                    loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                    onerror="this.src='https://via.placeholder.com/30?text=?'">
+                  ${esc(t.name)} <span class="pill">${esc(t.teamId)}</span>
+                </td>
                 <td>${t.averaj}</td>
                 <td><b>${t.puan}</b></td>
               </tr>`;
@@ -874,9 +1112,19 @@
                         const t2 = lData.find(x => x.name === m.away) || {};
                         html += `<div class="fixture-item">
                   <div></div>
-                  <div class="team-home"><img src="${esc(t1.logo || '')}" class="team-logo-small"><span>${esc(m.home)}</span></div>
+                  <div class="team-home">
+                    <img src="${esc(t1.logo || '')}" class="team-logo-small"
+                      loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                      onerror="this.src='https://via.placeholder.com/30?text=?'">
+                    <span>${esc(m.home)}</span>
+                  </div>
                   <div class="tire-container">-</div>
-                  <div class="team-away"><span>${esc(m.away)}</span><img src="${esc(t2.logo || '')}" class="team-logo-small"></div>
+                  <div class="team-away">
+                    <span>${esc(m.away)}</span>
+                    <img src="${esc(t2.logo || '')}" class="team-logo-small"
+                      loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                      onerror="this.src='https://via.placeholder.com/30?text=?'">
+                  </div>
                   <div></div>
                 </div>`;
                     });
@@ -918,9 +1166,19 @@
                 <div style="display:flex;justify-content:center;">
                   ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteMatch(${m.id})">X</button>` : ''}
                 </div>
-                <div class="team-home"><img src="${esc(t1.logo || '')}" class="team-logo-small"><span>${esc(m.t1Name)}</span></div>
+                <div class="team-home">
+                  <img src="${esc(t1.logo || '')}" class="team-logo-small"
+                    loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                    onerror="this.src='https://via.placeholder.com/30?text=?'">
+                  <span>${esc(m.t1Name)}</span>
+                </div>
                 <div class="score-container"><div class="score-box">${esc(m.s1)}</div><span>-</span><div class="score-box">${esc(m.s2)}</div></div>
-                <div class="team-away"><span>${esc(m.t2Name)}</span><img src="${esc(t2.logo || '')}" class="team-logo-small"></div>
+                <div class="team-away">
+                  <span>${esc(m.t2Name)}</span>
+                  <img src="${esc(t2.logo || '')}" class="team-logo-small"
+                    loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                    onerror="this.src='https://via.placeholder.com/30?text=?'">
+                </div>
                 <div></div>
               </div>`;
                 });
@@ -1101,21 +1359,17 @@
             return Array.from(map.values());
         }
 
+        // ✅ Search kaldırıldı: tüm oyuncular listelenir
         function renderPlayersList() {
             const wrap = document.getElementById('players-list');
             if (!wrap) return;
-            const q = (document.getElementById('player-search')?.value || '').toLowerCase().trim();
 
-            const uniq = uniquePlayersIndex().filter(x => {
-                const name = (x.name || '').toLowerCase();
-                const id = (x.playerId || '').toLowerCase();
-                return !q || name.includes(q) || id.includes(q);
-            });
+            const uniq = uniquePlayersIndex();
 
             wrap.innerHTML = uniq.map(p => `
             <div class="mini-card" onclick="showPlayersDetail('${esc(p.playerId)}')">
               <div class="row">
-                <div style="font-weight:800">${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></div>
+                <div style="font-weight:900">${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></div>
                 ${isAdmin ? `<button class="btn-danger btn-small" onclick="event.stopPropagation(); deletePlayerById('${esc(p.playerId)}')">Sil</button>` : ``}
               </div>
               <div class="muted">Detay için tıkla</div>
@@ -1146,7 +1400,7 @@
             box.innerHTML = `
             <div class="row" style="margin-bottom:10px">
               <div>
-                <div style="font-size:1.1rem;font-weight:800">${esc(name)} <span class="pill">${esc(pid)}</span></div>
+                <div style="font-size:1.12rem;font-weight:1000">${esc(name)} <span class="pill">${esc(pid)}</span></div>
                 <div class="muted">Liglere göre istatistik</div>
               </div>
               <div class="row">
@@ -1206,10 +1460,10 @@
             return null;
         }
 
+        // ✅ Search kaldırıldı: tüm takımlar listelenir
         function renderTeamsList() {
             const wrap = document.getElementById('teams-list');
             if (!wrap) return;
-            const q = (document.getElementById('team-search')?.value || '').toLowerCase().trim();
 
             let all = [];
             Object.keys(leagues).forEach(l => {
@@ -1217,19 +1471,15 @@
                 leagues[l].filter(t => t.id !== "dummy").forEach(t => all.push({ leagueKey: l, leagueName: leaguesMeta[l] || l, team: t }));
             });
 
-            const filtered = all.filter(x => {
-                const name = (x.team.name || '').toLowerCase();
-                const id = (x.team.teamId || '').toLowerCase();
-                return !q || name.includes(q) || id.includes(q);
-            });
-
-            wrap.innerHTML = filtered.map(x => `
+            wrap.innerHTML = all.map(x => `
             <div class="mini-card" onclick="showTeamDetail('${esc(x.team.teamId)}')">
               <div class="row">
                 <div class="team-cell">
-                  <img class="team-logo-small" src="${esc(x.team.logo || '')}" onerror="this.style.display='none'">
+                  <img class="team-logo-small" src="${esc(x.team.logo || '')}"
+                    loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                    onerror="this.src='https://via.placeholder.com/30?text=?'">
                   <div>
-                    <div style="font-weight:700">${esc(x.team.name)}</div>
+                    <div style="font-weight:900">${esc(x.team.name)}</div>
                     <div class="muted">${esc(x.leagueName)} • <span class="pill">${esc(x.team.teamId)}</span></div>
                   </div>
                 </div>
@@ -1265,9 +1515,11 @@
             box.innerHTML = `
             <div class="row" style="margin-bottom:10px">
               <div class="team-cell">
-                <img class="team-logo-small" src="${esc(team.logo || '')}" onerror="this.style.display='none'">
+                <img class="team-logo-small" src="${esc(team.logo || '')}"
+                  loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                  onerror="this.src='https://via.placeholder.com/30?text=?'">
                 <div>
-                  <div style="font-size:1.1rem;font-weight:800">${esc(team.name)} <span class="pill">${esc(team.teamId)}</span></div>
+                  <div style="font-size:1.12rem;font-weight:1000">${esc(team.name)} <span class="pill">${esc(team.teamId)}</span></div>
                   <div class="muted">${esc(leagueName)} • P: <b>${team.puan}</b> • AV: <b>${team.averaj}</b></div>
                 </div>
               </div>
@@ -1296,7 +1548,6 @@
             box.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // ✅ TEAM DELETE (admin only)
         function deleteTeamById(teamId) {
             const found = findTeamByTeamId(teamId);
             if (!found) return alert("Takım bulunamadı!");
@@ -1304,14 +1555,12 @@
 
             if (!confirm(`${team.name} takımı tamamen silinsin mi?`)) return;
 
-            // oyuncuları takımsız yap (aynı ligdeki kaydı)
             const roster = Array.isArray(team.roster) ? team.roster.map(normalizeHashId).filter(Boolean) : [];
             roster.forEach(pid => {
                 const rec = getRecordByIdAndLeague(pid, leagueKey);
                 if (rec) rec.team = "";
             });
 
-            // takım sil
             leagues[leagueKey] = (leagues[leagueKey] || []).filter(t => t.id !== team.id);
 
             save();
@@ -1336,7 +1585,12 @@
                 goals.forEach(p => {
                     const t = (leagues[l] || []).find(x => x.name === p.team) || {};
                     html += `<tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(p.playerId)}')">
-                <td class="team-cell"><img src="${esc(t.logo || '')}" class="team-logo-small"> ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></td>
+                <td class="team-cell">
+                  <img src="${esc(t.logo || '')}" class="team-logo-small"
+                    loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                    onerror="this.src='https://via.placeholder.com/30?text=?'">
+                  ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span>
+                </td>
                 <td style="text-align:right"><b>${p.goals}</b></td>
               </tr>`;
                 });
@@ -1347,7 +1601,12 @@
                 assists.forEach(p => {
                     const t = (leagues[l] || []).find(x => x.name === p.team) || {};
                     html += `<tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(p.playerId)}')">
-                <td class="team-cell"><img src="${esc(t.logo || '')}" class="team-logo-small"> ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></td>
+                <td class="team-cell">
+                  <img src="${esc(t.logo || '')}" class="team-logo-small"
+                    loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                    onerror="this.src='https://via.placeholder.com/30?text=?'">
+                  ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span>
+                </td>
                 <td style="text-align:right"><b>${p.assists}</b></td>
               </tr>`;
                 });
@@ -1358,7 +1617,12 @@
                 clean.forEach(p => {
                     const t = (leagues[l] || []).find(x => x.name === p.team) || {};
                     html += `<tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(p.playerId)}')">
-                <td class="team-cell"><img src="${esc(t.logo || '')}" class="team-logo-small"> ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></td>
+                <td class="team-cell">
+                  <img src="${esc(t.logo || '')}" class="team-logo-small"
+                    loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                    onerror="this.src='https://via.placeholder.com/30?text=?'">
+                  ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span>
+                </td>
                 <td style="text-align:right"><b>${p.cs}</b></td>
               </tr>`;
                 });
