@@ -580,11 +580,11 @@
                     <h3>Haber Yönetimi</h3>
                     <input type="text" id="news-title" placeholder="Başlık">
 
-                    <!-- ✅ URL yerine direkt upload -->
-                    <input type="file" id="news-image-file" accept="image/*">
-                    <div class="muted" style="margin:-4px 0 10px;">
-                        Fotoğraf yükleyince otomatik olarak Firebase veritabanına kaydedilir.
+                    <input type="text" id="news-image-url" placeholder="Haber Görsel Linki (https://...png)">
+                    <div class="muted">
+                        Görsel linki https olmalı ve mümkünse direkt .png/.jpg dosyası olmalı.
                     </div>
+
 
                     <textarea id="news-content" placeholder="İçerik... (Enter veya <br> kullanabilirsin)" rows="3"></textarea>
                     <button onclick="publishNews()">Yayınla</button>
@@ -937,57 +937,32 @@
         });
 
         // ---------- News ----------
-        function sanitizeFileName(name) {
-            // türkçe/boşluk vb. temizle, güvenli hale getir
-            return String(name || "")
-                .trim()
-                .replace(/\s+/g, "_")
-                .replace(/[^\w.\-]/g, "") // harf/rakam/_ . -
-                .toLowerCase();
-        }
-
         function publishNews() {
             const t = document.getElementById('news-title').value.trim();
             const c = document.getElementById('news-content').value;
-            const file = document.getElementById('news-image-file').files[0];
+            const img = document.getElementById('news-image-url').value.trim();
 
             if (!t || !c) return alert("Başlık ve içerik zorunlu!");
 
-            let imagePath = "";
-
-            if (file) {
-                const clean = sanitizeFileName(file.name);
-                const ext = (clean.split('.').pop() || "").toLowerCase();
-
-                // jpg/jpeg/png/webp öner
-                const ok = ["png", "jpg", "jpeg", "webp", "gif"].includes(ext);
-                if (!ok) return alert("Lütfen png/jpg/webp/gif dosyası seç!");
-
-                // çakışmasın diye başına timestamp ekliyoruz
-                const finalName = `news_${Date.now()}_${clean}`;
-                imagePath = `images/${finalName}`;
-
-                alert(
-                    "Fotoğraf YÜKLENMEDİ (GitHub yöntemi).\n\n" +
-                    "Şimdi bu dosyayı GitHub repo içinde /images klasörüne şu adla yükle:\n\n" +
-                    finalName + "\n\n" +
-                    "Yükledikten sonra haberde otomatik görünecek."
-                );
+            if (img && !img.startsWith("https://")) {
+                return alert("Görsel linki https ile başlamalı!");
             }
 
             newsData.push({
                 id: Date.now(),
                 title: t,
                 content: c,
-                image: imagePath, // ✅ base64 değil, repo yolu
+                image: img,
                 date: new Date().toLocaleDateString('tr-TR')
             });
 
             document.getElementById('news-title').value = "";
             document.getElementById('news-content').value = "";
-            document.getElementById('news-image-file').value = "";
+            document.getElementById('news-image-url').value = "";
+
             save();
         }
+
 
         function deleteNews(id) {
             if (confirm("Silinsin mi?")) {
@@ -998,22 +973,22 @@
 
         function renderNews() {
             document.getElementById('news-container').innerHTML = newsData.slice().reverse().map(n => `
-            <div class="news-card">
-              ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteNews(${n.id})" style="float:right">Sil</button>` : ''}
-              <h3>${esc(n.title)}</h3>
-              ${n.image ? `
-                <img
-                  src="${esc(n.image)}"
-                  class="news-img"
-                  loading="lazy"
-                  decoding="async"
-                  referrerpolicy="no-referrer"
-                  onerror="this.style.display='none'">
-              ` : ''}
-              <p>${renderNewsContent(n.content)}</p>
-              <small class="muted">${esc(n.date)}</small>
-            </div>
-          `).join('');
+                <div class="news-card">
+                  ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteNews(${n.id})" style="float:right">Sil</button>` : ''}
+                  <h3>${esc(n.title)}</h3>
+                  ${n.image ? `
+                    <img
+                      src="${esc(n.image)}"
+                      class="news-img"
+                      loading="lazy"
+                      decoding="async"
+                      referrerpolicy="no-referrer"
+                      onerror="this.style.display='none'">
+                  ` : ''}
+                  <p>${renderNewsContent(n.content)}</p>
+                  <small class="muted">${esc(n.date)}</small>
+                </div>
+              `).join('');
         }
 
         // ---------- League / Team ----------
@@ -1083,16 +1058,16 @@
                 let html = `<div class="league-card"><h3>${esc(displayName)}</h3><table><tr><th>#</th><th>Takım</th><th>AV</th><th>P</th></tr>`;
                 teams.forEach((t, i) => {
                     html += `<tr>
-                <td>${i + 1}</td>
-                <td class="team-cell">
-                  <img src="${esc(t.logo)}" class="team-logo-small"
-                    loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                    onerror="this.src='https://via.placeholder.com/30?text=?'">
-                  ${esc(t.name)} <span class="pill">${esc(t.teamId)}</span>
-                </td>
-                <td>${t.averaj}</td>
-                <td><b>${t.puan}</b></td>
-              </tr>`;
+                    <td>${i + 1}</td>
+                    <td class="team-cell">
+                      <img src="${esc(t.logo)}" class="team-logo-small"
+                        loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                        onerror="this.src='https://via.placeholder.com/30?text=?'">
+                      ${esc(t.name)} <span class="pill">${esc(t.teamId)}</span>
+                    </td>
+                    <td>${t.averaj}</td>
+                    <td><b>${t.puan}</b></td>
+                  </tr>`;
                 });
                 container.innerHTML += html + `</table></div>`;
             });
@@ -1133,22 +1108,22 @@
                         const t1 = lData.find(x => x.name === m.home) || {};
                         const t2 = lData.find(x => x.name === m.away) || {};
                         html += `<div class="fixture-item">
-                  <div></div>
-                  <div class="team-home">
-                    <img src="${esc(t1.logo || '')}" class="team-logo-small"
-                      loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                      onerror="this.src='https://via.placeholder.com/30?text=?'">
-                    <span>${esc(m.home)}</span>
-                  </div>
-                  <div class="tire-container">-</div>
-                  <div class="team-away">
-                    <span>${esc(m.away)}</span>
-                    <img src="${esc(t2.logo || '')}" class="team-logo-small"
-                      loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                      onerror="this.src='https://via.placeholder.com/30?text=?'">
-                  </div>
-                  <div></div>
-                </div>`;
+                      <div></div>
+                      <div class="team-home">
+                        <img src="${esc(t1.logo || '')}" class="team-logo-small"
+                          loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                          onerror="this.src='https://via.placeholder.com/30?text=?'">
+                        <span>${esc(m.home)}</span>
+                      </div>
+                      <div class="tire-container">-</div>
+                      <div class="team-away">
+                        <span>${esc(m.away)}</span>
+                        <img src="${esc(t2.logo || '')}" class="team-logo-small"
+                          loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                          onerror="this.src='https://via.placeholder.com/30?text=?'">
+                      </div>
+                      <div></div>
+                    </div>`;
                     });
                 });
                 container.innerHTML += html + `</div>`;
@@ -1185,24 +1160,24 @@
                     const t1 = lData.find(x => x.id !== "dummy" && ((m.t1Id && x.id === m.t1Id) || x.name === m.t1Name)) || {};
                     const t2 = lData.find(x => x.id !== "dummy" && ((m.t2Id && x.id === m.t2Id) || x.name === m.t2Name)) || {};
                     html += `<div class="match-row">
-                <div style="display:flex;justify-content:center;">
-                  ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteMatch(${m.id})">X</button>` : ''}
-                </div>
-                <div class="team-home">
-                  <img src="${esc(t1.logo || '')}" class="team-logo-small"
-                    loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                    onerror="this.src='https://via.placeholder.com/30?text=?'">
-                  <span>${esc(m.t1Name)}</span>
-                </div>
-                <div class="score-container"><div class="score-box">${esc(m.s1)}</div><span>-</span><div class="score-box">${esc(m.s2)}</div></div>
-                <div class="team-away">
-                  <span>${esc(m.t2Name)}</span>
-                  <img src="${esc(t2.logo || '')}" class="team-logo-small"
-                    loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                    onerror="this.src='https://via.placeholder.com/30?text=?'">
-                </div>
-                <div></div>
-              </div>`;
+                    <div style="display:flex;justify-content:center;">
+                      ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteMatch(${m.id})">X</button>` : ''}
+                    </div>
+                    <div class="team-home">
+                      <img src="${esc(t1.logo || '')}" class="team-logo-small"
+                        loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                        onerror="this.src='https://via.placeholder.com/30?text=?'">
+                      <span>${esc(m.t1Name)}</span>
+                    </div>
+                    <div class="score-container"><div class="score-box">${esc(m.s1)}</div><span>-</span><div class="score-box">${esc(m.s2)}</div></div>
+                    <div class="team-away">
+                      <span>${esc(m.t2Name)}</span>
+                      <img src="${esc(t2.logo || '')}" class="team-logo-small"
+                        loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                        onerror="this.src='https://via.placeholder.com/30?text=?'">
+                    </div>
+                    <div></div>
+                  </div>`;
                 });
                 container.innerHTML += html + `</div>`;
             });
@@ -1389,14 +1364,14 @@
             const uniq = uniquePlayersIndex();
 
             wrap.innerHTML = uniq.map(p => `
-            <div class="mini-card" onclick="showPlayersDetail('${esc(p.playerId)}')">
-              <div class="row">
-                <div style="font-weight:900">${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></div>
-                ${isAdmin ? `<button class="btn-danger btn-small" onclick="event.stopPropagation(); deletePlayerById('${esc(p.playerId)}')">Sil</button>` : ``}
-              </div>
-              <div class="muted">Detay için tıkla</div>
-            </div>
-          `).join('') || `<div class="muted">Oyuncu bulunamadı.</div>`;
+                <div class="mini-card" onclick="showPlayersDetail('${esc(p.playerId)}')">
+                  <div class="row">
+                    <div style="font-weight:900">${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></div>
+                    ${isAdmin ? `<button class="btn-danger btn-small" onclick="event.stopPropagation(); deletePlayerById('${esc(p.playerId)}')">Sil</button>` : ``}
+                  </div>
+                  <div class="muted">Detay için tıkla</div>
+                </div>
+              `).join('') || `<div class="muted">Oyuncu bulunamadı.</div>`;
         }
 
         function showPlayersDetail(playerId) {
@@ -1420,31 +1395,31 @@
 
             box.style.display = 'block';
             box.innerHTML = `
-            <div class="row" style="margin-bottom:10px">
-              <div>
-                <div style="font-size:1.12rem;font-weight:1000">${esc(name)} <span class="pill">${esc(pid)}</span></div>
-                <div class="muted">Liglere göre istatistik</div>
-              </div>
-              <div class="row">
-                <button class="linkbtn" onclick="document.getElementById('players-detail').style.display='none'">Kapat</button>
-                ${isAdmin ? `<button class="btn-danger btn-small" onclick="deletePlayerById('${esc(pid)}')">Oyuncuyu Sil</button>` : ``}
-              </div>
-            </div>
+                <div class="row" style="margin-bottom:10px">
+                  <div>
+                    <div style="font-size:1.12rem;font-weight:1000">${esc(name)} <span class="pill">${esc(pid)}</span></div>
+                    <div class="muted">Liglere göre istatistik</div>
+                  </div>
+                  <div class="row">
+                    <button class="linkbtn" onclick="document.getElementById('players-detail').style.display='none'">Kapat</button>
+                    ${isAdmin ? `<button class="btn-danger btn-small" onclick="deletePlayerById('${esc(pid)}')">Oyuncuyu Sil</button>` : ``}
+                  </div>
+                </div>
 
-            <h3>Lig Bazlı İstatistik</h3>
-            <table>
-              <tr><th>Lig</th><th>Takım</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
-              ${leaguesList.map(x => `
-                <tr>
-                  <td>${esc(leaguesMeta[x.league] || x.league)}</td>
-                  <td>${esc(x.team || '—')}</td>
-                  <td><b>${x.goals}</b></td>
-                  <td><b>${x.assists}</b></td>
-                  <td><b>${x.cs}</b></td>
-                </tr>
-              `).join('')}
-            </table>
-          `;
+                <h3>Lig Bazlı İstatistik</h3>
+                <table>
+                  <tr><th>Lig</th><th>Takım</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
+                  ${leaguesList.map(x => `
+                    <tr>
+                      <td>${esc(leaguesMeta[x.league] || x.league)}</td>
+                      <td>${esc(x.team || '—')}</td>
+                      <td><b>${x.goals}</b></td>
+                      <td><b>${x.assists}</b></td>
+                      <td><b>${x.cs}</b></td>
+                    </tr>
+                  `).join('')}
+                </table>
+              `;
             box.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
@@ -1494,22 +1469,22 @@
             });
 
             wrap.innerHTML = all.map(x => `
-            <div class="mini-card" onclick="showTeamDetail('${esc(x.team.teamId)}')">
-              <div class="row">
-                <div class="team-cell">
-                  <img class="team-logo-small" src="${esc(x.team.logo || '')}"
-                    loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                    onerror="this.src='https://via.placeholder.com/30?text=?'">
-                  <div>
-                    <div style="font-weight:900">${esc(x.team.name)}</div>
-                    <div class="muted">${esc(x.leagueName)} • <span class="pill">${esc(x.team.teamId)}</span></div>
+                <div class="mini-card" onclick="showTeamDetail('${esc(x.team.teamId)}')">
+                  <div class="row">
+                    <div class="team-cell">
+                      <img class="team-logo-small" src="${esc(x.team.logo || '')}"
+                        loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                        onerror="this.src='https://via.placeholder.com/30?text=?'">
+                      <div>
+                        <div style="font-weight:900">${esc(x.team.name)}</div>
+                        <div class="muted">${esc(x.leagueName)} • <span class="pill">${esc(x.team.teamId)}</span></div>
+                      </div>
+                    </div>
+                    <div class="pill">P: ${x.team.puan} • AV: ${x.team.averaj}</div>
                   </div>
+                  <div class="muted" style="margin-top:6px">Kadro için tıkla</div>
                 </div>
-                <div class="pill">P: ${x.team.puan} • AV: ${x.team.averaj}</div>
-              </div>
-              <div class="muted" style="margin-top:6px">Kadro için tıkla</div>
-            </div>
-          `).join('') || `<div class="muted">Takım bulunamadı.</div>`;
+              `).join('') || `<div class="muted">Takım bulunamadı.</div>`;
         }
 
         function showTeamDetail(teamId) {
@@ -1535,38 +1510,38 @@
 
             box.style.display = 'block';
             box.innerHTML = `
-            <div class="row" style="margin-bottom:10px">
-              <div class="team-cell">
-                <img class="team-logo-small" src="${esc(team.logo || '')}"
-                  loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                  onerror="this.src='https://via.placeholder.com/30?text=?'">
-                <div>
-                  <div style="font-size:1.12rem;font-weight:1000">${esc(team.name)} <span class="pill">${esc(team.teamId)}</span></div>
-                  <div class="muted">${esc(leagueName)} • P: <b>${team.puan}</b> • AV: <b>${team.averaj}</b></div>
+                <div class="row" style="margin-bottom:10px">
+                  <div class="team-cell">
+                    <img class="team-logo-small" src="${esc(team.logo || '')}"
+                      loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                      onerror="this.src='https://via.placeholder.com/30?text=?'">
+                    <div>
+                      <div style="font-size:1.12rem;font-weight:1000">${esc(team.name)} <span class="pill">${esc(team.teamId)}</span></div>
+                      <div class="muted">${esc(leagueName)} • P: <b>${team.puan}</b> • AV: <b>${team.averaj}</b></div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <button class="linkbtn" onclick="document.getElementById('teams-detail').style.display='none'">Kapat</button>
+                    ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteTeamById('${esc(team.teamId)}')">Takımı Sil</button>` : ``}
+                  </div>
                 </div>
-              </div>
-              <div class="row">
-                <button class="linkbtn" onclick="document.getElementById('teams-detail').style.display='none'">Kapat</button>
-                ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteTeamById('${esc(team.teamId)}')">Takımı Sil</button>` : ``}
-              </div>
-            </div>
 
-            <h3>Kadro</h3>
-            ${rosterRows.length ? `
-              <table>
-                <tr><th>Oyuncu</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
-                ${rosterRows.map(r => `
-                  <tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(r.pid)}')">
-                    <td>${esc(r.nm)} <span class="pill">${esc(r.pid)}</span></td>
-                    <td><b>${r.g}</b></td>
-                    <td><b>${r.a}</b></td>
-                    <td><b>${r.cs}</b></td>
-                  </tr>
-                `).join('')}
-              </table>
-              <div class="muted" style="margin-top:8px">Not: Oyuncuya tıklayınca oyuncu detayına gider.</div>
-            ` : `<div class="muted">Kadro boş.</div>`}
-          `;
+                <h3>Kadro</h3>
+                ${rosterRows.length ? `
+                  <table>
+                    <tr><th>Oyuncu</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
+                    ${rosterRows.map(r => `
+                      <tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(r.pid)}')">
+                        <td>${esc(r.nm)} <span class="pill">${esc(r.pid)}</span></td>
+                        <td><b>${r.g}</b></td>
+                        <td><b>${r.a}</b></td>
+                        <td><b>${r.cs}</b></td>
+                      </tr>
+                    `).join('')}
+                  </table>
+                  <div class="muted" style="margin-top:8px">Not: Oyuncuya tıklayınca oyuncu detayına gider.</div>
+                ` : `<div class="muted">Kadro boş.</div>`}
+              `;
             box.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
@@ -1607,14 +1582,14 @@
                 goals.forEach(p => {
                     const t = (leagues[l] || []).find(x => x.name === p.team) || {};
                     html += `<tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(p.playerId)}')">
-                <td class="team-cell">
-                  <img src="${esc(t.logo || '')}" class="team-logo-small"
-                    loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                    onerror="this.src='https://via.placeholder.com/30?text=?'">
-                  ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span>
-                </td>
-                <td style="text-align:right"><b>${p.goals}</b></td>
-              </tr>`;
+                    <td class="team-cell">
+                      <img src="${esc(t.logo || '')}" class="team-logo-small"
+                        loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                        onerror="this.src='https://via.placeholder.com/30?text=?'">
+                      ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span>
+                    </td>
+                    <td style="text-align:right"><b>${p.goals}</b></td>
+                  </tr>`;
                 });
                 html += `</table></div>`;
 
@@ -1623,14 +1598,14 @@
                 assists.forEach(p => {
                     const t = (leagues[l] || []).find(x => x.name === p.team) || {};
                     html += `<tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(p.playerId)}')">
-                <td class="team-cell">
-                  <img src="${esc(t.logo || '')}" class="team-logo-small"
-                    loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                    onerror="this.src='https://via.placeholder.com/30?text=?'">
-                  ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span>
-                </td>
-                <td style="text-align:right"><b>${p.assists}</b></td>
-              </tr>`;
+                    <td class="team-cell">
+                      <img src="${esc(t.logo || '')}" class="team-logo-small"
+                        loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                        onerror="this.src='https://via.placeholder.com/30?text=?'">
+                      ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span>
+                    </td>
+                    <td style="text-align:right"><b>${p.assists}</b></td>
+                  </tr>`;
                 });
                 html += `</table></div>`;
 
@@ -1639,14 +1614,14 @@
                 clean.forEach(p => {
                     const t = (leagues[l] || []).find(x => x.name === p.team) || {};
                     html += `<tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(p.playerId)}')">
-                <td class="team-cell">
-                  <img src="${esc(t.logo || '')}" class="team-logo-small"
-                    loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                    onerror="this.src='https://via.placeholder.com/30?text=?'">
-                  ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span>
-                </td>
-                <td style="text-align:right"><b>${p.cs}</b></td>
-              </tr>`;
+                    <td class="team-cell">
+                      <img src="${esc(t.logo || '')}" class="team-logo-small"
+                        loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                        onerror="this.src='https://via.placeholder.com/30?text=?'">
+                      ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span>
+                    </td>
+                    <td style="text-align:right"><b>${p.cs}</b></td>
+                  </tr>`;
                 });
                 html += `</table></div>`;
 
