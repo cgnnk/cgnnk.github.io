@@ -534,8 +534,8 @@
                 <img src="logo.png" alt="MBTL" class="main-logo" loading="lazy" decoding="async"
                      referrerpolicy="no-referrer" onerror="this.src='https://via.placeholder.com/45?text=MB'">
                 <div class="brand">
-                    <h1>MAMOBALL TURKEY LEAGUE</h1>
-                    <span>discord.gg/mbtl</span>
+                    <h1>MB LEAGUE</h1>
+                    <span>Mamoball Turkey League</span>
                 </div>
             </div>
 
@@ -581,7 +581,7 @@
             <input type="password" id="admin-password" placeholder="Şifre">
             <button onclick="loginEmail()">Email ile Giriş</button>
             <div style="height:10px"></div>
-            <button class="linkbtn" onclick="loginGoogle()">Google ile Giriş</button>
+            <button onclick="loginGoogle()">Google ile Giriş</button>
             <div class="muted" style="margin-top:10px;">
                 ⚠️ Güvenlik için ayrıca Firebase RTDB Rules’da admin dışında yazmayı kapatmalısın (aşağıdaki JS tek başına yetmez).
             </div>
@@ -896,12 +896,18 @@
         async function loginGoogle() {
             try {
                 const provider = new firebase.auth.GoogleAuthProvider();
-                await auth.signInWithPopup(provider);
+                const res = await firebase.auth().signInWithPopup(provider);
+
+                const uid = res.user.uid;
+                isAdmin = ADMIN_UIDS.includes(uid);
+
+                refreshAdminVisibility();
+                handleNav('admin');
             } catch (e) {
-                console.error(e);
-                alert("Google giriş hatası: " + (e?.message || e));
+                alert("Google giriş hatası: " + e.message);
             }
         }
+
 
         async function logout() {
             try {
