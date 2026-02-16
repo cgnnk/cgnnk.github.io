@@ -899,11 +899,17 @@
                 const res = await firebase.auth().signInWithPopup(provider);
 
                 const uid = res.user.uid;
+
+                // Admin kontrolü
                 isAdmin = ADMIN_UIDS.includes(uid);
 
                 refreshAdminVisibility();
                 handleNav('admin');
+                renderAll();
+
+                alert(isAdmin ? "Admin olarak giriş yapıldı ✅" : "Giriş yapıldı (Admin değilsin) ❌");
             } catch (e) {
+                console.error(e);
                 alert("Google giriş hatası: " + e.message);
             }
         }
