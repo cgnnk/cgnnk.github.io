@@ -577,15 +577,31 @@
             <div class="muted" style="margin-bottom:10px;">
                 Bu giriş Firebase Auth ile çalışır. Admin yetkisi UID listesine göre verilir.
             </div>
-            <input type="email" id="admin-email" placeholder="Admin Email">
-            <input type="password" id="admin-password" placeholder="Şifre">
-            <button onclick="loginEmail()">Email ile Giriş</button>
-            <div style="height:10px"></div>
-            <button onclick="loginGoogle()">Google ile Giriş</button>
+
+            <!-- Enter basınca email login değil Google login çalışsın -->
+            <input type="email"
+                   id="admin-email"
+                   placeholder="Admin Email"
+                   autocomplete="off"
+                   onkeydown="if(event.key==='Enter'){ event.preventDefault(); loginGoogle(); }">
+
+            <input type="password"
+                   id="admin-password"
+                   placeholder="Şifre"
+                   autocomplete="off"
+                   onkeydown="if(event.key==='Enter'){ event.preventDefault(); loginGoogle(); }">
+
+            <!-- Email login kapalı (butonu da kaldırdım) -->
+            <!-- <button onclick="loginEmail()">Email ile Giriş</button>
+        <div style="height:10px"></div> -->
+
+            <button type="button" onclick="loginGoogle()">Google ile Giriş</button>
+
             <div class="muted" style="margin-top:10px;">
                 ⚠️ Güvenlik için ayrıca Firebase RTDB Rules’da admin dışında yazmayı kapatmalısın (aşağıdaki JS tek başına yetmez).
             </div>
         </section>
+
 
         <!-- Admin Panel -->
         <section id="admin-panel" class="admin-section" style="display:none;">
@@ -882,16 +898,10 @@
         // ✅ AUTH HANDLERS (1)
         // =======================
         async function loginEmail() {
-            const email = document.getElementById('admin-email').value.trim();
-            const pass = document.getElementById('admin-password').value;
-            if (!email || !pass) return alert("Email/Şifre girin!");
-            try {
-                await auth.signInWithEmailAndPassword(email, pass);
-            } catch (e) {
-                console.error(e);
-                alert("Giriş hatası: " + (e?.message || e));
-            }
+            alert("Email ile giriş kapalı. Google ile giriş kullan.");
+            return;
         }
+
 
         async function loginGoogle() {
             try {
