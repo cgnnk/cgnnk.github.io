@@ -188,7 +188,7 @@
                     }
 
             .hamburger {
-                display: flex
+                display: flex;
             }
         }
 
@@ -537,8 +537,8 @@
                      referrerpolicy="no-referrer"
                      onerror="this.src='https://via.placeholder.com/45?text=MB'">
                 <div class="brand">
-                    <h1>MB LEAGUE</h1>
-                    <span>Mamoball Turkey League</span>
+                    <h1>MAMOBALL TURKEY LEAGUE</h1>
+                    <span>discord.gg/mbtl</span>
                 </div>
             </div>
 
@@ -579,19 +579,11 @@
                 <div>
                     <h3>Haber Yönetimi</h3>
                     <input type="text" id="news-title" placeholder="Başlık">
-
                     <input type="text" id="news-image-url" placeholder="Haber Görsel Linki (https://...png)">
-                    <div class="muted">
-                        Görsel linki https olmalı ve mümkünse direkt .png/.jpg dosyası olmalı.
-                    </div>
-
-
+                    <div class="muted">Görsel linki https olmalı ve mümkünse direkt .png/.jpg dosyası olmalı.</div>
                     <textarea id="news-content" placeholder="İçerik... (Enter veya <br> kullanabilirsin)" rows="3"></textarea>
                     <button onclick="publishNews()">Yayınla</button>
-
-                    <div class="muted" style="margin-top:10px">
-                        Not: Çok büyük fotoğraflar (özellikle 2-3MB+) Firebase DB’de sorun çıkarabilir. Gerekirse sıkıştır.
-                    </div>
+                    <div class="muted" style="margin-top:10px">Not: Çok büyük fotoğraflar (özellikle 2-3MB+) Firebase DB’de sorun çıkarabilir. Gerekirse sıkıştır.</div>
                 </div>
             </div>
         </section>
@@ -655,7 +647,10 @@
                     <input type="number" id="plus-assist" placeholder="Asist">
                     <input type="number" id="plus-cs" placeholder="CS">
                 </div>
-                <button onclick="updatePlayerStatsById()" style="background:linear-gradient(180deg, rgba(0,200,81,1), rgba(0,150,61,1));box-shadow:0 12px 26px rgba(0,200,81,.12);">Kaydet</button>
+                <button onclick="updatePlayerStatsById()"
+                        style="background:linear-gradient(180deg, rgba(0,200,81,1), rgba(0,150,61,1));box-shadow:0 12px 26px rgba(0,200,81,.12);">
+                    Kaydet
+                </button>
                 <div class="muted" style="margin-top:8px">Not: Aynı #ID farklı liglerde ayrı istatistik tutar.</div>
             </div>
         </section>
@@ -691,7 +686,6 @@
         <!-- Takımlar -->
         <section id="teams-section" style="display:none;">
             <h2>Takımlar</h2>
-            <!-- ✅ takım arama kaldırıldı -->
             <div id="teams-list"></div>
             <div id="teams-detail" class="league-card" style="display:none;"></div>
         </section>
@@ -717,7 +711,6 @@
                 </button>
             </div>
 
-            <!-- ✅ oyuncu arama kaldırıldı -->
             <div id="players-list"></div>
             <div id="players-detail" class="league-card" style="display:none;"></div>
         </section>
@@ -725,6 +718,11 @@
     </div>
 
     <script>
+        // ---------- DOM helpers (null-safe) ----------
+        const $ = (id) => document.getElementById(id);
+        const qs = (sel) => document.querySelector(sel);
+
+        // ---------- Firebase ----------
         const firebaseConfig = {
             apiKey: "AIzaSyD5pvFMZ7PXZ5jHsRvMr5hBCHYYumnqq_A",
             authDomain: "mamoball-turkey-league.firebaseapp.com",
@@ -734,6 +732,7 @@
             messagingSenderId: "648815784565",
             appId: "1:648815784565:web:5d82e86c1db870cd53fe3c"
         };
+
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
@@ -758,8 +757,6 @@
         function esc(s) {
             return String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
         }
-
-        // ✅ Firebase key safe (lig key'i)
         function makeSafeKey(s) {
             return String(s || "")
                 .trim()
@@ -767,8 +764,6 @@
                 .replace(/\s+/g, " ")
                 .trim();
         }
-
-        // Haberlerde <br> ve Enter çalışsın (diğer her şey escape)
         function renderNewsContent(content) {
             let safe = esc(content || '');
             safe = safe.replace(/&lt;br\s*\/?&gt;/gi, '<br>');
@@ -776,33 +771,44 @@
             return safe;
         }
 
+        // ---------- Menu / Nav (NULL-SAFE) ----------
         function toggleMenu() {
-            document.querySelector('.hamburger').classList.toggle('active');
-            document.getElementById('nav-menu').classList.toggle('active');
+            qs('.hamburger')?.classList.toggle('active');
+            $('nav-menu')?.classList.toggle('active');
         }
 
         function handleNav(tab) {
-            document.querySelector('.hamburger').classList.remove('active');
-            document.getElementById('nav-menu').classList.remove('active');
+            // Mobil menüyü kapat (varsa)
+            qs('.hamburger')?.classList.remove('active');
+            $('nav-menu')?.classList.remove('active');
 
-            ['news', 'standings', 'fixture', 'stats', 'matches', 'admin', 'teams', 'players'].forEach(t => {
-                const sec = document.getElementById(t + '-section');
+            // Tüm sekmeleri gizle
+            ['news', 'standings', 'fixture', 'stats', 'matches', 'teams', 'players'].forEach(t => {
+                const sec = $(t + '-section');
                 if (sec) sec.style.display = 'none';
             });
 
-            document.getElementById('admin-auth').style.display = 'none';
-            document.getElementById('admin-panel').style.display = 'none';
+            // Admin bloklarını gizle (varsa)
+            if ($('admin-auth')) $('admin-auth').style.display = 'none';
+            if ($('admin-panel')) $('admin-panel').style.display = 'none';
 
             if (tab === 'admin') {
-                isAdmin ? (document.getElementById('admin-panel').style.display = 'block')
-                    : (document.getElementById('admin-auth').style.display = 'block');
-            } else {
-                document.getElementById(tab + '-section').style.display = 'block';
+                if (isAdmin) {
+                    $('admin-panel') && ($('admin-panel').style.display = 'block');
+                } else {
+                    $('admin-auth') && ($('admin-auth').style.display = 'block');
+                }
+                return;
             }
+
+            const target = $(tab + '-section');
+            if (target) target.style.display = 'block';
+            // target yoksa hiçbir şey yapma (null style hatası artık olmaz)
         }
 
+        // ---------- Admin ----------
         function checkPassword() {
-            if (document.getElementById('admin-pass').value === ADMIN_PASSWORD) {
+            if (($('admin-pass')?.value || "") === ADMIN_PASSWORD) {
                 isAdmin = true;
                 refreshAdminVisibility();
                 handleNav('admin');
@@ -813,14 +819,14 @@
 
         function refreshAdminVisibility() {
             const show = isAdmin ? 'block' : 'none';
-            document.getElementById('admin-standings-tools').style.display = show;
-            document.getElementById('admin-fixture-tools').style.display = show;
-            document.getElementById('admin-stats-tools').style.display = show;
-            document.getElementById('admin-matches-tools').style.display = show;
-            document.getElementById('admin-players-tools').style.display = show;
+            $('admin-standings-tools') && ($('admin-standings-tools').style.display = show);
+            $('admin-fixture-tools') && ($('admin-fixture-tools').style.display = show);
+            $('admin-stats-tools') && ($('admin-stats-tools').style.display = show);
+            $('admin-matches-tools') && ($('admin-matches-tools').style.display = show);
+            $('admin-players-tools') && ($('admin-players-tools').style.display = show);
         }
 
-        // ---------- Standings recalculation from matches ----------
+        // ---------- Standings recalculation ----------
         function recalcStandingsFromMatches() {
             Object.keys(leagues).forEach(l => {
                 if (!Array.isArray(leagues[l])) return;
@@ -833,7 +839,7 @@
                 });
             });
 
-            matches.forEach(m => {
+            (matches || []).forEach(m => {
                 const l = m.league;
                 const lData = leagues[l];
                 if (!lData) return;
@@ -887,7 +893,7 @@
                 fixtures = data.fixtures || {};
             }
 
-            // ✅ FIX: Object gelen ligleri array'e çevir (eski veri uyumu)
+            // Eski veriler için object->array uyumu
             Object.keys(leagues).forEach(k => {
                 if (Array.isArray(leagues[k])) return;
                 if (leagues[k] && typeof leagues[k] === "object") {
@@ -897,12 +903,10 @@
             });
 
             // meta yoksa key'i göster
-            Object.keys(leagues).forEach(k => {
-                if (!leaguesMeta[k]) leaguesMeta[k] = k;
-            });
+            Object.keys(leagues).forEach(k => { if (!leaguesMeta[k]) leaguesMeta[k] = k; });
 
-            // migration normalize: players
-            players.forEach(p => {
+            // players normalize
+            (players || []).forEach(p => {
                 if (!p.playerId || !isValidHashId(p.playerId)) p.playerId = makeId('P');
                 else p.playerId = normalizeHashId(p.playerId);
                 if (!p.name) p.name = "Oyuncu";
@@ -913,7 +917,7 @@
                 if (p.cs == null) p.cs = 0;
             });
 
-            // migration normalize: teams
+            // teams normalize
             Object.keys(leagues).forEach(l => {
                 if (!Array.isArray(leagues[l])) return;
                 leagues[l].forEach(t => {
@@ -933,20 +937,18 @@
             renderPlayersList();
             refreshAdminVisibility();
 
-            document.getElementById('loader').style.display = 'none';
+            // loader kapat (varsa)
+            $('loader') && ($('loader').style.display = 'none');
         });
 
         // ---------- News ----------
         function publishNews() {
-            const t = document.getElementById('news-title').value.trim();
-            const c = document.getElementById('news-content').value;
-            const img = document.getElementById('news-image-url').value.trim();
+            const t = ($('news-title')?.value || "").trim();
+            const c = $('news-content')?.value || "";
+            const img = ($('news-image-url')?.value || "").trim();
 
             if (!t || !c) return alert("Başlık ve içerik zorunlu!");
-
-            if (img && !img.startsWith("https://")) {
-                return alert("Görsel linki https ile başlamalı!");
-            }
+            if (img && !img.startsWith("https://")) return alert("Görsel linki https ile başlamalı!");
 
             newsData.push({
                 id: Date.now(),
@@ -956,13 +958,12 @@
                 date: new Date().toLocaleDateString('tr-TR')
             });
 
-            document.getElementById('news-title').value = "";
-            document.getElementById('news-content').value = "";
-            document.getElementById('news-image-url').value = "";
+            if ($('news-title')) $('news-title').value = "";
+            if ($('news-content')) $('news-content').value = "";
+            if ($('news-image-url')) $('news-image-url').value = "";
 
             save();
         }
-
 
         function deleteNews(id) {
             if (confirm("Silinsin mi?")) {
@@ -972,41 +973,35 @@
         }
 
         function renderNews() {
-            document.getElementById('news-container').innerHTML = newsData.slice().reverse().map(n => `
-                <div class="news-card">
-                  ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteNews(${n.id})" style="float:right">Sil</button>` : ''}
-                  <h3>${esc(n.title)}</h3>
-                  ${n.image ? `
-                    <img
-                      src="${esc(n.image)}"
-                      class="news-img"
-                      loading="lazy"
-                      decoding="async"
-                      referrerpolicy="no-referrer"
-                      onerror="this.style.display='none'">
-                  ` : ''}
-                  <p>${renderNewsContent(n.content)}</p>
-                  <small class="muted">${esc(n.date)}</small>
-                </div>
-              `).join('');
+            const wrap = $('news-container');
+            if (!wrap) return;
+            wrap.innerHTML = newsData.slice().reverse().map(n => `
+            <div class="news-card">
+              ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteNews(${n.id})" style="float:right">Sil</button>` : ''}
+              <h3>${esc(n.title)}</h3>
+              ${n.image ? `
+                <img
+                  src="${esc(n.image)}"
+                  class="news-img"
+                  loading="lazy"
+                  decoding="async"
+                  referrerpolicy="no-referrer"
+                  onerror="this.style.display='none'">
+              ` : ''}
+              <p>${renderNewsContent(n.content)}</p>
+              <small class="muted">${esc(n.date)}</small>
+            </div>
+          `).join('');
         }
 
         // ---------- League / Team ----------
         function addLeague() {
-            const inp = document.getElementById('league-name-input');
+            const inp = $('league-name-input');
             const displayName = (inp?.value || "").trim();
             if (!displayName) return alert("Lig adı boş olamaz!");
 
             const key = makeSafeKey(displayName);
             if (!key) return alert("Lig adı geçersiz!");
-
-            if (leagues[key] && !Array.isArray(leagues[key])) {
-                if (leagues[key] && typeof leagues[key] === "object") {
-                    const arr = Object.values(leagues[key]).filter(v => v && typeof v === "object" && !Array.isArray(v));
-                    leagues[key] = arr;
-                }
-            }
-
             if (leagues[key]) return alert("Bu lig zaten var!");
 
             leagues[key] = [{
@@ -1014,16 +1009,16 @@
             }];
             leaguesMeta[key] = displayName;
 
-            inp.value = "";
+            if (inp) inp.value = "";
             save();
         }
 
         function addTeam() {
-            const l = document.getElementById('team-league-select').value;
-            const n = document.getElementById('team-name').value.trim();
-            const rawTeamId = document.getElementById('team-id-input').value.trim();
+            const l = $('team-league-select')?.value || "";
+            const n = ($('team-name')?.value || "").trim();
+            const rawTeamId = ($('team-id-input')?.value || "").trim();
             const teamId = rawTeamId ? normalizeHashId(rawTeamId) : makeId('T');
-            const logo = document.getElementById('team-logo-input').value.trim();
+            const logo = ($('team-logo-input')?.value || "").trim();
 
             if (!l || !n) return;
             if (rawTeamId && !isValidHashId(rawTeamId)) return alert("Takım ID geçersiz! (# ile başlayacak, sadece harf/rakam).");
@@ -1031,13 +1026,23 @@
             const allTeams = Object.values(leagues).flat().filter(x => x && x.id && x.id !== "dummy");
             if (allTeams.some(t => t.teamId === teamId)) return alert("Bu takım ID zaten kullanılıyor!");
 
-            leagues[l] = leagues[l].filter(x => x.id !== "dummy");
-            leagues[l].push({ id: "T" + Date.now(), teamId, name: n, logo: logo || 'https://via.placeholder.com/30?text=?', puan: 0, averaj: 0, roster: [] });
-            save(); alert("Takım Eklendi!");
+            leagues[l] = (leagues[l] || []).filter(x => x.id !== "dummy");
+            leagues[l].push({
+                id: "T" + Date.now(),
+                teamId,
+                name: n,
+                logo: logo || 'https://via.placeholder.com/30?text=?',
+                puan: 0,
+                averaj: 0,
+                roster: []
+            });
+
+            save();
+            alert("Takım Eklendi!");
         }
 
         function deleteLeague() {
-            const l = document.getElementById('team-league-select').value;
+            const l = $('team-league-select')?.value || "";
             const dn = leaguesMeta[l] || l;
             if (l && confirm(`${dn} silinsin mi?`)) {
                 delete leagues[l];
@@ -1048,26 +1053,30 @@
         }
 
         function renderStandings() {
-            const container = document.getElementById('leagues-container'); container.innerHTML = "";
+            const container = $('leagues-container');
+            if (!container) return;
+            container.innerHTML = "";
+
             Object.keys(leagues).forEach(l => {
                 if (!Array.isArray(leagues[l])) return;
 
                 const displayName = leaguesMeta[l] || l;
-                let teams = leagues[l].filter(t => t.id !== "dummy").sort((a, b) => b.puan - a.puan || b.averaj - a.averaj);
+                const teams = leagues[l].filter(t => t.id !== "dummy")
+                    .sort((a, b) => b.puan - a.puan || b.averaj - a.averaj);
 
                 let html = `<div class="league-card"><h3>${esc(displayName)}</h3><table><tr><th>#</th><th>Takım</th><th>AV</th><th>P</th></tr>`;
                 teams.forEach((t, i) => {
                     html += `<tr>
-                    <td>${i + 1}</td>
-                    <td class="team-cell">
-                      <img src="${esc(t.logo)}" class="team-logo-small"
-                        loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                        onerror="this.src='https://via.placeholder.com/30?text=?'">
-                      ${esc(t.name)} <span class="pill">${esc(t.teamId)}</span>
-                    </td>
-                    <td>${t.averaj}</td>
-                    <td><b>${t.puan}</b></td>
-                  </tr>`;
+                <td>${i + 1}</td>
+                <td class="team-cell">
+                  <img src="${esc(t.logo)}" class="team-logo-small"
+                    loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                    onerror="this.src='https://via.placeholder.com/30?text=?'">
+                  ${esc(t.name)} <span class="pill">${esc(t.teamId)}</span>
+                </td>
+                <td>${t.averaj}</td>
+                <td><b>${t.puan}</b></td>
+              </tr>`;
                 });
                 container.innerHTML += html + `</table></div>`;
             });
@@ -1075,11 +1084,13 @@
 
         // ---------- Fixture ----------
         function generateFixture() {
-            const l = document.getElementById('fixture-league-select').value;
+            const l = $('fixture-league-select')?.value || "";
             if (!l) return alert("Lig seçin!");
-            let teams = leagues[l].filter(t => t.id !== "dummy").map(t => t.name);
+
+            let teams = (leagues[l] || []).filter(t => t.id !== "dummy").map(t => t.name);
             if (teams.length < 2) return;
             if (teams.length % 2 !== 0) teams.push("BAY");
+
             let totalRounds = teams.length - 1, rounds = [];
             for (let r = 0; r < totalRounds; r++) {
                 let roundMatches = [];
@@ -1090,40 +1101,50 @@
                 rounds.push(roundMatches);
                 teams.splice(1, 0, teams.pop());
             }
+
             fixtures[l] = [...rounds, ...rounds.map(rd => rd.map(m => ({ home: m.away, away: m.home })))];
-            save(); alert("Fikstür Hazır!");
+            save();
+            alert("Fikstür Hazır!");
         }
+
         function deleteFixture() {
-            const l = document.getElementById('fixture-league-select').value;
-            if (l && confirm("Silinsin mi?")) { delete fixtures[l]; save(); }
+            const l = $('fixture-league-select')?.value || "";
+            if (l && confirm("Silinsin mi?")) {
+                delete fixtures[l];
+                save();
+            }
         }
+
         function renderFixture() {
-            const container = document.getElementById('fixture-display-container'); container.innerHTML = "";
+            const container = $('fixture-display-container');
+            if (!container) return;
+            container.innerHTML = "";
+
             Object.keys(fixtures).forEach(l => {
                 let html = `<div class="league-card"><h3>${esc((leaguesMeta[l] || l))} Fikstürü</h3>`;
-                fixtures[l].forEach((round, i) => {
+                (fixtures[l] || []).forEach((round, i) => {
                     html += `<div class="week-title" style="margin-top:10px">${i + 1}. Hafta</div>`;
-                    round.forEach(m => {
+                    (round || []).forEach(m => {
                         const lData = leagues[l] || [];
                         const t1 = lData.find(x => x.name === m.home) || {};
                         const t2 = lData.find(x => x.name === m.away) || {};
                         html += `<div class="fixture-item">
-                      <div></div>
-                      <div class="team-home">
-                        <img src="${esc(t1.logo || '')}" class="team-logo-small"
-                          loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                          onerror="this.src='https://via.placeholder.com/30?text=?'">
-                        <span>${esc(m.home)}</span>
-                      </div>
-                      <div class="tire-container">-</div>
-                      <div class="team-away">
-                        <span>${esc(m.away)}</span>
-                        <img src="${esc(t2.logo || '')}" class="team-logo-small"
-                          loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                          onerror="this.src='https://via.placeholder.com/30?text=?'">
-                      </div>
-                      <div></div>
-                    </div>`;
+                  <div></div>
+                  <div class="team-home">
+                    <img src="${esc(t1.logo || '')}" class="team-logo-small"
+                      loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                      onerror="this.src='https://via.placeholder.com/30?text=?'">
+                    <span>${esc(m.home)}</span>
+                  </div>
+                  <div class="tire-container">-</div>
+                  <div class="team-away">
+                    <span>${esc(m.away)}</span>
+                    <img src="${esc(t2.logo || '')}" class="team-logo-small"
+                      loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                      onerror="this.src='https://via.placeholder.com/30?text=?'">
+                  </div>
+                  <div></div>
+                </div>`;
                     });
                 });
                 container.innerHTML += html + `</div>`;
@@ -1132,27 +1153,42 @@
 
         // ---------- Matches ----------
         function addMatch() {
-            const l = document.getElementById('match-league-select').value;
-            const w = document.getElementById('match-week-select').value;
-            const t1Id = document.getElementById('team-1-select').value;
-            const t2Id = document.getElementById('team-2-select').value;
-            const s1 = parseInt(document.getElementById('score-1').value);
-            const s2 = parseInt(document.getElementById('score-2').value);
+            const l = $('match-league-select')?.value || "";
+            const w = $('match-week-select')?.value || "";
+            const t1Id = $('team-1-select')?.value || "";
+            const t2Id = $('team-2-select')?.value || "";
+            const s1 = parseInt($('score-1')?.value);
+            const s2 = parseInt($('score-2')?.value);
+
             if (!l || !t1Id || !t2Id) return;
             if (Number.isNaN(s1) || Number.isNaN(s2)) return alert("Skor girin!");
-            const t1 = leagues[l].find(x => x.id === t1Id), t2 = leagues[l].find(x => x.id === t2Id);
+
+            const t1 = (leagues[l] || []).find(x => x.id === t1Id);
+            const t2 = (leagues[l] || []).find(x => x.id === t2Id);
+            if (!t1 || !t2) return alert("Takım bulunamadı!");
+
             matches.push({ id: Date.now(), league: l, week: w, t1Id: t1.id, t2Id: t2.id, t1Name: t1.name, t2Name: t2.name, s1, s2 });
-            save(); alert("Skor Kaydedildi!");
+            save();
+            alert("Skor Kaydedildi!");
         }
+
         function deleteMatch(id) {
             if (confirm("Silinsin mi?")) {
                 matches = matches.filter(m => m.id !== id);
                 save();
             }
         }
+
         function renderMatches() {
-            const container = document.getElementById('matches-display-container'); container.innerHTML = "";
-            const grouped = matches.reduce((acc, m) => { (acc[m.week] = acc[m.week] || []).push(m); return acc; }, {});
+            const container = $('matches-display-container');
+            if (!container) return;
+            container.innerHTML = "";
+
+            const grouped = (matches || []).reduce((acc, m) => {
+                (acc[m.week] = acc[m.week] || []).push(m);
+                return acc;
+            }, {});
+
             Object.keys(grouped).sort((a, b) => b - a).forEach(w => {
                 let html = `<div class="week-container"><div class="week-title">${w}. Hafta</div>`;
                 grouped[w].slice().reverse().forEach(m => {
@@ -1160,24 +1196,26 @@
                     const t1 = lData.find(x => x.id !== "dummy" && ((m.t1Id && x.id === m.t1Id) || x.name === m.t1Name)) || {};
                     const t2 = lData.find(x => x.id !== "dummy" && ((m.t2Id && x.id === m.t2Id) || x.name === m.t2Name)) || {};
                     html += `<div class="match-row">
-                    <div style="display:flex;justify-content:center;">
-                      ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteMatch(${m.id})">X</button>` : ''}
-                    </div>
-                    <div class="team-home">
-                      <img src="${esc(t1.logo || '')}" class="team-logo-small"
-                        loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                        onerror="this.src='https://via.placeholder.com/30?text=?'">
-                      <span>${esc(m.t1Name)}</span>
-                    </div>
-                    <div class="score-container"><div class="score-box">${esc(m.s1)}</div><span>-</span><div class="score-box">${esc(m.s2)}</div></div>
-                    <div class="team-away">
-                      <span>${esc(m.t2Name)}</span>
-                      <img src="${esc(t2.logo || '')}" class="team-logo-small"
-                        loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                        onerror="this.src='https://via.placeholder.com/30?text=?'">
-                    </div>
-                    <div></div>
-                  </div>`;
+                <div style="display:flex;justify-content:center;">
+                  ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteMatch(${m.id})">X</button>` : ''}
+                </div>
+                <div class="team-home">
+                  <img src="${esc(t1.logo || '')}" class="team-logo-small"
+                    loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                    onerror="this.src='https://via.placeholder.com/30?text=?'">
+                  <span>${esc(m.t1Name)}</span>
+                </div>
+                <div class="score-container">
+                  <div class="score-box">${esc(m.s1)}</div><span>-</span><div class="score-box">${esc(m.s2)}</div>
+                </div>
+                <div class="team-away">
+                  <span>${esc(m.t2Name)}</span>
+                  <img src="${esc(t2.logo || '')}" class="team-logo-small"
+                    loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                    onerror="this.src='https://via.placeholder.com/30?text=?'">
+                </div>
+                <div></div>
+              </div>`;
                 });
                 container.innerHTML += html + `</div>`;
             });
@@ -1187,44 +1225,55 @@
         function updateLeagueSelects() {
             const leagueKeys = Object.keys(leagues).filter(k => Array.isArray(leagues[k]));
             ['team-league-select', 'match-league-select', 'stats-league-select', 'fixture-league-select', 'player-create-league', 'player-assign-league'].forEach(id => {
-                const s = document.getElementById(id);
-                if (s) {
-                    const val = s.value;
-                    s.innerHTML = '<option value="">Lig Seçin</option>' + leagueKeys.map(l => {
-                        const dn = leaguesMeta[l] || l;
-                        return `<option value="${esc(l)}">${esc(dn)}</option>`;
-                    }).join('');
-                    s.value = val;
+                const s = $(id);
+                if (!s) return;
+                const val = s.value;
+                s.innerHTML = '<option value="">Lig Seçin</option>' + leagueKeys.map(l => {
+                    const dn = leaguesMeta[l] || l;
+                    return `<option value="${esc(l)}">${esc(dn)}</option>`;
+                }).join('');
+                s.value = val;
+            });
+        }
+
+        function updateMatchTeams() {
+            const l = $('match-league-select')?.value || "";
+            const s1 = $('team-1-select');
+            const s2 = $('team-2-select');
+            if (!s1 || !s2) return;
+
+            s1.innerHTML = '<option value="">Ev Sahibi Seçin</option>';
+            s2.innerHTML = '<option value="">Deplasman Seçin</option>';
+
+            (leagues[l] || []).forEach(t => {
+                if (t.id !== "dummy") {
+                    const opt = `<option value="${esc(t.id)}">${esc(t.name)}</option>`;
+                    s1.innerHTML += opt;
+                    s2.innerHTML += opt;
                 }
             });
         }
-        function updateMatchTeams() {
-            const l = document.getElementById('match-league-select').value;
-            const s1 = document.getElementById('team-1-select');
-            const s2 = document.getElementById('team-2-select');
-            s1.innerHTML = '<option value="">Ev Sahibi Seçin</option>';
-            s2.innerHTML = '<option value="">Deplasman Seçin</option>';
-            if (leagues[l]) {
-                leagues[l].forEach(t => {
-                    if (t.id !== "dummy") {
-                        const opt = `<option value="${esc(t.id)}">${esc(t.name)}</option>`;
-                        s1.innerHTML += opt;
-                        s2.innerHTML += opt;
-                    }
-                });
-            }
-        }
+
         function updateStatsTeams() {
-            const l = document.getElementById('stats-league-select').value;
-            const s = document.getElementById('stats-team-select');
+            const l = $('stats-league-select')?.value || "";
+            const s = $('stats-team-select');
+            if (!s) return;
+
             s.innerHTML = '<option value="">Takım Seçin</option>';
-            if (leagues[l]) leagues[l].forEach(t => { if (t.id !== "dummy") s.innerHTML += `<option value="${esc(t.name)}">${esc(t.name)}</option>`; });
+            (leagues[l] || []).forEach(t => {
+                if (t.id !== "dummy") s.innerHTML += `<option value="${esc(t.name)}">${esc(t.name)}</option>`;
+            });
         }
+
         function updateAssignTeams() {
-            const l = document.getElementById('player-assign-league').value;
-            const s = document.getElementById('player-assign-team');
+            const l = $('player-assign-league')?.value || "";
+            const s = $('player-assign-team');
+            if (!s) return;
+
             s.innerHTML = '<option value="">Takım Seçin</option>';
-            if (leagues[l]) leagues[l].forEach(t => { if (t.id !== "dummy") s.innerHTML += `<option value="${esc(t.id)}">${esc(t.name)}</option>`; });
+            (leagues[l] || []).forEach(t => {
+                if (t.id !== "dummy") s.innerHTML += `<option value="${esc(t.id)}">${esc(t.name)}</option>`;
+            });
         }
 
         // ---------- Players / Stats helpers ----------
@@ -1238,9 +1287,10 @@
         }
 
         function createOrOverwritePlayer() {
-            const l = document.getElementById('player-create-league').value;
-            const rawId = document.getElementById('player-id-input').value.trim();
-            const name = document.getElementById('player-name-input').value.trim();
+            const l = $('player-create-league')?.value || "";
+            const rawId = ($('player-id-input')?.value || "").trim();
+            const name = ($('player-name-input')?.value || "").trim();
+
             if (!l) return alert("Lig seçin!");
             if (!rawId || !isValidHashId(rawId)) return alert("Oyuncu ID geçersiz! (# ile başlayacak, sadece harf/rakam).");
             if (!name) return alert("Oyuncu adı girin!");
@@ -1261,15 +1311,16 @@
                 alert("Oyuncu oluşturuldu!");
             }
 
-            document.getElementById('player-id-input').value = "";
-            document.getElementById('player-name-input').value = "";
+            if ($('player-id-input')) $('player-id-input').value = "";
+            if ($('player-name-input')) $('player-name-input').value = "";
             renderPlayersList();
         }
 
         function assignPlayerToTeam() {
-            const l = document.getElementById('player-assign-league').value;
-            const teamId = document.getElementById('player-assign-team').value;
-            const rawPid = document.getElementById('player-assign-id').value.trim();
+            const l = $('player-assign-league')?.value || "";
+            const teamId = $('player-assign-team')?.value || "";
+            const rawPid = ($('player-assign-id')?.value || "").trim();
+
             if (!l || !teamId) return alert("Lig ve takım seçin!");
             if (!rawPid || !isValidHashId(rawPid)) return alert("Oyuncu ID geçersiz!");
             const pid = normalizeHashId(rawPid);
@@ -1298,27 +1349,26 @@
 
             save();
             alert("Oyuncu takıma eklendi!");
-            document.getElementById('player-assign-id').value = "";
+            if ($('player-assign-id')) $('player-assign-id').value = "";
             renderPlayersList();
             renderTeamsList();
         }
 
         function updatePlayerStatsById() {
-            const l = document.getElementById('stats-league-select').value;
-            const teamName = document.getElementById('stats-team-select').value;
-            const rawPid = document.getElementById('stats-player-id').value.trim();
-            const maybeName = document.getElementById('stats-player-name').value.trim();
-            const g = parseInt(document.getElementById('plus-goal').value) || 0;
-            const a = parseInt(document.getElementById('plus-assist').value) || 0;
-            const cs = parseInt(document.getElementById('plus-cs').value) || 0;
+            const l = $('stats-league-select')?.value || "";
+            const teamName = $('stats-team-select')?.value || "";
+            const rawPid = ($('stats-player-id')?.value || "").trim();
+            const maybeName = ($('stats-player-name')?.value || "").trim();
+
+            const g = parseInt($('plus-goal')?.value) || 0;
+            const a = parseInt($('plus-assist')?.value) || 0;
+            const cs = parseInt($('plus-cs')?.value) || 0;
 
             if (!l) return alert("Lig seçin!");
             if (!rawPid || !isValidHashId(rawPid)) return alert("Oyuncu ID geçersiz!");
             const pid = normalizeHashId(rawPid);
 
-            if (maybeName) {
-                getAllRecordsByPlayerId(pid).forEach(r => { r.name = maybeName; });
-            }
+            if (maybeName) getAllRecordsByPlayerId(pid).forEach(r => { r.name = maybeName; });
 
             let rec = getRecordByIdAndLeague(pid, l);
             if (!rec) {
@@ -1336,9 +1386,9 @@
             save();
             alert("İstatistik kaydedildi!");
 
-            document.getElementById('plus-goal').value = "";
-            document.getElementById('plus-assist').value = "";
-            document.getElementById('plus-cs').value = "";
+            if ($('plus-goal')) $('plus-goal').value = "";
+            if ($('plus-assist')) $('plus-assist').value = "";
+            if ($('plus-cs')) $('plus-cs').value = "";
             renderPlayersList();
             renderStats();
         }
@@ -1347,35 +1397,32 @@
             const map = new Map();
             (players || []).forEach(p => {
                 const pid = normalizeHashId(p.playerId);
-                if (!map.has(pid)) {
-                    map.set(pid, { playerId: pid, name: p.name || "Oyuncu" });
-                } else {
-                    if (p.name) map.get(pid).name = p.name;
-                }
+                if (!map.has(pid)) map.set(pid, { playerId: pid, name: p.name || "Oyuncu" });
+                else if (p.name) map.get(pid).name = p.name;
             });
             return Array.from(map.values());
         }
 
-        // ✅ Search kaldırıldı: tüm oyuncular listelenir
         function renderPlayersList() {
-            const wrap = document.getElementById('players-list');
+            const wrap = $('players-list');
             if (!wrap) return;
 
             const uniq = uniquePlayersIndex();
-
             wrap.innerHTML = uniq.map(p => `
-                <div class="mini-card" onclick="showPlayersDetail('${esc(p.playerId)}')">
-                  <div class="row">
-                    <div style="font-weight:900">${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></div>
-                    ${isAdmin ? `<button class="btn-danger btn-small" onclick="event.stopPropagation(); deletePlayerById('${esc(p.playerId)}')">Sil</button>` : ``}
-                  </div>
-                  <div class="muted">Detay için tıkla</div>
-                </div>
-              `).join('') || `<div class="muted">Oyuncu bulunamadı.</div>`;
+            <div class="mini-card" onclick="showPlayersDetail('${esc(p.playerId)}')">
+              <div class="row">
+                <div style="font-weight:900">${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></div>
+                ${isAdmin ? `<button class="btn-danger btn-small" onclick="event.stopPropagation(); deletePlayerById('${esc(p.playerId)}')">Sil</button>` : ``}
+              </div>
+              <div class="muted">Detay için tıkla</div>
+            </div>
+          `).join('') || `<div class="muted">Oyuncu bulunamadı.</div>`;
         }
 
         function showPlayersDetail(playerId) {
-            const box = document.getElementById('players-detail');
+            const box = $('players-detail');
+            if (!box) return;
+
             const pid = normalizeHashId(playerId);
             const recs = getAllRecordsByPlayerId(pid);
             if (!recs.length) return;
@@ -1395,31 +1442,31 @@
 
             box.style.display = 'block';
             box.innerHTML = `
-                <div class="row" style="margin-bottom:10px">
-                  <div>
-                    <div style="font-size:1.12rem;font-weight:1000">${esc(name)} <span class="pill">${esc(pid)}</span></div>
-                    <div class="muted">Liglere göre istatistik</div>
-                  </div>
-                  <div class="row">
-                    <button class="linkbtn" onclick="document.getElementById('players-detail').style.display='none'">Kapat</button>
-                    ${isAdmin ? `<button class="btn-danger btn-small" onclick="deletePlayerById('${esc(pid)}')">Oyuncuyu Sil</button>` : ``}
-                  </div>
-                </div>
+            <div class="row" style="margin-bottom:10px">
+              <div>
+                <div style="font-size:1.12rem;font-weight:1000">${esc(name)} <span class="pill">${esc(pid)}</span></div>
+                <div class="muted">Liglere göre istatistik</div>
+              </div>
+              <div class="row">
+                <button class="linkbtn" onclick="$('players-detail').style.display='none'">Kapat</button>
+                ${isAdmin ? `<button class="btn-danger btn-small" onclick="deletePlayerById('${esc(pid)}')">Oyuncuyu Sil</button>` : ``}
+              </div>
+            </div>
 
-                <h3>Lig Bazlı İstatistik</h3>
-                <table>
-                  <tr><th>Lig</th><th>Takım</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
-                  ${leaguesList.map(x => `
-                    <tr>
-                      <td>${esc(leaguesMeta[x.league] || x.league)}</td>
-                      <td>${esc(x.team || '—')}</td>
-                      <td><b>${x.goals}</b></td>
-                      <td><b>${x.assists}</b></td>
-                      <td><b>${x.cs}</b></td>
-                    </tr>
-                  `).join('')}
-                </table>
-              `;
+            <h3>Lig Bazlı İstatistik</h3>
+            <table>
+              <tr><th>Lig</th><th>Takım</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
+              ${leaguesList.map(x => `
+                <tr>
+                  <td>${esc(leaguesMeta[x.league] || x.league)}</td>
+                  <td>${esc(x.team || '—')}</td>
+                  <td><b>${x.goals}</b></td>
+                  <td><b>${x.assists}</b></td>
+                  <td><b>${x.cs}</b></td>
+                </tr>
+              `).join('')}
+            </table>
+          `;
             box.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
@@ -1440,7 +1487,7 @@
 
             save();
             alert("Oyuncu silindi!");
-            document.getElementById('players-detail').style.display = 'none';
+            $('players-detail') && ($('players-detail').style.display = 'none');
             renderPlayersList();
             renderTeamsList();
             renderStats();
@@ -1457,9 +1504,8 @@
             return null;
         }
 
-        // ✅ Search kaldırıldı: tüm takımlar listelenir
         function renderTeamsList() {
-            const wrap = document.getElementById('teams-list');
+            const wrap = $('teams-list');
             if (!wrap) return;
 
             let all = [];
@@ -1469,26 +1515,28 @@
             });
 
             wrap.innerHTML = all.map(x => `
-                <div class="mini-card" onclick="showTeamDetail('${esc(x.team.teamId)}')">
-                  <div class="row">
-                    <div class="team-cell">
-                      <img class="team-logo-small" src="${esc(x.team.logo || '')}"
-                        loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                        onerror="this.src='https://via.placeholder.com/30?text=?'">
-                      <div>
-                        <div style="font-weight:900">${esc(x.team.name)}</div>
-                        <div class="muted">${esc(x.leagueName)} • <span class="pill">${esc(x.team.teamId)}</span></div>
-                      </div>
-                    </div>
-                    <div class="pill">P: ${x.team.puan} • AV: ${x.team.averaj}</div>
+            <div class="mini-card" onclick="showTeamDetail('${esc(x.team.teamId)}')">
+              <div class="row">
+                <div class="team-cell">
+                  <img class="team-logo-small" src="${esc(x.team.logo || '')}"
+                    loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                    onerror="this.src='https://via.placeholder.com/30?text=?'">
+                  <div>
+                    <div style="font-weight:900">${esc(x.team.name)}</div>
+                    <div class="muted">${esc(x.leagueName)} • <span class="pill">${esc(x.team.teamId)}</span></div>
                   </div>
-                  <div class="muted" style="margin-top:6px">Kadro için tıkla</div>
                 </div>
-              `).join('') || `<div class="muted">Takım bulunamadı.</div>`;
+                <div class="pill">P: ${x.team.puan} • AV: ${x.team.averaj}</div>
+              </div>
+              <div class="muted" style="margin-top:6px">Kadro için tıkla</div>
+            </div>
+          `).join('') || `<div class="muted">Takım bulunamadı.</div>`;
         }
 
         function showTeamDetail(teamId) {
-            const box = document.getElementById('teams-detail');
+            const box = $('teams-detail');
+            if (!box) return;
+
             const found = findTeamByTeamId(teamId);
             if (!found) {
                 box.style.display = 'block';
@@ -1510,38 +1558,38 @@
 
             box.style.display = 'block';
             box.innerHTML = `
-                <div class="row" style="margin-bottom:10px">
-                  <div class="team-cell">
-                    <img class="team-logo-small" src="${esc(team.logo || '')}"
-                      loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                      onerror="this.src='https://via.placeholder.com/30?text=?'">
-                    <div>
-                      <div style="font-size:1.12rem;font-weight:1000">${esc(team.name)} <span class="pill">${esc(team.teamId)}</span></div>
-                      <div class="muted">${esc(leagueName)} • P: <b>${team.puan}</b> • AV: <b>${team.averaj}</b></div>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <button class="linkbtn" onclick="document.getElementById('teams-detail').style.display='none'">Kapat</button>
-                    ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteTeamById('${esc(team.teamId)}')">Takımı Sil</button>` : ``}
-                  </div>
+            <div class="row" style="margin-bottom:10px">
+              <div class="team-cell">
+                <img class="team-logo-small" src="${esc(team.logo || '')}"
+                  loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                  onerror="this.src='https://via.placeholder.com/30?text=?'">
+                <div>
+                  <div style="font-size:1.12rem;font-weight:1000">${esc(team.name)} <span class="pill">${esc(team.teamId)}</span></div>
+                  <div class="muted">${esc(leagueName)} • P: <b>${team.puan}</b> • AV: <b>${team.averaj}</b></div>
                 </div>
+              </div>
+              <div class="row">
+                <button class="linkbtn" onclick="$('teams-detail').style.display='none'">Kapat</button>
+                ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteTeamById('${esc(team.teamId)}')">Takımı Sil</button>` : ``}
+              </div>
+            </div>
 
-                <h3>Kadro</h3>
-                ${rosterRows.length ? `
-                  <table>
-                    <tr><th>Oyuncu</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
-                    ${rosterRows.map(r => `
-                      <tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(r.pid)}')">
-                        <td>${esc(r.nm)} <span class="pill">${esc(r.pid)}</span></td>
-                        <td><b>${r.g}</b></td>
-                        <td><b>${r.a}</b></td>
-                        <td><b>${r.cs}</b></td>
-                      </tr>
-                    `).join('')}
-                  </table>
-                  <div class="muted" style="margin-top:8px">Not: Oyuncuya tıklayınca oyuncu detayına gider.</div>
-                ` : `<div class="muted">Kadro boş.</div>`}
-              `;
+            <h3>Kadro</h3>
+            ${rosterRows.length ? `
+              <table>
+                <tr><th>Oyuncu</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
+                ${rosterRows.map(r => `
+                  <tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(r.pid)}')">
+                    <td>${esc(r.nm)} <span class="pill">${esc(r.pid)}</span></td>
+                    <td><b>${r.g}</b></td>
+                    <td><b>${r.a}</b></td>
+                    <td><b>${r.cs}</b></td>
+                  </tr>
+                `).join('')}
+              </table>
+              <div class="muted" style="margin-top:8px">Not: Oyuncuya tıklayınca oyuncu detayına gider.</div>
+            ` : `<div class="muted">Kadro boş.</div>`}
+          `;
             box.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
@@ -1563,14 +1611,18 @@
             save();
             alert("Takım silindi!");
             renderTeamsList();
-            document.getElementById('teams-detail').style.display = 'none';
+            $('teams-detail') && ($('teams-detail').style.display = 'none');
         }
 
         // ---------- Stats ----------
         function renderStats() {
-            const container = document.getElementById('stats-display-container'); container.innerHTML = "";
+            const container = $('stats-display-container');
+            if (!container) return;
+            container.innerHTML = "";
+
             Object.keys(leagues).forEach(l => {
                 if (!Array.isArray(leagues[l])) return;
+
                 const lp = (players || []).filter(p => p.league === l);
                 if (lp.length === 0) return;
 
@@ -1582,14 +1634,14 @@
                 goals.forEach(p => {
                     const t = (leagues[l] || []).find(x => x.name === p.team) || {};
                     html += `<tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(p.playerId)}')">
-                    <td class="team-cell">
-                      <img src="${esc(t.logo || '')}" class="team-logo-small"
-                        loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                        onerror="this.src='https://via.placeholder.com/30?text=?'">
-                      ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span>
-                    </td>
-                    <td style="text-align:right"><b>${p.goals}</b></td>
-                  </tr>`;
+                <td class="team-cell">
+                  <img src="${esc(t.logo || '')}" class="team-logo-small"
+                    loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                    onerror="this.src='https://via.placeholder.com/30?text=?'">
+                  ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span>
+                </td>
+                <td style="text-align:right"><b>${p.goals}</b></td>
+              </tr>`;
                 });
                 html += `</table></div>`;
 
@@ -1598,14 +1650,14 @@
                 assists.forEach(p => {
                     const t = (leagues[l] || []).find(x => x.name === p.team) || {};
                     html += `<tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(p.playerId)}')">
-                    <td class="team-cell">
-                      <img src="${esc(t.logo || '')}" class="team-logo-small"
-                        loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                        onerror="this.src='https://via.placeholder.com/30?text=?'">
-                      ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span>
-                    </td>
-                    <td style="text-align:right"><b>${p.assists}</b></td>
-                  </tr>`;
+                <td class="team-cell">
+                  <img src="${esc(t.logo || '')}" class="team-logo-small"
+                    loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                    onerror="this.src='https://via.placeholder.com/30?text=?'">
+                  ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span>
+                </td>
+                <td style="text-align:right"><b>${p.assists}</b></td>
+              </tr>`;
                 });
                 html += `</table></div>`;
 
@@ -1614,14 +1666,14 @@
                 clean.forEach(p => {
                     const t = (leagues[l] || []).find(x => x.name === p.team) || {};
                     html += `<tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(p.playerId)}')">
-                    <td class="team-cell">
-                      <img src="${esc(t.logo || '')}" class="team-logo-small"
-                        loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                        onerror="this.src='https://via.placeholder.com/30?text=?'">
-                      ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span>
-                    </td>
-                    <td style="text-align:right"><b>${p.cs}</b></td>
-                  </tr>`;
+                <td class="team-cell">
+                  <img src="${esc(t.logo || '')}" class="team-logo-small"
+                    loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                    onerror="this.src='https://via.placeholder.com/30?text=?'">
+                  ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span>
+                </td>
+                <td style="text-align:right"><b>${p.cs}</b></td>
+              </tr>`;
                 });
                 html += `</table></div>`;
 
@@ -1639,11 +1691,23 @@
             renderMatches();
         }
 
-        // ---------- Init ----------
-        (function init() {
-            const s = document.getElementById('match-week-select');
-            for (let i = 1; i <= 30; i++) s.innerHTML += `<option value="${i}">${i}</option>`;
-        })();
+        // ---------- Init (DOM READY) ----------
+        function initWeekSelect() {
+            const s = $('match-week-select');
+            if (!s) return;
+            if (s.dataset.inited === "1") return;
+            s.dataset.inited = "1";
+
+            for (let i = 1; i <= 30; i++) {
+                s.innerHTML += `<option value="${i}">${i}</option>`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initWeekSelect();
+            // Sayfa açılışında Haberler açık olsun (null style hatası yok)
+            handleNav('news');
+        });
     </script>
 </body>
 </html>
