@@ -537,8 +537,8 @@
                      referrerpolicy="no-referrer"
                      onerror="this.src='https://via.placeholder.com/45?text=MB'">
                 <div class="brand">
-                    <h1>MAMOBALL TURKEY LEAGUE</h1>
-                    <span>Kalite, Hırs, Adalet</span>
+                    <h1>MB LEAGUE</h1>
+                    <span>Mamoball Turkey League</span>
                 </div>
             </div>
 
@@ -937,6 +937,15 @@
         });
 
         // ---------- News ----------
+        function sanitizeFileName(name) {
+            // türkçe/boşluk vb. temizle, güvenli hale getir
+            return String(name || "")
+                .trim()
+                .replace(/\s+/g, "_")
+                .replace(/[^\w.\-]/g, "") // harf/rakam/_ . -
+                .toLowerCase();
+        }
+
         function publishNews() {
             const t = document.getElementById('news-title').value.trim();
             const c = document.getElementById('news-content').value;
@@ -944,27 +953,40 @@
 
             if (!t || !c) return alert("Başlık ve içerik zorunlu!");
 
-            // ✅ Fotoğraf upload (base64) -> DB'ye kaydet
+            let imagePath = "";
+
             if (file) {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const dataUrl = reader.result; // base64
-                    newsData.push({ id: Date.now(), title: t, content: c, image: dataUrl, date: new Date().toLocaleDateString('tr-TR') });
-                    document.getElementById('news-title').value = "";
-                    document.getElementById('news-content').value = "";
-                    document.getElementById('news-image-file').value = "";
-                    save();
-                };
-                reader.onerror = () => alert("Fotoğraf okunamadı!");
-                reader.readAsDataURL(file);
-            } else {
-                // Fotoğraf yoksa da haber atılabilsin
-                newsData.push({ id: Date.now(), title: t, content: c, image: "", date: new Date().toLocaleDateString('tr-TR') });
-                document.getElementById('news-title').value = "";
-                document.getElementById('news-content').value = "";
-                document.getElementById('news-image-file').value = "";
-                save();
+                const clean = sanitizeFileName(file.name);
+                const ext = (clean.split('.').pop() || "").toLowerCase();
+
+                // jpg/jpeg/png/webp öner
+                const ok = ["png", "jpg", "jpeg", "webp", "gif"].includes(ext);
+                if (!ok) return alert("Lütfen png/jpg/webp/gif dosyası seç!");
+
+                // çakışmasın diye başına timestamp ekliyoruz
+                const finalName = `news_${Date.now()}_${clean}`;
+                imagePath = `images/${finalName}`;
+
+                alert(
+                    "Fotoğraf YÜKLENMEDİ (GitHub yöntemi).\n\n" +
+                    "Şimdi bu dosyayı GitHub repo içinde /images klasörüne şu adla yükle:\n\n" +
+                    finalName + "\n\n" +
+                    "Yükledikten sonra haberde otomatik görünecek."
+                );
             }
+
+            newsData.push({
+                id: Date.now(),
+                title: t,
+                content: c,
+                image: imagePath, // ✅ base64 değil, repo yolu
+                date: new Date().toLocaleDateString('tr-TR')
+            });
+
+            document.getElementById('news-title').value = "";
+            document.getElementById('news-content').value = "";
+            document.getElementById('news-image-file').value = "";
+            save();
         }
 
         function deleteNews(id) {
@@ -1650,4 +1672,3 @@
     </script>
 </body>
 </html>
-
