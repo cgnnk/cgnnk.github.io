@@ -571,27 +571,6 @@
             </div>
         </section>
 
-        <!-- ✅ Admin Auth (1) Firebase Auth -->
-        <section id="admin-auth" class="admin-section" style="display:none;">
-            <h2>Yönetici Girişi</h2>
-            <div class="muted" style="margin-bottom:10px;">
-                Bu giriş Firebase Auth ile çalışır. Admin yetkisi UID listesine göre verilir.
-            </div>
-
-            <input type="password"
-                   id="admin-password"
-                   placeholder="Şifre"
-                   autocomplete="off"
-                   onkeydown="if(event.key==='Enter'){ event.preventDefault(); loginGoogle(); }">
-
-            <button type="button" onclick="loginGoogle()">Google ile Giriş</button>
-
-            <div class="muted" style="margin-top:10px;">
-                ⚠️ Güvenlik için ayrıca Firebase RTDB Rules’da admin dışında yazmayı kapatmalısın (aşağıdaki JS tek başına yetmez).
-            </div>
-        </section>
-
-
         <!-- Admin Panel -->
         <!-- ✅ Admin Auth (Firebase Auth) -->
         <section id="admin-auth" class="admin-section" style="display:none;">
@@ -614,6 +593,15 @@
                 ⚠️ Güvenlik için ayrıca Firebase RTDB Rules’da admin dışında yazmayı kapatmalısın (JS tek başına yetmez).
             </div>
         </section>
+
+        <!-- ✅ Admin Panel Wrapper (EKLE) -->
+        <section id="admin-panel" class="admin-section" style="display:none;">
+            <h2>Admin Panel</h2>
+
+            <!-- Buraya admin araçlarını taşı ya da aynen bırak -->
+            <div id="transfers-admin-list" class="league-card"></div>
+        </section>
+
 
 
         <!-- Haberler -->
@@ -855,26 +843,32 @@
         }
 
         function handleNav(tab) {
-            document.querySelector('.hamburger').classList.remove('active');
-            document.getElementById('nav-menu').classList.remove('active');
+            document.querySelector('.hamburger')?.classList.remove('active');
+            document.getElementById('nav-menu')?.classList.remove('active');
 
             ['news', 'standings', 'fixture', 'stats', 'matches', 'admin', 'teams', 'players'].forEach(t => {
                 const sec = document.getElementById(t + '-section');
                 if (sec) sec.style.display = 'none';
             });
 
-            document.getElementById('admin-auth').style.display = 'none';
-            document.getElementById('admin-panel').style.display = 'none';
+            const adminAuth = document.getElementById('admin-auth');
+            if (adminAuth) adminAuth.style.display = 'none';
 
-            // active league bar only when not on news/admin
+            const adminPanel = document.getElementById('admin-panel');
+            if (adminPanel) adminPanel.style.display = 'none';
+
             const bar = document.getElementById('active-league-bar');
             if (bar) bar.style.display = (tab !== 'news' && tab !== 'admin') ? 'block' : 'none';
 
             if (tab === 'admin') {
-                isAdmin ? (document.getElementById('admin-panel').style.display = 'block')
-                    : (document.getElementById('admin-auth').style.display = 'block');
+                if (isAdmin) {
+                    if (adminPanel) adminPanel.style.display = 'block';
+                } else {
+                    if (adminAuth) adminAuth.style.display = 'block';
+                }
             } else {
-                document.getElementById(tab + '-section').style.display = 'block';
+                const sec = document.getElementById(tab + '-section');
+                if (sec) sec.style.display = 'block';
             }
         }
 
