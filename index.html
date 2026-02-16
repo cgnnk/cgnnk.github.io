@@ -7,6 +7,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
     <style>
         :root {
@@ -537,8 +538,8 @@
                      referrerpolicy="no-referrer"
                      onerror="this.src='https://via.placeholder.com/45?text=MB'">
                 <div class="brand">
-                    <h1>MAMOBALL TURKEY LEAGUE</h1>
-                    <span>discord.gg/mbtl</span>
+                    <h1>MB LEAGUE</h1>
+                    <span>Mamoball Turkey League</span>
                 </div>
             </div>
 
@@ -562,10 +563,13 @@
     <div class="container page">
 
         <!-- Admin Auth -->
-        <section id="admin-auth" class="admin-section" style="display:none;">
-            <h2>Yönetici Girişi</h2>
-            <input type="password" id="admin-pass" placeholder="Şifre">
-            <button onclick="checkPassword()">Giriş Yap</button>
+        <section id="admin-auth" class="admin-section" style="display:none; text-align: center; padding: 40px 20px;">
+            <h2>Yönetici Erişimi</h2>
+            <p class="muted">Bu bölüme erişmek için yetkili Google hesabı ile giriş yapmalısınız.</p>
+            <button onclick="loginWithGoogle()" style="display: flex; align-items: center; justify-content: center; gap: 10px; background: #fff; color: #444; border: 1px solid #ddd;">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
+                Google ile Giriş Yap
+            </button>
         </section>
 
         <!-- Admin Panel (Sadece Haber Yönetimi) -->
@@ -807,15 +811,56 @@
         }
 
         // ---------- Admin ----------
-        function checkPassword() {
-            if (($('admin-pass')?.value || "") === ADMIN_PASSWORD) {
+        // Yetkili admin e-postalarını buraya ekle
+        const AUTHORIZED_ADMINS = ["cgnk06@gmail.com", "ikinci-admin@gmail.com"];
+
+        const auth = firebase.auth();
+
+        // Oturum durumunu dinle (Sayfa yenilendiğinde adminliği hatırlar)
+        auth.onAuthStateChanged((user) => {
+            if (user && AUTHORIZED_ADMINS.includes(user.email)) {
                 isAdmin = true;
-                refreshAdminVisibility();
+                console.log("Admin girişi başarılı:", user.email);
+            } else {
+                isAdmin = false;
+                if (user) console.warn("Yetkisiz giriş denemesi:", user.email);
+            }
+
+            // UI Güncellemeleri
+            refreshAdminVisibility();
+            renderAll();
+            // Eğer admin sekmesindeysek ve yetki geldiyse paneli göster
+            if (isAdmin && qs('#admin-auth').style.display === 'block') {
                 handleNav('admin');
-                renderAll();
-            } else alert("Hatalı!");
+            }
+
+            // Loader'ı kapat (Veri zaten db.on('value') ile yükleniyor)
+            $('loader') && ($('loader').style.display = 'none');
+        });
+
+        // Google ile Giriş Fonksiyonu
+        function loginWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    if (!AUTHORIZED_ADMINS.includes(result.user.email)) {
+                        alert("Bu hesap yönetici yetkisine sahip değil!");
+                        logout(); // Yetkisizse oturumu kapat
+                    }
+                })
+                .catch((error) => {
+                    console.error("Giriş hatası:", error);
+                    alert("Giriş yapılamadı: " + error.message);
+                });
         }
-        function logout() { isAdmin = false; location.reload(); }
+
+        // Çıkış Fonksiyonunu Güncelle
+        function logout() {
+            auth.signOut().then(() => {
+                isAdmin = false;
+                location.reload();
+            });
+        }
 
         function refreshAdminVisibility() {
             const show = isAdmin ? 'block' : 'none';
