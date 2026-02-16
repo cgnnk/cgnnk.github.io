@@ -903,51 +903,29 @@
         }
 
         // ---------- Admin Auth ----------
-        const AUTHORIZED_ADMINS = ["cgnk06@gmail.com", "scaevus94@gmail.com"]
-            .map(e => String(e).toLowerCase().trim());
+        const AUTHORIZED_ADMINS = ["cgnk06@gmail.com", "scaevus94@gmail.com"];
 
-        // Email normalizer
-        function normalizeEmail(email) {
-            return String(email || "").toLowerCase().trim();
-        }
-
-        // Auth state
         auth.onAuthStateChanged((user) => {
-            const email = normalizeEmail(user?.email);
-
-            if (user && AUTHORIZED_ADMINS.includes(email)) {
+            if (user && AUTHORIZED_ADMINS.includes(user.email)) {
                 isAdmin = true;
-                console.log("Admin girişi:", email);
+                console.log("Admin girişi:", user.email);
             } else {
                 isAdmin = false;
-                if (user) console.warn("Yetkisiz giriş:", email);
+                if (user) console.warn("Yetkisiz giriş:", user.email);
             }
-
             refreshAdminVisibility();
             renderAll();
-
-            if (isAdmin && $('admin-auth') && $('admin-auth').style.display === 'block') {
-                handleNav('admin');
-            }
-
+            if (isAdmin && $('admin-auth') && $('admin-auth').style.display === 'block') handleNav('admin');
             $('loader') && ($('loader').style.display = 'none');
         });
 
         function loginWithGoogle() {
             const provider = new firebase.auth.GoogleAuthProvider();
-
             auth.signInWithPopup(provider)
                 .then((result) => {
-                    const email = normalizeEmail(result?.user?.email);
-
-                    console.log("Giriş yapan email:", email);
-
-                    if (!AUTHORIZED_ADMINS.includes(email)) {
-                        alert("Bu hesap yönetici yetkisine sahip değil! (" + email + ")");
+                    if (!AUTHORIZED_ADMINS.includes(result.user.email)) {
+                        alert("Bu hesap yönetici yetkisine sahip değil!");
                         logout();
-                    } else {
-                        // admin ise direkt admin paneline geçir
-                        handleNav('admin');
                     }
                 })
                 .catch((error) => {
@@ -961,15 +939,6 @@
                 location.reload();
             });
         }
-
-        function refreshAdminVisibility() {
-            const show = isAdmin ? 'block' : 'none';
-            $('admin-standings-tools') && ($('admin-standings-tools').style.display = show);
-            $('admin-fixture-tools') && ($('admin-fixture-tools').style.display = show);
-            $('admin-matches-tools') && ($('admin-matches-tools').style.display = show);
-            $('admin-players-tools') && ($('admin-players-tools').style.display = show);
-        }
-
         function refreshAdminVisibility() {
             const show = isAdmin ? 'block' : 'none';
             $('admin-standings-tools') && ($('admin-standings-tools').style.display = show);
