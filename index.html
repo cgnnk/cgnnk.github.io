@@ -578,22 +578,11 @@
                 Bu giriş Firebase Auth ile çalışır. Admin yetkisi UID listesine göre verilir.
             </div>
 
-            <!-- Enter basınca email login değil Google login çalışsın -->
-            <input type="email"
-                   id="admin-email"
-                   placeholder="Admin Email"
-                   autocomplete="off"
-                   onkeydown="if(event.key==='Enter'){ event.preventDefault(); loginGoogle(); }">
-
             <input type="password"
                    id="admin-password"
                    placeholder="Şifre"
                    autocomplete="off"
                    onkeydown="if(event.key==='Enter'){ event.preventDefault(); loginGoogle(); }">
-
-            <!-- Email login kapalı (butonu da kaldırdım) -->
-            <!-- <button onclick="loginEmail()">Email ile Giriş</button>
-        <div style="height:10px"></div> -->
 
             <button type="button" onclick="loginGoogle()">Google ile Giriş</button>
 
@@ -604,33 +593,28 @@
 
 
         <!-- Admin Panel -->
-        <section id="admin-panel" class="admin-section" style="display:none;">
-            <div class="row" style="margin-bottom:14px;">
-                <h2 style="margin:0;border:none;padding:0;">Yönetim Paneli</h2>
-                <button onclick="logout()" class="btn-danger" style="width:auto;">Çıkış</button>
+        <!-- ✅ Admin Auth (Firebase Auth) -->
+        <section id="admin-auth" class="admin-section" style="display:none;">
+            <h2>Yönetici Girişi</h2>
+
+            <div class="muted" style="margin-bottom:10px;">
+                Google ile giriş yap. Admin yetkisi, giriş yapan kullanıcının UID’si <b>ADMIN_UIDS</b> listesinde varsa verilir.
             </div>
 
-            <div class="admin-grid">
-                <div>
-                    <h3>Haber Yönetimi</h3>
-                    <input type="text" id="news-title" placeholder="Başlık">
-                    <input type="text" id="news-image-url" placeholder="Haber Görsel Linki (https://...png)">
-                    <div class="muted">Görsel linki https olmalı ve mümkünse direkt .png/.jpg dosyası olmalı.</div>
-                    <textarea id="news-content" placeholder="İçerik... (Enter veya <br> kullanabilirsin)" rows="3"></textarea>
-                    <button onclick="publishNews()">Yayınla</button>
-                    <div class="muted" style="margin-top:10px">
-                        Not: Çok büyük fotoğraflar (özellikle 2-3MB+) Firebase DB’de sorun çıkarabilir. Gerekirse sıkıştır.
-                    </div>
-                </div>
+            <button type="button" onclick="loginGoogle()" style="width:100%;">
+                Google ile Giriş
+            </button>
 
-                <!-- ✅ Transfer Log viewer (6) -->
-                <div>
-                    <h3>Transfer Geçmişi</h3>
-                    <div class="muted" style="margin-bottom:10px">Son 30 transfer gösterilir.</div>
-                    <div id="transfers-admin-list"></div>
-                </div>
+            <!-- Enter'a basınca da Google çalışsın (opsiyonel) -->
+            <div tabindex="0"
+                 style="outline:none;height:0;overflow:hidden;"
+                 onkeydown="if(event.key==='Enter'){ event.preventDefault(); loginGoogle(); }"></div>
+
+            <div class="muted" style="margin-top:10px;">
+                ⚠️ Güvenlik için ayrıca Firebase RTDB Rules’da admin dışında yazmayı kapatmalısın (JS tek başına yetmez).
             </div>
         </section>
+
 
         <!-- Haberler -->
         <section id="news-section">
@@ -898,9 +882,9 @@
         // ✅ AUTH HANDLERS (1)
         // =======================
         async function loginEmail() {
-            alert("Email ile giriş kapalı. Google ile giriş kullan.");
-            return;
+            alert("Email/Şifre girişi kapalı. Google ile giriş yap.");
         }
+
 
 
         async function loginGoogle() {
