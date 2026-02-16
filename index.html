@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mamoball Turkey League</title>
 
-    <!-- Firebase (Compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <style>
@@ -190,7 +188,7 @@
                     }
 
             .hamburger {
-                display: flex;
+                display: flex
             }
         }
 
@@ -453,11 +451,11 @@
         }
 
         .team-home {
-            justify-content: flex-start;
+            justify-content: flex-start
         }
 
         .team-away {
-            justify-content: flex-end;
+            justify-content: flex-end
         }
 
         .week-title {
@@ -531,8 +529,13 @@
     <header>
         <div class="container header-content">
             <div class="logo-box">
-                <img src="logo.png" alt="MBTL" class="main-logo" loading="lazy" decoding="async"
-                     referrerpolicy="no-referrer" onerror="this.src='https://via.placeholder.com/45?text=MB'">
+                <img src="logo.png"
+                     alt="MBTL"
+                     class="main-logo"
+                     loading="lazy"
+                     decoding="async"
+                     referrerpolicy="no-referrer"
+                     onerror="this.src='https://via.placeholder.com/45?text=MB'">
                 <div class="brand">
                     <h1>MB LEAGUE</h1>
                     <span>Mamoball Turkey League</span>
@@ -558,51 +561,40 @@
 
     <div class="container page">
 
-        <!-- ✅ Active League Selector (2) -->
-        <section class="league-card" id="active-league-bar" style="display:none;">
-            <div class="row">
-                <div>
-                    <div style="font-weight:1000;letter-spacing:.05em;text-transform:uppercase;font-size:.9rem;">Aktif Lig</div>
-                    <div class="muted">Puan durumu / fikstür / sonuçlar varsayılan olarak bu ligde açılır.</div>
-                </div>
-                <div style="min-width:280px;flex:1;max-width:420px;">
-                    <select id="active-league-select" onchange="setActiveLeague(this.value)"></select>
-                </div>
-            </div>
-        </section>
-
-        <!-- Admin Panel -->
-        <!-- ✅ Admin Auth (Firebase Auth) -->
+        <!-- Admin Auth -->
         <section id="admin-auth" class="admin-section" style="display:none;">
             <h2>Yönetici Girişi</h2>
-
-            <div class="muted" style="margin-bottom:10px;">
-                Google ile giriş yap. Admin yetkisi, giriş yapan kullanıcının UID’si <b>ADMIN_UIDS</b> listesinde varsa verilir.
-            </div>
-
-            <button type="button" onclick="loginGoogle()" style="width:100%;">
-                Google ile Giriş
-            </button>
-
-            <!-- Enter'a basınca da Google çalışsın (opsiyonel) -->
-            <div tabindex="0"
-                 style="outline:none;height:0;overflow:hidden;"
-                 onkeydown="if(event.key==='Enter'){ event.preventDefault(); loginGoogle(); }"></div>
-
-            <div class="muted" style="margin-top:10px;">
-                ⚠️ Güvenlik için ayrıca Firebase RTDB Rules’da admin dışında yazmayı kapatmalısın (JS tek başına yetmez).
-            </div>
+            <input type="password" id="admin-pass" placeholder="Şifre">
+            <button onclick="checkPassword()">Giriş Yap</button>
         </section>
 
-        <!-- ✅ Admin Panel Wrapper (EKLE) -->
+        <!-- Admin Panel (Sadece Haber Yönetimi) -->
         <section id="admin-panel" class="admin-section" style="display:none;">
-            <h2>Admin Panel</h2>
+            <div class="row" style="margin-bottom:14px;">
+                <h2 style="margin:0;border:none;padding:0;">Yönetim Paneli</h2>
+                <button onclick="logout()" class="btn-danger" style="width:auto;">Çıkış</button>
+            </div>
 
-            <!-- Buraya admin araçlarını taşı ya da aynen bırak -->
-            <div id="transfers-admin-list" class="league-card"></div>
+            <div class="admin-grid">
+                <div>
+                    <h3>Haber Yönetimi</h3>
+                    <input type="text" id="news-title" placeholder="Başlık">
+
+                    <input type="text" id="news-image-url" placeholder="Haber Görsel Linki (https://...png)">
+                    <div class="muted">
+                        Görsel linki https olmalı ve mümkünse direkt .png/.jpg dosyası olmalı.
+                    </div>
+
+
+                    <textarea id="news-content" placeholder="İçerik... (Enter veya <br> kullanabilirsin)" rows="3"></textarea>
+                    <button onclick="publishNews()">Yayınla</button>
+
+                    <div class="muted" style="margin-top:10px">
+                        Not: Çok büyük fotoğraflar (özellikle 2-3MB+) Firebase DB’de sorun çıkarabilir. Gerekirse sıkıştır.
+                    </div>
+                </div>
+            </div>
         </section>
-
-
 
         <!-- Haberler -->
         <section id="news-section">
@@ -610,7 +602,7 @@
             <div id="news-container" class="news-grid"></div>
         </section>
 
-        <!-- Puan Durumu (4) -->
+        <!-- Puan Durumu -->
         <section id="standings-section" style="display:none;">
             <h2>Puan Durumu</h2>
             <div id="leagues-container"></div>
@@ -633,7 +625,7 @@
             </div>
         </section>
 
-        <!-- Fikstür (3) teamId bazlı -->
+        <!-- Fikstür -->
         <section id="fixture-section" style="display:none;">
             <h2>Fikstür</h2>
             <div id="fixture-display-container"></div>
@@ -643,9 +635,6 @@
                 <select id="fixture-league-select"><option value="">Lig Seçin</option></select>
                 <button onclick="generateFixture()" style="background:linear-gradient(180deg,#6a1b9a,#4f1471);margin-bottom:6px;">Fikstür Oluştur</button>
                 <button onclick="deleteFixture()" class="btn-danger">Fikstürü Temizle</button>
-                <div class="muted" style="margin-top:10px">
-                    Not: Yeni sistemde fikstür maçları teamId bazlı üretilir ve her maçın matchKey’i olur.
-                </div>
             </div>
         </section>
 
@@ -666,47 +655,43 @@
                     <input type="number" id="plus-assist" placeholder="Asist">
                     <input type="number" id="plus-cs" placeholder="CS">
                 </div>
-                <button onclick="updatePlayerStatsById()"
-                        style="background:linear-gradient(180deg, rgba(0,200,81,1), rgba(0,150,61,1));box-shadow:0 12px 26px rgba(0,200,81,.12);">
-                    Kaydet
-                </button>
+                <button onclick="updatePlayerStatsById()" style="background:linear-gradient(180deg, rgba(0,200,81,1), rgba(0,150,61,1));box-shadow:0 12px 26px rgba(0,200,81,.12);">Kaydet</button>
                 <div class="muted" style="margin-top:8px">Not: Aynı #ID farklı liglerde ayrı istatistik tutar.</div>
             </div>
         </section>
 
-        <!-- Maç Sonuçları (3) fixture maç seçip skor girme -->
+        <!-- Maç Sonuçları -->
         <section id="matches-section" style="display:none;">
             <h2>Maç Sonuçları</h2>
             <div id="matches-display-container"></div>
 
             <div id="admin-matches-tools" class="league-card" style="display:none;">
-                <h3>Skor Girişi (Fikstür Üzerinden)</h3>
+                <h3>Skor Girişi</h3>
+                <select id="match-league-select" onchange="updateMatchTeams()"><option value="">Lig Seçin</option></select>
+                <select id="match-week-select"><option value="">Hafta Seçin</option></select>
 
-                <select id="match-league-select" onchange="updateMatchWeeksFromFixture()"><option value="">Lig Seçin</option></select>
-                <select id="match-week-select" onchange="updateFixtureMatchesForWeek()"><option value="">Hafta Seçin</option></select>
-                <select id="match-fixture-select" onchange="previewFixtureMatch()"><option value="">Maç Seçin</option></select>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                    <select id="team-1-select"><option value="">Ev Sahibi Seçin</option></select>
 
-                <div class="muted" id="fixture-match-preview" style="margin:-2px 0 10px"></div>
+                    <div style="display:flex;gap:8px;">
+                        <input type="number" id="score-1" placeholder="0">
+                        <input type="number" id="score-2" placeholder="0">
+                    </div>
 
-                <div style="display:flex;gap:8px;">
-                    <input type="number" id="score-1" placeholder="0">
-                    <input type="number" id="score-2" placeholder="0">
+                    <select id="team-2-select"><option value="">Deplasman Seçin</option></select>
                 </div>
 
-                <button onclick="setScoreForSelectedFixture()"
+                <button onclick="addMatch()"
                         style="margin-top:10px;background:linear-gradient(180deg, rgba(0,200,81,1), rgba(0,150,61,1));box-shadow:0 12px 26px rgba(0,200,81,.12);">
                     Onayla
                 </button>
-
-                <div class="muted" style="margin-top:10px">
-                    Not: Skor girince ilgili fikstür maçının matchKey’i ile kaydedilir. Hatalı takım seçme derdi yok.
-                </div>
             </div>
         </section>
 
         <!-- Takımlar -->
         <section id="teams-section" style="display:none;">
             <h2>Takımlar</h2>
+            <!-- ✅ takım arama kaldırıldı -->
             <div id="teams-list"></div>
             <div id="teams-detail" class="league-card" style="display:none;"></div>
         </section>
@@ -730,17 +715,9 @@
                         style="background:linear-gradient(180deg, rgba(0,200,81,1), rgba(0,150,61,1));box-shadow:0 12px 26px rgba(0,200,81,.12);">
                     Takıma Ekle
                 </button>
-
-                <!-- ✅ (6) transfer / çıkar -->
-                <div style="height:12px"></div>
-                <h3>Transfer / Çıkarma</h3>
-                <select id="player-remove-league" onchange="updateRemoveTeams()"><option value="">Lig Seçin</option></select>
-                <select id="player-remove-team"><option value="">Takım Seçin</option></select>
-                <input type="text" id="player-remove-id" placeholder="Oyuncu ID (Örn: #P9A2X7)">
-                <button class="btn-danger" onclick="removePlayerFromTeam()">Takımdan Çıkar</button>
-                <div class="muted" style="margin-top:8px;">Not: Transfer geçmişine kayıt düşer.</div>
             </div>
 
+            <!-- ✅ oyuncu arama kaldırıldı -->
             <div id="players-list"></div>
             <div id="players-detail" class="league-card" style="display:none;"></div>
         </section>
@@ -748,47 +725,20 @@
     </div>
 
     <script>
-        // =======================
-        // Firebase Config
-        // =======================
         const firebaseConfig = {
-            apiKey: "AIzaSyD5pvFMZ7PXZ5jHsRvMr5hBCHYYummqq_A",
+            apiKey: "AIzaSyD5pvFMZ7PXZ5jHsRvMr5hBCHYYumnqq_A",
             authDomain: "mamoball-turkey-league.firebaseapp.com",
-            databaseURL: "https://mamoball-turkey-league-default-rtdb.europe-west1.firebasedatabase.app",
+            databaseURL: "https://mamoball-turkey-league-default-rtdb.europe-west1.firebasedatabase.app/",
             projectId: "mamoball-turkey-league",
             storageBucket: "mamoball-turkey-league.firebasestorage.app",
             messagingSenderId: "648815784565",
-            appId: "1:648815784565:web:5d82e06c1db870cd53fe3c",
-            measurementId: "G-SH5M314KP3"
+            appId: "1:648815784565:web:5d82e86c1db870cd53fe3c"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const auth = firebase.auth();
 
-        // =======================
-        // ✅ ADMIN SECURITY (1)
-        // =======================
-        // Buraya kendi admin UID'lerini yaz (Firebase Auth -> Users kısmında görünür)
-        const ADMIN_UIDS = [
-            "byZAyEDQPSvuMwShNCcb0ANPvx1"
-        ];
-
-        let isAdmin = false;
-        let currentUser = null;
-
-        // =======================
-        // State
-        // =======================
-        let newsData = [];
-        let leagues = {};
-        let leaguesMeta = {};
-        let fixtures = {};      // fixtures[leagueKey] = [ [matchObj,...], ... ] weeks
-        let matches = [];       // matches[] = { id, league, week, matchKey, homeId, awayId, s1, s2, createdAt }
-        let players = [];
-        let transfers = [];     // ✅ (6) transfers[] = { id, at, league, fromTeamId, toTeamId, playerId, playerName, note }
-
-        // ✅ (2) active league
-        let activeLeagueKey = "";
+        const ADMIN_PASSWORD = "cagan6161.";
+        let newsData = [], leagues = {}, leaguesMeta = {}, matches = [], players = [], fixtures = {}, isAdmin = false;
 
         // ---------- Helpers ----------
         function normalizeHashId(input) {
@@ -809,7 +759,7 @@
             return String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
         }
 
-        // Firebase key safe (lig key'i)
+        // ✅ Firebase key safe (lig key'i)
         function makeSafeKey(s) {
             return String(s || "")
                 .trim()
@@ -826,91 +776,40 @@
             return safe;
         }
 
-        // ✅ localStorage active league
-        function loadActiveLeague() {
-            const v = localStorage.getItem("activeLeagueKey") || "";
-            activeLeagueKey = v;
-        }
-        function setActiveLeague(k) {
-            activeLeagueKey = k || "";
-            localStorage.setItem("activeLeagueKey", activeLeagueKey);
-            renderAll();
-        }
-
         function toggleMenu() {
             document.querySelector('.hamburger').classList.toggle('active');
             document.getElementById('nav-menu').classList.toggle('active');
         }
 
         function handleNav(tab) {
-            document.querySelector('.hamburger')?.classList.remove('active');
-            document.getElementById('nav-menu')?.classList.remove('active');
+            document.querySelector('.hamburger').classList.remove('active');
+            document.getElementById('nav-menu').classList.remove('active');
 
             ['news', 'standings', 'fixture', 'stats', 'matches', 'admin', 'teams', 'players'].forEach(t => {
                 const sec = document.getElementById(t + '-section');
                 if (sec) sec.style.display = 'none';
             });
 
-            const adminAuth = document.getElementById('admin-auth');
-            if (adminAuth) adminAuth.style.display = 'none';
-
-            const adminPanel = document.getElementById('admin-panel');
-            if (adminPanel) adminPanel.style.display = 'none';
-
-            const bar = document.getElementById('active-league-bar');
-            if (bar) bar.style.display = (tab !== 'news' && tab !== 'admin') ? 'block' : 'none';
+            document.getElementById('admin-auth').style.display = 'none';
+            document.getElementById('admin-panel').style.display = 'none';
 
             if (tab === 'admin') {
-                if (isAdmin) {
-                    if (adminPanel) adminPanel.style.display = 'block';
-                } else {
-                    if (adminAuth) adminAuth.style.display = 'block';
-                }
+                isAdmin ? (document.getElementById('admin-panel').style.display = 'block')
+                    : (document.getElementById('admin-auth').style.display = 'block');
             } else {
-                const sec = document.getElementById(tab + '-section');
-                if (sec) sec.style.display = 'block';
+                document.getElementById(tab + '-section').style.display = 'block';
             }
         }
 
-        // =======================
-        // ✅ AUTH HANDLERS (1)
-        // =======================
-        async function loginEmail() {
-            alert("Email/Şifre girişi kapalı. Google ile giriş yap.");
-        }
-
-
-
-        async function loginGoogle() {
-            try {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                const res = await firebase.auth().signInWithPopup(provider);
-
-                const uid = res.user.uid;
-
-                // Admin kontrolü
-                isAdmin = ADMIN_UIDS.includes(uid);
-
+        function checkPassword() {
+            if (document.getElementById('admin-pass').value === ADMIN_PASSWORD) {
+                isAdmin = true;
                 refreshAdminVisibility();
                 handleNav('admin');
                 renderAll();
-
-                alert(isAdmin ? "Admin olarak giriş yapıldı ✅" : "Giriş yapıldı (Admin değilsin) ❌");
-            } catch (e) {
-                console.error(e);
-                alert("Google giriş hatası: " + e.message);
-            }
+            } else alert("Hatalı!");
         }
-
-
-        async function logout() {
-            try {
-                await auth.signOut();
-            } catch (e) {
-                console.error(e);
-            }
-            location.reload();
-        }
+        function logout() { isAdmin = false; location.reload(); }
 
         function refreshAdminVisibility() {
             const show = isAdmin ? 'block' : 'none';
@@ -921,119 +820,74 @@
             document.getElementById('admin-players-tools').style.display = show;
         }
 
-        // =======================
-        // ✅ Standings (4)
-        // =======================
-        // Computes: O/G/B/M, AG/YG, AV, P, Form (last 5)
-        function computeStandingsForLeague(lkey) {
-            const lData = leagues[lkey] || [];
-            const teams = lData.filter(t => t && t.id !== "dummy");
-
-            const map = new Map(); // teamId -> stats
-            teams.forEach(t => {
-                const tid = normalizeHashId(t.teamId);
-                map.set(tid, {
-                    teamId: tid,
-                    name: t.name,
-                    logo: t.logo,
-                    O: 0, G: 0, B: 0, M: 0, AG: 0, YG: 0, AV: 0, P: 0,
-                    form: [] // newest first as W/D/L
+        // ---------- Standings recalculation from matches ----------
+        function recalcStandingsFromMatches() {
+            Object.keys(leagues).forEach(l => {
+                if (!Array.isArray(leagues[l])) return;
+                leagues[l].forEach(t => {
+                    if (t && t.id !== "dummy") {
+                        t.puan = 0; t.averaj = 0;
+                        if (!t.teamId || !isValidHashId(t.teamId)) t.teamId = makeId('T');
+                        if (!Array.isArray(t.roster)) t.roster = [];
+                    }
                 });
             });
 
-            // filter matches for league with scores
-            const lm = (matches || []).filter(m => m.league === lkey && !Number.isNaN(parseInt(m.s1)) && !Number.isNaN(parseInt(m.s2)));
+            matches.forEach(m => {
+                const l = m.league;
+                const lData = leagues[l];
+                if (!lData) return;
 
-            // sort by createdAt to build form
-            lm.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
-
-            lm.forEach(m => {
-                const h = normalizeHashId(m.homeId);
-                const a = normalizeHashId(m.awayId);
                 const s1 = parseInt(m.s1), s2 = parseInt(m.s2);
-                if (!map.has(h) || !map.has(a)) return;
+                if (Number.isNaN(s1) || Number.isNaN(s2)) return;
 
-                const H = map.get(h);
-                const A = map.get(a);
+                const t1 = lData.find(x => x.id !== "dummy" && ((m.t1Id && x.id === m.t1Id) || x.name === m.t1Name));
+                const t2 = lData.find(x => x.id !== "dummy" && ((m.t2Id && x.id === m.t2Id) || x.name === m.t2Name));
+                if (!t1 || !t2) return;
 
-                H.O++; A.O++;
-                H.AG += s1; H.YG += s2;
-                A.AG += s2; A.YG += s1;
+                t1.averaj += (s1 - s2);
+                t2.averaj += (s2 - s1);
 
-                if (s1 > s2) {
-                    H.G++; H.P += 3; H.form.push('W');
-                    A.M++; A.form.push('L');
-                } else if (s2 > s1) {
-                    A.G++; A.P += 3; A.form.push('W');
-                    H.M++; H.form.push('L');
-                } else {
-                    H.B++; A.B++;
-                    H.P += 1; A.P += 1;
-                    H.form.push('D'); A.form.push('D');
-                }
+                if (s1 > s2) t1.puan += 3;
+                else if (s2 > s1) t2.puan += 3;
+                else { t1.puan += 1; t2.puan += 1; }
             });
-
-            map.forEach(st => {
-                st.AV = (st.AG - st.YG);
-                // last 5 (newest last in st.form right now, because we pushed in time order)
-                const last5 = st.form.slice(-5).reverse(); // newest first for display
-                st.formDisplay = last5.map(x => x === 'W' ? '✅' : (x === 'D' ? '➖' : '❌')).join(' ');
-            });
-
-            const arr = Array.from(map.values());
-            arr.sort((a, b) =>
-                (b.P - a.P) ||
-                (b.AV - a.AV) ||
-                (b.AG - a.AG) ||
-                String(a.name).localeCompare(String(b.name))
-            );
-            return arr;
         }
 
-        // =======================
-        // ✅ Save / Load
-        // =======================
         async function save() {
+            recalcStandingsFromMatches();
             try {
                 await db.ref('/').set({
                     news: newsData,
                     leagues: leagues,
                     leaguesMeta: leaguesMeta,
-                    fixtures: fixtures,
                     matches: matches,
                     players: players,
-                    transfers: transfers,
-                    activeLeagueKey: activeLeagueKey || ""
+                    fixtures: fixtures
                 });
-
                 renderAll();
                 updateLeagueSelects();
                 renderTeamsList();
                 renderPlayersList();
-                renderTransfersAdmin();
             } catch (e) {
                 console.error("Firebase write error:", e);
                 alert("Kaydedilemedi! Firebase hatası: " + (e?.message || e));
             }
         }
 
-        // =======================
-        // Firebase realtime load
-        // =======================
+        // ---------- Firebase load ----------
         db.ref('/').on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 newsData = data.news || [];
                 leagues = data.leagues || {};
                 leaguesMeta = data.leaguesMeta || {};
-                fixtures = data.fixtures || {};
                 matches = data.matches || [];
                 players = data.players || [];
-                transfers = data.transfers || [];
-                if (data.activeLeagueKey && !activeLeagueKey) activeLeagueKey = data.activeLeagueKey;
+                fixtures = data.fixtures || {};
             }
 
-            // old league object -> array
+            // ✅ FIX: Object gelen ligleri array'e çevir (eski veri uyumu)
             Object.keys(leagues).forEach(k => {
                 if (Array.isArray(leagues[k])) return;
                 if (leagues[k] && typeof leagues[k] === "object") {
@@ -1047,20 +901,19 @@
                 if (!leaguesMeta[k]) leaguesMeta[k] = k;
             });
 
-            // migrate players normalize
-            (players || []).forEach(p => {
+            // migration normalize: players
+            players.forEach(p => {
                 if (!p.playerId || !isValidHashId(p.playerId)) p.playerId = makeId('P');
                 else p.playerId = normalizeHashId(p.playerId);
                 if (!p.name) p.name = "Oyuncu";
                 if (!p.team) p.team = "";
-                if (!p.teamId) p.teamId = "";
                 if (!p.league) p.league = "";
                 if (p.goals == null) p.goals = 0;
                 if (p.assists == null) p.assists = 0;
                 if (p.cs == null) p.cs = 0;
             });
 
-            // migrate teams normalize
+            // migration normalize: teams
             Object.keys(leagues).forEach(l => {
                 if (!Array.isArray(leagues[l])) return;
                 leagues[l].forEach(t => {
@@ -1072,102 +925,35 @@
                 });
             });
 
-            // ensure transfers
-            if (!Array.isArray(transfers)) transfers = [];
-
-            // active league init if empty
-            ensureActiveLeagueValid();
+            recalcStandingsFromMatches();
 
             renderAll();
             updateLeagueSelects();
             renderTeamsList();
             renderPlayersList();
             refreshAdminVisibility();
-            renderTransfersAdmin();
-            renderActiveLeagueBar();
 
             document.getElementById('loader').style.display = 'none';
         });
 
-        // =======================
-        // ✅ Auth state listener (1)
-        // =======================
-        auth.onAuthStateChanged((user) => {
-            currentUser = user || null;
-            isAdmin = !!user && ADMIN_UIDS.includes(user.uid);
-            refreshAdminVisibility();
-
-            // admin tab open state
-            // if user is admin -> show panel, else show auth
-            // but only if currently on admin
-            const adminAuth = document.getElementById('admin-auth');
-            const adminPanel = document.getElementById('admin-panel');
-            if (adminAuth && adminPanel) {
-                if (isAdmin) {
-                    adminAuth.style.display = 'none';
-                    // If user clicked admin
-                    // don't force open, just keep current nav
-                } else {
-                    adminPanel.style.display = 'none';
-                }
-            }
-
-            renderNews(); // to show delete buttons
-            renderMatches();
-            renderTeamsList();
-            renderPlayersList();
-            renderTransfersAdmin();
-        });
-
-        // =======================
-        // ✅ Active league bar (2)
-        // =======================
-        function ensureActiveLeagueValid() {
-            const keys = Object.keys(leagues).filter(k => Array.isArray(leagues[k]));
-            if (keys.length === 0) {
-                activeLeagueKey = "";
-                return;
-            }
-            if (!activeLeagueKey || !keys.includes(activeLeagueKey)) {
-                // try localStorage
-                loadActiveLeague();
-                if (!activeLeagueKey || !keys.includes(activeLeagueKey)) {
-                    activeLeagueKey = keys[0];
-                }
-            }
-        }
-
-        function renderActiveLeagueBar() {
-            const bar = document.getElementById('active-league-bar');
-            const sel = document.getElementById('active-league-select');
-            if (!bar || !sel) return;
-
-            const keys = Object.keys(leagues).filter(k => Array.isArray(leagues[k]));
-            sel.innerHTML = keys.map(k => {
-                const dn = leaguesMeta[k] || k;
-                return `<option value="${esc(k)}">${esc(dn)}</option>`;
-            }).join('') || `<option value="">Lig yok</option>`;
-
-            sel.value = activeLeagueKey || (keys[0] || "");
-        }
-
-        // =======================
-        // News
-        // =======================
+        // ---------- News ----------
         function publishNews() {
-            if (!isAdmin) return alert("Yetki yok!");
             const t = document.getElementById('news-title').value.trim();
             const c = document.getElementById('news-content').value;
             const img = document.getElementById('news-image-url').value.trim();
+
             if (!t || !c) return alert("Başlık ve içerik zorunlu!");
-            if (img && !img.startsWith("https://")) return alert("Görsel linki https ile başlamalı!");
+
+            if (img && !img.startsWith("https://")) {
+                return alert("Görsel linki https ile başlamalı!");
+            }
 
             newsData.push({
                 id: Date.now(),
                 title: t,
                 content: c,
                 image: img,
-                date: new Date().toLocaleString('tr-TR')
+                date: new Date().toLocaleDateString('tr-TR')
             });
 
             document.getElementById('news-title').value = "";
@@ -1177,8 +963,8 @@
             save();
         }
 
+
         function deleteNews(id) {
-            if (!isAdmin) return;
             if (confirm("Silinsin mi?")) {
                 newsData = newsData.filter(n => n.id !== id);
                 save();
@@ -1187,512 +973,261 @@
 
         function renderNews() {
             document.getElementById('news-container').innerHTML = newsData.slice().reverse().map(n => `
-            <div class="news-card">
-              ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteNews(${n.id})" style="float:right">Sil</button>` : ''}
-              <h3>${esc(n.title)}</h3>
-              ${n.image ? `
-                <img src="${esc(n.image)}" class="news-img" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                     onerror="this.style.display='none'">
-              ` : ''}
-              <p>${renderNewsContent(n.content)}</p>
-              <small class="muted">${esc(n.date)}</small>
-            </div>
-          `).join('');
+                <div class="news-card">
+                  ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteNews(${n.id})" style="float:right">Sil</button>` : ''}
+                  <h3>${esc(n.title)}</h3>
+                  ${n.image ? `
+                    <img
+                      src="${esc(n.image)}"
+                      class="news-img"
+                      loading="lazy"
+                      decoding="async"
+                      referrerpolicy="no-referrer"
+                      onerror="this.style.display='none'">
+                  ` : ''}
+                  <p>${renderNewsContent(n.content)}</p>
+                  <small class="muted">${esc(n.date)}</small>
+                </div>
+              `).join('');
         }
 
-        // =======================
-        // League / Team
-        // =======================
+        // ---------- League / Team ----------
         function addLeague() {
-            if (!isAdmin) return alert("Yetki yok!");
             const inp = document.getElementById('league-name-input');
             const displayName = (inp?.value || "").trim();
             if (!displayName) return alert("Lig adı boş olamaz!");
+
             const key = makeSafeKey(displayName);
             if (!key) return alert("Lig adı geçersiz!");
+
+            if (leagues[key] && !Array.isArray(leagues[key])) {
+                if (leagues[key] && typeof leagues[key] === "object") {
+                    const arr = Object.values(leagues[key]).filter(v => v && typeof v === "object" && !Array.isArray(v));
+                    leagues[key] = arr;
+                }
+            }
 
             if (leagues[key]) return alert("Bu lig zaten var!");
 
             leagues[key] = [{
-                id: "dummy", name: "Takım Ekleyin", logo: "", teamId: "#DUMMY", roster: []
+                id: "dummy", name: "Takım Ekleyin", logo: "", puan: 0, averaj: 0, teamId: "#DUMMY", roster: []
             }];
             leaguesMeta[key] = displayName;
 
             inp.value = "";
-            // set active if empty
-            if (!activeLeagueKey) activeLeagueKey = key;
             save();
         }
 
         function addTeam() {
-            if (!isAdmin) return alert("Yetki yok!");
             const l = document.getElementById('team-league-select').value;
             const n = document.getElementById('team-name').value.trim();
             const rawTeamId = document.getElementById('team-id-input').value.trim();
             const teamId = rawTeamId ? normalizeHashId(rawTeamId) : makeId('T');
             const logo = document.getElementById('team-logo-input').value.trim();
 
-            if (!l || !n) return alert("Lig ve takım adı girin!");
+            if (!l || !n) return;
             if (rawTeamId && !isValidHashId(rawTeamId)) return alert("Takım ID geçersiz! (# ile başlayacak, sadece harf/rakam).");
 
             const allTeams = Object.values(leagues).flat().filter(x => x && x.id && x.id !== "dummy");
-            if (allTeams.some(t => normalizeHashId(t.teamId) === normalizeHashId(teamId))) return alert("Bu takım ID zaten kullanılıyor!");
+            if (allTeams.some(t => t.teamId === teamId)) return alert("Bu takım ID zaten kullanılıyor!");
 
-            leagues[l] = (leagues[l] || []).filter(x => x.id !== "dummy");
-            leagues[l].push({
-                id: "T" + Date.now(),
-                teamId,
-                name: n,
-                logo: logo || 'https://via.placeholder.com/30?text=?',
-                roster: []
-            });
-
-            // inputs clear
-            document.getElementById('team-name').value = "";
-            document.getElementById('team-id-input').value = "";
-            document.getElementById('team-logo-input').value = "";
-
-            save();
-            alert("Takım eklendi!");
+            leagues[l] = leagues[l].filter(x => x.id !== "dummy");
+            leagues[l].push({ id: "T" + Date.now(), teamId, name: n, logo: logo || 'https://via.placeholder.com/30?text=?', puan: 0, averaj: 0, roster: [] });
+            save(); alert("Takım Eklendi!");
         }
 
         function deleteLeague() {
-            if (!isAdmin) return alert("Yetki yok!");
             const l = document.getElementById('team-league-select').value;
             const dn = leaguesMeta[l] || l;
             if (l && confirm(`${dn} silinsin mi?`)) {
                 delete leagues[l];
                 delete leaguesMeta[l];
                 if (fixtures[l]) delete fixtures[l];
-                // remove matches for league
-                matches = (matches || []).filter(m => m.league !== l);
-                // remove players records for league
-                players = (players || []).filter(p => p.league !== l);
-                // active league adjust
-                if (activeLeagueKey === l) activeLeagueKey = "";
-                ensureActiveLeagueValid();
                 save();
             }
         }
 
-        // =======================
-        // ✅ Fixture (3) – teamId based matchKey
-        // fixtures[l][weekIndex] = [{ matchKey, homeId, awayId }]
-        // =======================
+        function renderStandings() {
+            const container = document.getElementById('leagues-container'); container.innerHTML = "";
+            Object.keys(leagues).forEach(l => {
+                if (!Array.isArray(leagues[l])) return;
+
+                const displayName = leaguesMeta[l] || l;
+                let teams = leagues[l].filter(t => t.id !== "dummy").sort((a, b) => b.puan - a.puan || b.averaj - a.averaj);
+
+                let html = `<div class="league-card"><h3>${esc(displayName)}</h3><table><tr><th>#</th><th>Takım</th><th>AV</th><th>P</th></tr>`;
+                teams.forEach((t, i) => {
+                    html += `<tr>
+                    <td>${i + 1}</td>
+                    <td class="team-cell">
+                      <img src="${esc(t.logo)}" class="team-logo-small"
+                        loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                        onerror="this.src='https://via.placeholder.com/30?text=?'">
+                      ${esc(t.name)} <span class="pill">${esc(t.teamId)}</span>
+                    </td>
+                    <td>${t.averaj}</td>
+                    <td><b>${t.puan}</b></td>
+                  </tr>`;
+                });
+                container.innerHTML += html + `</table></div>`;
+            });
+        }
+
+        // ---------- Fixture ----------
         function generateFixture() {
-            if (!isAdmin) return alert("Yetki yok!");
             const l = document.getElementById('fixture-league-select').value;
             if (!l) return alert("Lig seçin!");
-
-            const teams = (leagues[l] || []).filter(t => t.id !== "dummy").map(t => ({
-                teamId: normalizeHashId(t.teamId),
-                name: t.name
-            }));
-
-            if (teams.length < 2) return alert("En az 2 takım olmalı!");
-
-            let arr = teams.map(t => t.teamId);
-            if (arr.length % 2 !== 0) arr.push("BAY");
-
-            const totalRounds = arr.length - 1;
-            const rounds = [];
-
+            let teams = leagues[l].filter(t => t.id !== "dummy").map(t => t.name);
+            if (teams.length < 2) return;
+            if (teams.length % 2 !== 0) teams.push("BAY");
+            let totalRounds = teams.length - 1, rounds = [];
             for (let r = 0; r < totalRounds; r++) {
-                const roundMatches = [];
-                for (let m = 0; m < arr.length / 2; m++) {
-                    const h = arr[m];
-                    const a = arr[arr.length - 1 - m];
-                    if (h !== "BAY" && a !== "BAY") {
-                        const matchKey = `W${r + 1}_${h}_${a}`; // deterministic key
-                        roundMatches.push({ matchKey, homeId: h, awayId: a });
-                    }
+                let roundMatches = [];
+                for (let m = 0; m < teams.length / 2; m++) {
+                    let h = teams[m], a = teams[teams.length - 1 - m];
+                    if (h !== "BAY" && a !== "BAY") roundMatches.push({ home: h, away: a });
                 }
                 rounds.push(roundMatches);
-                // circle method rotate (keep index 0 fixed)
-                arr.splice(1, 0, arr.pop());
+                teams.splice(1, 0, teams.pop());
             }
-
-            // double round (reverse home/away)
-            const secondHalf = rounds.map((rd, idx) => rd.map(m => {
-                const matchKey = `W${(totalRounds + idx + 1)}_${m.awayId}_${m.homeId}`;
-                return { matchKey, homeId: m.awayId, awayId: m.homeId };
-            }));
-
-            fixtures[l] = [...rounds, ...secondHalf];
-
-            // also refresh week select in matches tool
-            updateMatchWeeksFromFixture();
-
-            save();
-            alert("Fikstür hazır!");
+            fixtures[l] = [...rounds, ...rounds.map(rd => rd.map(m => ({ home: m.away, away: m.home })))];
+            save(); alert("Fikstür Hazır!");
         }
-
         function deleteFixture() {
-            if (!isAdmin) return alert("Yetki yok!");
             const l = document.getElementById('fixture-league-select').value;
-            if (l && confirm("Fikstür temizlensin mi?")) {
-                delete fixtures[l];
-                // optional: remove matches with matchKey in that league
-                matches = (matches || []).filter(m => m.league !== l);
-                save();
-            }
+            if (l && confirm("Silinsin mi?")) { delete fixtures[l]; save(); }
         }
-
-        function getTeamByIdInLeague(lkey, teamId) {
-            const tid = normalizeHashId(teamId);
-            return (leagues[lkey] || []).find(t => t && t.id !== "dummy" && normalizeHashId(t.teamId) === tid) || null;
-        }
-
         function renderFixture() {
-            const container = document.getElementById('fixture-display-container');
-            container.innerHTML = "";
-
-            const leagueKeys = Object.keys(fixtures || {});
-            // show only active league by default if exists
-            const showKeys = activeLeagueKey ? leagueKeys.filter(k => k === activeLeagueKey) : leagueKeys;
-
-            showKeys.forEach(l => {
-                const weeks = fixtures[l];
-                if (!Array.isArray(weeks)) return;
-
+            const container = document.getElementById('fixture-display-container'); container.innerHTML = "";
+            Object.keys(fixtures).forEach(l => {
                 let html = `<div class="league-card"><h3>${esc((leaguesMeta[l] || l))} Fikstürü</h3>`;
-                weeks.forEach((round, i) => {
+                fixtures[l].forEach((round, i) => {
                     html += `<div class="week-title" style="margin-top:10px">${i + 1}. Hafta</div>`;
-                    (round || []).forEach(m => {
-                        const t1 = getTeamByIdInLeague(l, m.homeId) || {};
-                        const t2 = getTeamByIdInLeague(l, m.awayId) || {};
-                        const hName = t1.name || m.homeId;
-                        const aName = t2.name || m.awayId;
-
-                        const score = findMatchScore(l, m.matchKey);
-                        const mid = score ? `<div class="tire-container"><span class="score-box">${score.s1}</span><span>-</span><span class="score-box">${score.s2}</span></div>` : `<div class="tire-container">-</div>`;
-
+                    round.forEach(m => {
+                        const lData = leagues[l] || [];
+                        const t1 = lData.find(x => x.name === m.home) || {};
+                        const t2 = lData.find(x => x.name === m.away) || {};
                         html += `<div class="fixture-item">
-                  <div></div>
-                  <div class="team-home">
-                    <img src="${esc(t1.logo || '')}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                         onerror="this.src='https://via.placeholder.com/30?text=?'">
-                    <span>${esc(hName)}</span>
-                  </div>
-                  ${mid}
-                  <div class="team-away">
-                    <span>${esc(aName)}</span>
-                    <img src="${esc(t2.logo || '')}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                         onerror="this.src='https://via.placeholder.com/30?text=?'">
-                  </div>
-                  <div></div>
-                </div>`;
+                      <div></div>
+                      <div class="team-home">
+                        <img src="${esc(t1.logo || '')}" class="team-logo-small"
+                          loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                          onerror="this.src='https://via.placeholder.com/30?text=?'">
+                        <span>${esc(m.home)}</span>
+                      </div>
+                      <div class="tire-container">-</div>
+                      <div class="team-away">
+                        <span>${esc(m.away)}</span>
+                        <img src="${esc(t2.logo || '')}" class="team-logo-small"
+                          loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                          onerror="this.src='https://via.placeholder.com/30?text=?'">
+                      </div>
+                      <div></div>
+                    </div>`;
                     });
                 });
                 container.innerHTML += html + `</div>`;
             });
-
-            if (container.innerHTML.trim() === "") {
-                container.innerHTML = `<div class="muted">Fikstür bulunamadı.</div>`;
-            }
         }
 
-        // =======================
-        // ✅ Matches (3)
-        // =======================
-        function findMatchScore(lkey, matchKey) {
-            const m = (matches || []).find(x => x.league === lkey && x.matchKey === matchKey);
-            if (!m) return null;
-            return { s1: m.s1, s2: m.s2, id: m.id, week: m.week, homeId: m.homeId, awayId: m.awayId };
-        }
-
-        function updateMatchWeeksFromFixture() {
+        // ---------- Matches ----------
+        function addMatch() {
             const l = document.getElementById('match-league-select').value;
-            const weekSel = document.getElementById('match-week-select');
-            const matchSel = document.getElementById('match-fixture-select');
-            const prev = document.getElementById('fixture-match-preview');
-
-            weekSel.innerHTML = '<option value="">Hafta Seçin</option>';
-            matchSel.innerHTML = '<option value="">Maç Seçin</option>';
-            if (prev) prev.innerHTML = '';
-
-            const weeks = fixtures[l];
-            if (!Array.isArray(weeks)) return;
-
-            for (let i = 0; i < weeks.length; i++) {
-                weekSel.innerHTML += `<option value="${i + 1}">${i + 1}</option>`;
-            }
-        }
-
-        function updateFixtureMatchesForWeek() {
-            const l = document.getElementById('match-league-select').value;
-            const w = parseInt(document.getElementById('match-week-select').value);
-            const matchSel = document.getElementById('match-fixture-select');
-            const prev = document.getElementById('fixture-match-preview');
-
-            matchSel.innerHTML = '<option value="">Maç Seçin</option>';
-            if (prev) prev.innerHTML = '';
-            if (!l || !w) return;
-
-            const week = (fixtures[l] || [])[w - 1];
-            if (!Array.isArray(week)) return;
-
-            week.forEach(m => {
-                const t1 = getTeamByIdInLeague(l, m.homeId) || {};
-                const t2 = getTeamByIdInLeague(l, m.awayId) || {};
-                const label = `${t1.name || m.homeId} vs ${t2.name || m.awayId}`;
-                matchSel.innerHTML += `<option value="${esc(m.matchKey)}">${esc(label)}</option>`;
-            });
-        }
-
-        function previewFixtureMatch() {
-            const l = document.getElementById('match-league-select').value;
-            const w = parseInt(document.getElementById('match-week-select').value);
-            const mk = document.getElementById('match-fixture-select').value;
-            const prev = document.getElementById('fixture-match-preview');
-            if (!prev) return;
-
-            if (!l || !w || !mk) { prev.innerHTML = ""; return; }
-
-            const week = (fixtures[l] || [])[w - 1] || [];
-            const m = week.find(x => x.matchKey === mk);
-            if (!m) { prev.innerHTML = ""; return; }
-
-            const t1 = getTeamByIdInLeague(l, m.homeId) || {};
-            const t2 = getTeamByIdInLeague(l, m.awayId) || {};
-            const score = findMatchScore(l, mk);
-
-            prev.innerHTML = `<span class="pill">${esc(leaguesMeta[l] || l)}</span> <span class="pill">${w}. Hafta</span>
-                            <span class="pill">${esc(t1.name || m.homeId)} vs ${esc(t2.name || m.awayId)}</span>
-                            ${score ? `<span class="pill">Skor: ${score.s1}-${score.s2}</span>` : `<span class="pill">Skor: -</span>`}`;
-        }
-
-        function setScoreForSelectedFixture() {
-            if (!isAdmin) return alert("Yetki yok!");
-            const l = document.getElementById('match-league-select').value;
-            const w = parseInt(document.getElementById('match-week-select').value);
-            const mk = document.getElementById('match-fixture-select').value;
-
+            const w = document.getElementById('match-week-select').value;
+            const t1Id = document.getElementById('team-1-select').value;
+            const t2Id = document.getElementById('team-2-select').value;
             const s1 = parseInt(document.getElementById('score-1').value);
             const s2 = parseInt(document.getElementById('score-2').value);
-
-            if (!l || !w || !mk) return alert("Lig/Hafta/Maç seçin!");
+            if (!l || !t1Id || !t2Id) return;
             if (Number.isNaN(s1) || Number.isNaN(s2)) return alert("Skor girin!");
-
-            const week = (fixtures[l] || [])[w - 1] || [];
-            const fx = week.find(x => x.matchKey === mk);
-            if (!fx) return alert("Fikstür maçı bulunamadı!");
-
-            // upsert
-            const existing = (matches || []).find(m => m.league === l && m.matchKey === mk);
-            if (existing) {
-                existing.s1 = s1;
-                existing.s2 = s2;
-                existing.week = w;
-                existing.homeId = fx.homeId;
-                existing.awayId = fx.awayId;
-            } else {
-                matches.push({
-                    id: Date.now(),
-                    createdAt: Date.now(),
-                    league: l,
-                    week: w,
-                    matchKey: mk,
-                    homeId: fx.homeId,
-                    awayId: fx.awayId,
-                    s1, s2
-                });
-            }
-
-            document.getElementById('score-1').value = "";
-            document.getElementById('score-2').value = "";
-
-            save();
-            alert("Skor kaydedildi!");
-            previewFixtureMatch();
+            const t1 = leagues[l].find(x => x.id === t1Id), t2 = leagues[l].find(x => x.id === t2Id);
+            matches.push({ id: Date.now(), league: l, week: w, t1Id: t1.id, t2Id: t2.id, t1Name: t1.name, t2Name: t2.name, s1, s2 });
+            save(); alert("Skor Kaydedildi!");
         }
-
         function deleteMatch(id) {
-            if (!isAdmin) return;
             if (confirm("Silinsin mi?")) {
-                matches = (matches || []).filter(m => m.id !== id);
+                matches = matches.filter(m => m.id !== id);
                 save();
             }
         }
-
         function renderMatches() {
-            const container = document.getElementById('matches-display-container');
-            container.innerHTML = "";
-
-            // group by league+week, but show active league first
-            const list = (matches || []).slice();
-            list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-
-            const show = activeLeagueKey ? list.filter(m => m.league === activeLeagueKey) : list;
-
-            // group by week
-            const grouped = show.reduce((acc, m) => {
-                const k = `${m.league}__${m.week}`;
-                (acc[k] = acc[k] || []).push(m);
-                return acc;
-            }, {});
-
-            const keys = Object.keys(grouped).sort((a, b) => {
-                const [la, wa] = a.split("__");
-                const [lb, wb] = b.split("__");
-                if (activeLeagueKey) {
-                    return parseInt(wb) - parseInt(wa);
-                }
-                // multi league: sort by leagueName then week desc
-                const lna = leaguesMeta[la] || la;
-                const lnb = leaguesMeta[lb] || lb;
-                return lnb.localeCompare(lna) || (parseInt(wb) - parseInt(wa));
-            });
-
-            keys.forEach(k => {
-                const [l, w] = k.split("__");
-                const dn = leaguesMeta[l] || l;
-                let html = `<div class="week-container">
-              <div class="week-title">${esc(dn)} • ${w}. Hafta</div>`;
-
-                (grouped[k] || []).forEach(m => {
-                    const t1 = getTeamByIdInLeague(l, m.homeId) || {};
-                    const t2 = getTeamByIdInLeague(l, m.awayId) || {};
-                    const n1 = t1.name || m.homeId;
-                    const n2 = t2.name || m.awayId;
-
+            const container = document.getElementById('matches-display-container'); container.innerHTML = "";
+            const grouped = matches.reduce((acc, m) => { (acc[m.week] = acc[m.week] || []).push(m); return acc; }, {});
+            Object.keys(grouped).sort((a, b) => b - a).forEach(w => {
+                let html = `<div class="week-container"><div class="week-title">${w}. Hafta</div>`;
+                grouped[w].slice().reverse().forEach(m => {
+                    const lData = leagues[m.league] || [];
+                    const t1 = lData.find(x => x.id !== "dummy" && ((m.t1Id && x.id === m.t1Id) || x.name === m.t1Name)) || {};
+                    const t2 = lData.find(x => x.id !== "dummy" && ((m.t2Id && x.id === m.t2Id) || x.name === m.t2Name)) || {};
                     html += `<div class="match-row">
-                <div style="display:flex;justify-content:center;">
-                  ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteMatch(${m.id})">X</button>` : ''}
-                </div>
-                <div class="team-home">
-                  <img src="${esc(t1.logo || '')}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                       onerror="this.src='https://via.placeholder.com/30?text=?'">
-                  <span>${esc(n1)}</span>
-                </div>
-                <div class="score-container">
-                  <div class="score-box">${esc(m.s1)}</div><span>-</span><div class="score-box">${esc(m.s2)}</div>
-                </div>
-                <div class="team-away">
-                  <span>${esc(n2)}</span>
-                  <img src="${esc(t2.logo || '')}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                       onerror="this.src='https://via.placeholder.com/30?text=?'">
-                </div>
-                <div></div>
-              </div>`;
+                    <div style="display:flex;justify-content:center;">
+                      ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteMatch(${m.id})">X</button>` : ''}
+                    </div>
+                    <div class="team-home">
+                      <img src="${esc(t1.logo || '')}" class="team-logo-small"
+                        loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                        onerror="this.src='https://via.placeholder.com/30?text=?'">
+                      <span>${esc(m.t1Name)}</span>
+                    </div>
+                    <div class="score-container"><div class="score-box">${esc(m.s1)}</div><span>-</span><div class="score-box">${esc(m.s2)}</div></div>
+                    <div class="team-away">
+                      <span>${esc(m.t2Name)}</span>
+                      <img src="${esc(t2.logo || '')}" class="team-logo-small"
+                        loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                        onerror="this.src='https://via.placeholder.com/30?text=?'">
+                    </div>
+                    <div></div>
+                  </div>`;
                 });
-
                 container.innerHTML += html + `</div>`;
             });
-
-            if (container.innerHTML.trim() === "") {
-                container.innerHTML = `<div class="muted">Maç sonucu bulunamadı.</div>`;
-            }
         }
 
-        // =======================
-        // ✅ Standings render (4)
-        // =======================
-        function renderStandings() {
-            const container = document.getElementById('leagues-container');
-            container.innerHTML = "";
-
-            const leagueKeys = Object.keys(leagues).filter(k => Array.isArray(leagues[k]));
-            const showKeys = activeLeagueKey ? leagueKeys.filter(k => k === activeLeagueKey) : leagueKeys;
-
-            showKeys.forEach(l => {
-                const dn = leaguesMeta[l] || l;
-                const st = computeStandingsForLeague(l);
-
-                let html = `<div class="league-card">
-              <h3>${esc(dn)}</h3>
-              <table>
-                <tr>
-                  <th>#</th>
-                  <th>Takım</th>
-                  <th>O</th><th>G</th><th>B</th><th>M</th>
-                  <th>AG</th><th>YG</th><th>AV</th>
-                  <th>P</th>
-                  <th>Form</th>
-                </tr>`;
-
-                st.forEach((t, i) => {
-                    html += `<tr>
-                <td>${i + 1}</td>
-                <td class="team-cell">
-                  <img src="${esc(t.logo || '')}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                       onerror="this.src='https://via.placeholder.com/30?text=?'">
-                  ${esc(t.name)} <span class="pill">${esc(t.teamId)}</span>
-                </td>
-                <td>${t.O}</td><td>${t.G}</td><td>${t.B}</td><td>${t.M}</td>
-                <td>${t.AG}</td><td>${t.YG}</td><td>${t.AV}</td>
-                <td><b>${t.P}</b></td>
-                <td class="muted" style="white-space:nowrap">${esc(t.formDisplay || '')}</td>
-              </tr>`;
-                });
-
-                container.innerHTML += html + `</table></div>`;
-            });
-
-            if (container.innerHTML.trim() === "") {
-                container.innerHTML = `<div class="muted">Lig bulunamadı.</div>`;
-            }
-        }
-
-        // =======================
-        // Select updates (also active league)
-        // =======================
+        // ---------- Select updates ----------
         function updateLeagueSelects() {
             const leagueKeys = Object.keys(leagues).filter(k => Array.isArray(leagues[k]));
-            const ids = [
-                'team-league-select',
-                'match-league-select',
-                'stats-league-select',
-                'fixture-league-select',
-                'player-create-league',
-                'player-assign-league',
-                'player-remove-league'
-            ];
-
-            ids.forEach(id => {
+            ['team-league-select', 'match-league-select', 'stats-league-select', 'fixture-league-select', 'player-create-league', 'player-assign-league'].forEach(id => {
                 const s = document.getElementById(id);
-                if (!s) return;
-                const val = s.value;
-                s.innerHTML = '<option value="">Lig Seçin</option>' + leagueKeys.map(l => {
-                    const dn = leaguesMeta[l] || l;
-                    return `<option value="${esc(l)}">${esc(dn)}</option>`;
-                }).join('');
-                s.value = val;
+                if (s) {
+                    const val = s.value;
+                    s.innerHTML = '<option value="">Lig Seçin</option>' + leagueKeys.map(l => {
+                        const dn = leaguesMeta[l] || l;
+                        return `<option value="${esc(l)}">${esc(dn)}</option>`;
+                    }).join('');
+                    s.value = val;
+                }
             });
-
-            renderActiveLeagueBar();
         }
-
+        function updateMatchTeams() {
+            const l = document.getElementById('match-league-select').value;
+            const s1 = document.getElementById('team-1-select');
+            const s2 = document.getElementById('team-2-select');
+            s1.innerHTML = '<option value="">Ev Sahibi Seçin</option>';
+            s2.innerHTML = '<option value="">Deplasman Seçin</option>';
+            if (leagues[l]) {
+                leagues[l].forEach(t => {
+                    if (t.id !== "dummy") {
+                        const opt = `<option value="${esc(t.id)}">${esc(t.name)}</option>`;
+                        s1.innerHTML += opt;
+                        s2.innerHTML += opt;
+                    }
+                });
+            }
+        }
         function updateStatsTeams() {
             const l = document.getElementById('stats-league-select').value;
             const s = document.getElementById('stats-team-select');
             s.innerHTML = '<option value="">Takım Seçin</option>';
-            (leagues[l] || []).forEach(t => {
-                if (t.id !== "dummy") s.innerHTML += `<option value="${esc(t.name)}">${esc(t.name)}</option>`;
-            });
+            if (leagues[l]) leagues[l].forEach(t => { if (t.id !== "dummy") s.innerHTML += `<option value="${esc(t.name)}">${esc(t.name)}</option>`; });
         }
-
         function updateAssignTeams() {
             const l = document.getElementById('player-assign-league').value;
             const s = document.getElementById('player-assign-team');
             s.innerHTML = '<option value="">Takım Seçin</option>';
-            (leagues[l] || []).forEach(t => {
-                if (t.id !== "dummy") s.innerHTML += `<option value="${esc(t.teamId)}">${esc(t.name)}</option>`;
-            });
+            if (leagues[l]) leagues[l].forEach(t => { if (t.id !== "dummy") s.innerHTML += `<option value="${esc(t.id)}">${esc(t.name)}</option>`; });
         }
 
-        function updateRemoveTeams() {
-            const l = document.getElementById('player-remove-league').value;
-            const s = document.getElementById('player-remove-team');
-            s.innerHTML = '<option value="">Takım Seçin</option>';
-            (leagues[l] || []).forEach(t => {
-                if (t.id !== "dummy") s.innerHTML += `<option value="${esc(t.teamId)}">${esc(t.name)}</option>`;
-            });
-        }
-
-        // =======================
-        // Players / Stats
-        // =======================
+        // ---------- Players / Stats helpers ----------
         function getAllRecordsByPlayerId(pid) {
             pid = normalizeHashId(pid);
             return (players || []).filter(p => normalizeHashId(p.playerId) === pid);
@@ -1703,7 +1238,6 @@
         }
 
         function createOrOverwritePlayer() {
-            if (!isAdmin) return alert("Yetki yok!");
             const l = document.getElementById('player-create-league').value;
             const rawId = document.getElementById('player-id-input').value.trim();
             const name = document.getElementById('player-name-input').value.trim();
@@ -1717,12 +1251,12 @@
             if (existing.length) {
                 existing.forEach(r => { r.name = name; });
                 if (!existing.some(r => r.league === l)) {
-                    players.push({ id: Date.now(), playerId: pid, name, league: l, team: "", teamId: "", goals: 0, assists: 0, cs: 0 });
+                    players.push({ id: Date.now(), playerId: pid, name, league: l, team: "", goals: 0, assists: 0, cs: 0 });
                 }
                 save();
-                alert("Oyuncu güncellendi!");
+                alert("Oyuncu güncellendi (üzerine yazıldı)!");
             } else {
-                players.push({ id: Date.now(), playerId: pid, name, league: l, team: "", teamId: "", goals: 0, assists: 0, cs: 0 });
+                players.push({ id: Date.now(), playerId: pid, name, league: l, team: "", goals: 0, assists: 0, cs: 0 });
                 save();
                 alert("Oyuncu oluşturuldu!");
             }
@@ -1732,25 +1266,7 @@
             renderPlayersList();
         }
 
-        // ✅ (6) Transfer log
-        function logTransfer({ league, fromTeamId, toTeamId, playerId, playerName, note }) {
-            transfers = transfers || [];
-            transfers.push({
-                id: Date.now(),
-                at: Date.now(),
-                league,
-                fromTeamId: fromTeamId ? normalizeHashId(fromTeamId) : "",
-                toTeamId: toTeamId ? normalizeHashId(toTeamId) : "",
-                playerId: normalizeHashId(playerId),
-                playerName: playerName || "",
-                note: note || ""
-            });
-            // keep it from exploding
-            if (transfers.length > 3000) transfers = transfers.slice(-3000);
-        }
-
         function assignPlayerToTeam() {
-            if (!isAdmin) return alert("Yetki yok!");
             const l = document.getElementById('player-assign-league').value;
             const teamId = document.getElementById('player-assign-team').value;
             const rawPid = document.getElementById('player-assign-id').value.trim();
@@ -1758,105 +1274,40 @@
             if (!rawPid || !isValidHashId(rawPid)) return alert("Oyuncu ID geçersiz!");
             const pid = normalizeHashId(rawPid);
 
-            const team = getTeamByIdInLeague(l, teamId);
+            const team = (leagues[l] || []).find(t => t.id === teamId);
             if (!team) return alert("Takım bulunamadı!");
 
             let rec = getRecordByIdAndLeague(pid, l);
             if (!rec) {
                 const any = getAllRecordsByPlayerId(pid)[0];
                 const nm = any ? any.name : "Oyuncu";
-                rec = { id: Date.now(), playerId: pid, name: nm, league: l, team: "", teamId: "", goals: 0, assists: 0, cs: 0 };
+                rec = { id: Date.now(), playerId: pid, name: nm, league: l, team: "", goals: 0, assists: 0, cs: 0 };
                 players.push(rec);
             }
 
-            const oldTeamId = rec.teamId ? normalizeHashId(rec.teamId) : "";
-
-            // remove from old team roster
-            if (oldTeamId) {
-                const oldTeam = getTeamByIdInLeague(l, oldTeamId);
+            if (rec.team) {
+                const oldTeam = (leagues[l] || []).find(t => t.id !== "dummy" && t.name === rec.team);
                 if (oldTeam && Array.isArray(oldTeam.roster)) {
                     oldTeam.roster = oldTeam.roster.filter(x => normalizeHashId(x) !== pid);
                 }
             }
 
-            // set new
             rec.team = team.name;
-            rec.teamId = normalizeHashId(team.teamId);
-
             if (!Array.isArray(team.roster)) team.roster = [];
             if (!team.roster.some(x => normalizeHashId(x) === pid)) team.roster.push(pid);
-
-            // ✅ log transfer (6)
-            logTransfer({
-                league: l,
-                fromTeamId: oldTeamId,
-                toTeamId: team.teamId,
-                playerId: pid,
-                playerName: rec.name,
-                note: oldTeamId ? "Transfer" : "İlk kayıt"
-            });
 
             save();
             alert("Oyuncu takıma eklendi!");
             document.getElementById('player-assign-id').value = "";
             renderPlayersList();
             renderTeamsList();
-            renderTransfersAdmin();
-        }
-
-        function removePlayerFromTeam() {
-            if (!isAdmin) return alert("Yetki yok!");
-            const l = document.getElementById('player-remove-league').value;
-            const teamId = document.getElementById('player-remove-team').value;
-            const rawPid = document.getElementById('player-remove-id').value.trim();
-            if (!l || !teamId) return alert("Lig ve takım seçin!");
-            if (!rawPid || !isValidHashId(rawPid)) return alert("Oyuncu ID geçersiz!");
-            const pid = normalizeHashId(rawPid);
-
-            const team = getTeamByIdInLeague(l, teamId);
-            if (!team) return alert("Takım bulunamadı!");
-
-            const rec = getRecordByIdAndLeague(pid, l);
-            if (!rec) return alert("Bu ligde oyuncu kaydı bulunamadı!");
-
-            if (normalizeHashId(rec.teamId) !== normalizeHashId(team.teamId)) {
-                return alert("Oyuncu seçtiğin takımda görünmüyor!");
-            }
-
-            // remove roster
-            if (Array.isArray(team.roster)) {
-                team.roster = team.roster.filter(x => normalizeHashId(x) !== pid);
-            }
-
-            // clear record team
-            rec.team = "";
-            rec.teamId = "";
-
-            // ✅ log (6)
-            logTransfer({
-                league: l,
-                fromTeamId: team.teamId,
-                toTeamId: "",
-                playerId: pid,
-                playerName: rec.name,
-                note: "Takımdan çıkarıldı"
-            });
-
-            save();
-            alert("Oyuncu takımdan çıkarıldı!");
-            document.getElementById('player-remove-id').value = "";
-            renderTeamsList();
-            renderPlayersList();
-            renderTransfersAdmin();
         }
 
         function updatePlayerStatsById() {
-            if (!isAdmin) return alert("Yetki yok!");
             const l = document.getElementById('stats-league-select').value;
             const teamName = document.getElementById('stats-team-select').value;
             const rawPid = document.getElementById('stats-player-id').value.trim();
             const maybeName = document.getElementById('stats-player-name').value.trim();
-
             const g = parseInt(document.getElementById('plus-goal').value) || 0;
             const a = parseInt(document.getElementById('plus-assist').value) || 0;
             const cs = parseInt(document.getElementById('plus-cs').value) || 0;
@@ -1873,14 +1324,13 @@
             if (!rec) {
                 const any = getAllRecordsByPlayerId(pid)[0];
                 const nm = maybeName || (any ? any.name : "Oyuncu");
-                rec = { id: Date.now(), playerId: pid, name: nm, league: l, team: teamName || "", teamId: "", goals: 0, assists: 0, cs: 0 };
+                rec = { id: Date.now(), playerId: pid, name: nm, league: l, team: teamName || "", goals: 0, assists: 0, cs: 0 };
                 players.push(rec);
             }
 
             rec.goals = (rec.goals || 0) + g;
             rec.assists = (rec.assists || 0) + a;
             rec.cs = (rec.cs || 0) + cs;
-
             if (teamName) rec.team = teamName;
 
             save();
@@ -1906,6 +1356,7 @@
             return Array.from(map.values());
         }
 
+        // ✅ Search kaldırıldı: tüm oyuncular listelenir
         function renderPlayersList() {
             const wrap = document.getElementById('players-list');
             if (!wrap) return;
@@ -1913,14 +1364,14 @@
             const uniq = uniquePlayersIndex();
 
             wrap.innerHTML = uniq.map(p => `
-            <div class="mini-card" onclick="showPlayersDetail('${esc(p.playerId)}')">
-              <div class="row">
-                <div style="font-weight:900">${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></div>
-                ${isAdmin ? `<button class="btn-danger btn-small" onclick="event.stopPropagation(); deletePlayerById('${esc(p.playerId)}')">Sil</button>` : ``}
-              </div>
-              <div class="muted">Detay için tıkla</div>
-            </div>
-          `).join('') || `<div class="muted">Oyuncu bulunamadı.</div>`;
+                <div class="mini-card" onclick="showPlayersDetail('${esc(p.playerId)}')">
+                  <div class="row">
+                    <div style="font-weight:900">${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></div>
+                    ${isAdmin ? `<button class="btn-danger btn-small" onclick="event.stopPropagation(); deletePlayerById('${esc(p.playerId)}')">Sil</button>` : ``}
+                  </div>
+                  <div class="muted">Detay için tıkla</div>
+                </div>
+              `).join('') || `<div class="muted">Oyuncu bulunamadı.</div>`;
         }
 
         function showPlayersDetail(playerId) {
@@ -1942,66 +1393,42 @@
             const leaguesList = Object.values(byLeague).sort((a, b) => String(a.league).localeCompare(String(b.league)));
             const name = recs.find(x => x.name)?.name || "Oyuncu";
 
-            // last transfers for this player
-            const pTransfers = (transfers || []).filter(t => normalizeHashId(t.playerId) === pid).slice(-8).reverse();
-
             box.style.display = 'block';
             box.innerHTML = `
-            <div class="row" style="margin-bottom:10px">
-              <div>
-                <div style="font-size:1.12rem;font-weight:1000">${esc(name)} <span class="pill">${esc(pid)}</span></div>
-                <div class="muted">Liglere göre istatistik</div>
-              </div>
-              <div class="row">
-                <button class="linkbtn" onclick="document.getElementById('players-detail').style.display='none'">Kapat</button>
-                ${isAdmin ? `<button class="btn-danger btn-small" onclick="deletePlayerById('${esc(pid)}')">Oyuncuyu Sil</button>` : ``}
-              </div>
-            </div>
+                <div class="row" style="margin-bottom:10px">
+                  <div>
+                    <div style="font-size:1.12rem;font-weight:1000">${esc(name)} <span class="pill">${esc(pid)}</span></div>
+                    <div class="muted">Liglere göre istatistik</div>
+                  </div>
+                  <div class="row">
+                    <button class="linkbtn" onclick="document.getElementById('players-detail').style.display='none'">Kapat</button>
+                    ${isAdmin ? `<button class="btn-danger btn-small" onclick="deletePlayerById('${esc(pid)}')">Oyuncuyu Sil</button>` : ``}
+                  </div>
+                </div>
 
-            <h3>Lig Bazlı İstatistik</h3>
-            <table>
-              <tr><th>Lig</th><th>Takım</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
-              ${leaguesList.map(x => `
-                <tr>
-                  <td>${esc(leaguesMeta[x.league] || x.league)}</td>
-                  <td>${esc(x.team || '—')}</td>
-                  <td><b>${x.goals}</b></td>
-                  <td><b>${x.assists}</b></td>
-                  <td><b>${x.cs}</b></td>
-                </tr>
-              `).join('')}
-            </table>
-
-            <div style="height:12px"></div>
-            <h3>Son Transferler</h3>
-            ${pTransfers.length ? `
-              <table>
-                <tr><th>Tarih</th><th>Lig</th><th>İşlem</th></tr>
-                ${pTransfers.map(t => {
-                const dn = leaguesMeta[t.league] || t.league;
-                const fromTeam = t.fromTeamId ? (getTeamByIdInLeague(t.league, t.fromTeamId)?.name || t.fromTeamId) : "—";
-                const toTeam = t.toTeamId ? (getTeamByIdInLeague(t.league, t.toTeamId)?.name || t.toTeamId) : "—";
-                const d = new Date(t.at || 0).toLocaleString('tr-TR');
-                return `<tr>
-                    <td class="muted">${esc(d)}</td>
-                    <td>${esc(dn)}</td>
-                    <td>${esc(fromTeam)} → <b>${esc(toTeam)}</b> <span class="muted">(${esc(t.note || '')})</span></td>
-                  </tr>`;
-            }).join('')}
-              </table>
-            ` : `<div class="muted">Transfer kaydı yok.</div>`}
-          `;
+                <h3>Lig Bazlı İstatistik</h3>
+                <table>
+                  <tr><th>Lig</th><th>Takım</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
+                  ${leaguesList.map(x => `
+                    <tr>
+                      <td>${esc(leaguesMeta[x.league] || x.league)}</td>
+                      <td>${esc(x.team || '—')}</td>
+                      <td><b>${x.goals}</b></td>
+                      <td><b>${x.assists}</b></td>
+                      <td><b>${x.cs}</b></td>
+                    </tr>
+                  `).join('')}
+                </table>
+              `;
             box.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function deletePlayerById(playerId) {
-            if (!isAdmin) return;
             const pid = normalizeHashId(playerId);
             if (!confirm("Bu oyuncu ID'ye ait TÜM lig kayıtları silinsin mi?")) return;
 
             players = (players || []).filter(p => normalizeHashId(p.playerId) !== pid);
 
-            // remove from all rosters
             Object.keys(leagues).forEach(l => {
                 if (!Array.isArray(leagues[l])) return;
                 leagues[l].forEach(t => {
@@ -2019,9 +1446,7 @@
             renderStats();
         }
 
-        // =======================
-        // Teams
-        // =======================
+        // ---------- Teams ----------
         function findTeamByTeamId(teamId) {
             const tid = normalizeHashId(teamId);
             for (const l of Object.keys(leagues)) {
@@ -2032,36 +1457,34 @@
             return null;
         }
 
+        // ✅ Search kaldırıldı: tüm takımlar listelenir
         function renderTeamsList() {
             const wrap = document.getElementById('teams-list');
             if (!wrap) return;
 
             let all = [];
-            const leagueKeys = Object.keys(leagues).filter(k => Array.isArray(leagues[k]));
-            const showKeys = activeLeagueKey ? leagueKeys.filter(k => k === activeLeagueKey) : leagueKeys;
-
-            showKeys.forEach(l => {
-                (leagues[l] || []).filter(t => t.id !== "dummy").forEach(t => {
-                    all.push({ leagueKey: l, leagueName: leaguesMeta[l] || l, team: t });
-                });
+            Object.keys(leagues).forEach(l => {
+                if (!Array.isArray(leagues[l])) return;
+                leagues[l].filter(t => t.id !== "dummy").forEach(t => all.push({ leagueKey: l, leagueName: leaguesMeta[l] || l, team: t }));
             });
 
             wrap.innerHTML = all.map(x => `
-            <div class="mini-card" onclick="showTeamDetail('${esc(x.team.teamId)}')">
-              <div class="row">
-                <div class="team-cell">
-                  <img class="team-logo-small" src="${esc(x.team.logo || '')}" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                       onerror="this.src='https://via.placeholder.com/30?text=?'">
-                  <div>
-                    <div style="font-weight:900">${esc(x.team.name)}</div>
-                    <div class="muted">${esc(x.leagueName)} • <span class="pill">${esc(x.team.teamId)}</span></div>
+                <div class="mini-card" onclick="showTeamDetail('${esc(x.team.teamId)}')">
+                  <div class="row">
+                    <div class="team-cell">
+                      <img class="team-logo-small" src="${esc(x.team.logo || '')}"
+                        loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                        onerror="this.src='https://via.placeholder.com/30?text=?'">
+                      <div>
+                        <div style="font-weight:900">${esc(x.team.name)}</div>
+                        <div class="muted">${esc(x.leagueName)} • <span class="pill">${esc(x.team.teamId)}</span></div>
+                      </div>
+                    </div>
+                    <div class="pill">P: ${x.team.puan} • AV: ${x.team.averaj}</div>
                   </div>
+                  <div class="muted" style="margin-top:6px">Kadro için tıkla</div>
                 </div>
-                <div class="pill">Kadro: ${(x.team.roster || []).length}</div>
-              </div>
-              <div class="muted" style="margin-top:6px">Kadro için tıkla</div>
-            </div>
-          `).join('') || `<div class="muted">Takım bulunamadı.</div>`;
+              `).join('') || `<div class="muted">Takım bulunamadı.</div>`;
         }
 
         function showTeamDetail(teamId) {
@@ -2085,67 +1508,44 @@
                 return { pid, nm, g, a, cs };
             });
 
-            // team transfers
-            const teamTransfers = (transfers || [])
-                .filter(t => t.league === leagueKey && (normalizeHashId(t.toTeamId) === normalizeHashId(team.teamId) || normalizeHashId(t.fromTeamId) === normalizeHashId(team.teamId)))
-                .slice(-10).reverse();
-
             box.style.display = 'block';
             box.innerHTML = `
-            <div class="row" style="margin-bottom:10px">
-              <div class="team-cell">
-                <img class="team-logo-small" src="${esc(team.logo || '')}" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                     onerror="this.src='https://via.placeholder.com/30?text=?'">
-                <div>
-                  <div style="font-size:1.12rem;font-weight:1000">${esc(team.name)} <span class="pill">${esc(team.teamId)}</span></div>
-                  <div class="muted">${esc(leagueName)}</div>
+                <div class="row" style="margin-bottom:10px">
+                  <div class="team-cell">
+                    <img class="team-logo-small" src="${esc(team.logo || '')}"
+                      loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                      onerror="this.src='https://via.placeholder.com/30?text=?'">
+                    <div>
+                      <div style="font-size:1.12rem;font-weight:1000">${esc(team.name)} <span class="pill">${esc(team.teamId)}</span></div>
+                      <div class="muted">${esc(leagueName)} • P: <b>${team.puan}</b> • AV: <b>${team.averaj}</b></div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <button class="linkbtn" onclick="document.getElementById('teams-detail').style.display='none'">Kapat</button>
+                    ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteTeamById('${esc(team.teamId)}')">Takımı Sil</button>` : ``}
+                  </div>
                 </div>
-              </div>
-              <div class="row">
-                <button class="linkbtn" onclick="document.getElementById('teams-detail').style.display='none'">Kapat</button>
-                ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteTeamById('${esc(team.teamId)}')">Takımı Sil</button>` : ``}
-              </div>
-            </div>
 
-            <h3>Kadro</h3>
-            ${rosterRows.length ? `
-              <table>
-                <tr><th>Oyuncu</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
-                ${rosterRows.map(r => `
-                  <tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(r.pid)}')">
-                    <td>${esc(r.nm)} <span class="pill">${esc(r.pid)}</span></td>
-                    <td><b>${r.g}</b></td>
-                    <td><b>${r.a}</b></td>
-                    <td><b>${r.cs}</b></td>
-                  </tr>
-                `).join('')}
-              </table>
-              <div class="muted" style="margin-top:8px">Not: Oyuncuya tıklayınca oyuncu detayına gider.</div>
-            ` : `<div class="muted">Kadro boş.</div>`}
-
-            <div style="height:12px"></div>
-            <h3>Son Transferler</h3>
-            ${teamTransfers.length ? `
-              <table>
-                <tr><th>Tarih</th><th>Oyuncu</th><th>İşlem</th></tr>
-                ${teamTransfers.map(t => {
-                const d = new Date(t.at || 0).toLocaleString('tr-TR');
-                const fromTeam = t.fromTeamId ? (getTeamByIdInLeague(leagueKey, t.fromTeamId)?.name || t.fromTeamId) : "—";
-                const toTeam = t.toTeamId ? (getTeamByIdInLeague(leagueKey, t.toTeamId)?.name || t.toTeamId) : "—";
-                return `<tr>
-                    <td class="muted">${esc(d)}</td>
-                    <td>${esc(t.playerName || 'Oyuncu')} <span class="pill">${esc(t.playerId)}</span></td>
-                    <td>${esc(fromTeam)} → <b>${esc(toTeam)}</b> <span class="muted">(${esc(t.note || '')})</span></td>
-                  </tr>`;
-            }).join('')}
-              </table>
-            ` : `<div class="muted">Transfer kaydı yok.</div>`}
-          `;
+                <h3>Kadro</h3>
+                ${rosterRows.length ? `
+                  <table>
+                    <tr><th>Oyuncu</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
+                    ${rosterRows.map(r => `
+                      <tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(r.pid)}')">
+                        <td>${esc(r.nm)} <span class="pill">${esc(r.pid)}</span></td>
+                        <td><b>${r.g}</b></td>
+                        <td><b>${r.a}</b></td>
+                        <td><b>${r.cs}</b></td>
+                      </tr>
+                    `).join('')}
+                  </table>
+                  <div class="muted" style="margin-top:8px">Not: Oyuncuya tıklayınca oyuncu detayına gider.</div>
+                ` : `<div class="muted">Kadro boş.</div>`}
+              `;
             box.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function deleteTeamById(teamId) {
-            if (!isAdmin) return;
             const found = findTeamByTeamId(teamId);
             if (!found) return alert("Takım bulunamadı!");
             const { leagueKey, team } = found;
@@ -2155,13 +1555,10 @@
             const roster = Array.isArray(team.roster) ? team.roster.map(normalizeHashId).filter(Boolean) : [];
             roster.forEach(pid => {
                 const rec = getRecordByIdAndLeague(pid, leagueKey);
-                if (rec) { rec.team = ""; rec.teamId = ""; }
+                if (rec) rec.team = "";
             });
 
             leagues[leagueKey] = (leagues[leagueKey] || []).filter(t => t.id !== team.id);
-
-            // also clean fixture? (optional)
-            // keep fixture but teams missing will show ids.
 
             save();
             alert("Takım silindi!");
@@ -2169,17 +1566,11 @@
             document.getElementById('teams-detail').style.display = 'none';
         }
 
-        // =======================
-        // Stats
-        // =======================
+        // ---------- Stats ----------
         function renderStats() {
-            const container = document.getElementById('stats-display-container');
-            container.innerHTML = "";
-
-            const leagueKeys = Object.keys(leagues).filter(k => Array.isArray(leagues[k]));
-            const showKeys = activeLeagueKey ? leagueKeys.filter(k => k === activeLeagueKey) : leagueKeys;
-
-            showKeys.forEach(l => {
+            const container = document.getElementById('stats-display-container'); container.innerHTML = "";
+            Object.keys(leagues).forEach(l => {
+                if (!Array.isArray(leagues[l])) return;
                 const lp = (players || []).filter(p => p.league === l);
                 if (lp.length === 0) return;
 
@@ -2191,13 +1582,14 @@
                 goals.forEach(p => {
                     const t = (leagues[l] || []).find(x => x.name === p.team) || {};
                     html += `<tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(p.playerId)}')">
-                <td class="team-cell">
-                  <img src="${esc(t.logo || '')}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                       onerror="this.src='https://via.placeholder.com/30?text=?'">
-                  ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span>
-                </td>
-                <td style="text-align:right"><b>${p.goals}</b></td>
-              </tr>`;
+                    <td class="team-cell">
+                      <img src="${esc(t.logo || '')}" class="team-logo-small"
+                        loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                        onerror="this.src='https://via.placeholder.com/30?text=?'">
+                      ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span>
+                    </td>
+                    <td style="text-align:right"><b>${p.goals}</b></td>
+                  </tr>`;
                 });
                 html += `</table></div>`;
 
@@ -2206,113 +1598,52 @@
                 assists.forEach(p => {
                     const t = (leagues[l] || []).find(x => x.name === p.team) || {};
                     html += `<tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(p.playerId)}')">
-                <td class="team-cell">
-                  <img src="${esc(t.logo || '')}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                       onerror="this.src='https://via.placeholder.com/30?text=?'">
-                  ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span>
-                </td>
-                <td style="text-align:right"><b>${p.assists}</b></td>
-              </tr>`;
+                    <td class="team-cell">
+                      <img src="${esc(t.logo || '')}" class="team-logo-small"
+                        loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                        onerror="this.src='https://via.placeholder.com/30?text=?'">
+                      ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span>
+                    </td>
+                    <td style="text-align:right"><b>${p.assists}</b></td>
+                  </tr>`;
                 });
                 html += `</table></div>`;
 
                 const clean = [...lp].filter(p => (p.cs || 0) > 0).sort((a, b) => b.cs - a.cs).slice(0, 5);
-                html += `<div class="stats-card"><h3>CS Krallığı</h3><table>`;
+                html += `<div class="stats-card"><h3>Cs Krallığı</h3><table>`;
                 clean.forEach(p => {
                     const t = (leagues[l] || []).find(x => x.name === p.team) || {};
                     html += `<tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(p.playerId)}')">
-                <td class="team-cell">
-                  <img src="${esc(t.logo || '')}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                       onerror="this.src='https://via.placeholder.com/30?text=?'">
-                  ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span>
-                </td>
-                <td style="text-align:right"><b>${p.cs}</b></td>
-              </tr>`;
+                    <td class="team-cell">
+                      <img src="${esc(t.logo || '')}" class="team-logo-small"
+                        loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                        onerror="this.src='https://via.placeholder.com/30?text=?'">
+                      ${esc(p.name)} <span class="pill">${esc(p.playerId)}</span>
+                    </td>
+                    <td style="text-align:right"><b>${p.cs}</b></td>
+                  </tr>`;
                 });
                 html += `</table></div>`;
 
                 html += `</div>`;
                 container.innerHTML += html;
             });
-
-            if (container.innerHTML.trim() === "") {
-                container.innerHTML = `<div class="muted">İstatistik bulunamadı.</div>`;
-            }
         }
 
-        // =======================
-        // Transfers admin render (6)
-        // =======================
-        function renderTransfersAdmin() {
-            const box = document.getElementById('transfers-admin-list');
-            if (!box) return;
-
-            if (!isAdmin) {
-                box.innerHTML = `<div class="muted">Admin girişi yapınca görünür.</div>`;
-                return;
-            }
-
-            const last = (transfers || []).slice(-30).reverse();
-            if (!last.length) {
-                box.innerHTML = `<div class="muted">Transfer kaydı yok.</div>`;
-                return;
-            }
-
-            box.innerHTML = `
-            <table>
-              <tr><th>Tarih</th><th>Lig</th><th>Oyuncu</th><th>İşlem</th></tr>
-              ${last.map(t => {
-                const dn = leaguesMeta[t.league] || t.league;
-                const d = new Date(t.at || 0).toLocaleString('tr-TR');
-                const fromTeam = t.fromTeamId ? (getTeamByIdInLeague(t.league, t.fromTeamId)?.name || t.fromTeamId) : "—";
-                const toTeam = t.toTeamId ? (getTeamByIdInLeague(t.league, t.toTeamId)?.name || t.toTeamId) : "—";
-                return `<tr>
-                  <td class="muted">${esc(d)}</td>
-                  <td>${esc(dn)}</td>
-                  <td>${esc(t.playerName || 'Oyuncu')} <span class="pill">${esc(t.playerId)}</span></td>
-                  <td>${esc(fromTeam)} → <b>${esc(toTeam)}</b> <span class="muted">(${esc(t.note || '')})</span></td>
-                </tr>`;
-            }).join('')}
-            </table>`;
-        }
-
-        // =======================
-        // Render all
-        // =======================
+        // ---------- Render all ----------
         function renderAll() {
-            renderActiveLeagueBar();
             renderNews();
             renderStandings();
             renderFixture();
             renderStats();
             renderMatches();
-            renderTransfersAdmin();
         }
 
-        // =======================
-        // Init
-        // =======================
+        // ---------- Init ----------
         (function init() {
-            loadActiveLeague();
-            // matches week select is generated from fixture now
-            // default nav
-            handleNav('news');
+            const s = document.getElementById('match-week-select');
+            for (let i = 1; i <= 30; i++) s.innerHTML += `<option value="${i}">${i}</option>`;
         })();
-
-        // =======================
-        // ✅ IMPORTANT SECURITY NOTE (1)
-        // =======================
-        // Bu kod admin UI’ını UID ile sınırlar ama asıl güvenlik Firebase Rules ile olur.
-        // RTDB Rules örneği (Console -> Realtime Database -> Rules):
-        //
-        // {
-        //   "rules": {
-        //     ".read": true,
-        //     ".write": "auth != null && (auth.uid === 'UID1' || auth.uid === 'UID2')"
-        //   }
-        // }
-        //
-        // ADMIN_UIDS ile aynı UID’leri rules’a da yaz.
     </script>
 </body>
 </html>
