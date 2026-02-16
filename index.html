@@ -1196,20 +1196,19 @@
 
                 // player aggregation from embedded details
                 const details = m.details || {};
-                [t1, t2].forEach(tid => {
-                    const teamDetail = details[tid] || {};
-                    Object.keys(teamDetail).forEach(pid => {
-                        const rec = teamDetail[pid] || {};
-                        const g = parseInt(rec.g) || 0;
-                        const a = parseInt(rec.a) || 0;
-                        const cs = parseInt(rec.cs) || 0;
+                [t1, t2].forEach(teamId => {
+                    const list = Array.isArray(details[teamId]) ? details[teamId] : [];
+                    list.forEach(item => {
+                        const pid = normalizeHashId(item.playerId);
+                        const g = parseInt(item.g) || 0;
+                        const a = parseInt(item.a) || 0;
+                        const cs = parseInt(item.cs) || 0;
 
                         const pName = getPlayerName(pid);
                         if (!playerStats[pid]) playerStats[pid] = { playerId: pid, name: pName, goals: 0, assists: 0, cs: 0 };
                         playerStats[pid].goals += g;
                         playerStats[pid].assists += a;
                         playerStats[pid].cs += cs;
-                        // isim güncelleme (registry değişmiş olabilir)
                         if (pName && pName !== "Oyuncu") playerStats[pid].name = pName;
                     });
                 });
@@ -1480,26 +1479,40 @@
             </div>
           `;
         }
-
         function collectMatchDetails(leagueKey, t1Id, t2Id) {
             const details = {};
-            details[t1Id] = {};
-            details[t2Id] = {};
+            details[t1Id] = [];
+            details[t2Id] = [];
 
             const inputs = Array.from(document.querySelectorAll('#match-detail-inputs input[data-pid][data-field]'));
+
+            // geçici map: teamId -> pid -> {g,a,cs}
+            const tmp = { [t1Id]: {}, [t2Id]: {} };
+
             inputs.forEach(inp => {
-                const pid = normalizeHashId(inp.getAttribute('data-pid'));
-                const field = inp.getAttribute('data-field');
-                const side = inp.getAttribute('data-side');
+                const pid = normalizeHashId(inp.getAttribute('data-pid')); // "#P123"
+                const field = inp.getAttribute('data-field');             // "g" | "a" | "cs"
+                const side = inp.getAttribute('data-side');               // "home" | "away"
                 const val = parseInt(inp.value) || 0;
 
                 const teamId = (side === "home") ? t1Id : t2Id;
-                if (!details[teamId][pid]) details[teamId][pid] = { g: 0, a: 0, cs: 0 };
-                details[teamId][pid][field] = val;
+                if (!tmp[teamId][pid]) tmp[teamId][pid] = { g: 0, a: 0, cs: 0 };
+                tmp[teamId][pid][field] = val;
+            });
+
+            // tmp -> array
+            [t1Id, t2Id].forEach(teamId => {
+                details[teamId] = Object.keys(tmp[teamId]).map(pid => ({
+                    playerId: pid,
+                    g: tmp[teamId][pid].g || 0,
+                    a: tmp[teamId][pid].a || 0,
+                    cs: tmp[teamId][pid].cs || 0
+                }));
             });
 
             return details;
         }
+
 
         function formatTopLinesFromDetails(leagueKey, t1Id, t2Id, details) {
             const lines = [];
@@ -1508,28 +1521,30 @@
 
             function listForTeam(teamId) {
                 const team = (teamId === t1Id) ? t1 : t2;
-                const td = details[teamId] || {};
-                const arr = Object.keys(td).map(pid => {
-                    const r = td[pid] || {};
-                    return { pid, name: getPlayerName(pid), g: (+r.g || 0), a: (+r.a || 0), cs: (+r.cs || 0) };
-                });
+                const arr = (Array.isArray(details[teamId]) ? details[teamId] : []).map(item => ({
+                    pid: normalizeHashId(item.playerId),
+                    name: getPlayerName(item.playerId),
+                    g: parseInt(item.g) || 0,
+                    a: parseInt(item.a) || 0,
+                    cs: parseInt(item.cs) || 0
+                }));
 
                 const scorers = arr.filter(x => x.g > 0).sort((a, b) => b.g - a.g).slice(0, 6);
                 const assists = arr.filter(x => x.a > 0).sort((a, b) => b.a - a.a).slice(0, 6);
                 const clean = arr.filter(x => x.cs > 0).sort((a, b) => b.cs - a.cs).slice(0, 6);
 
-                const sLine = scorers.length ? `⚽ ${team.name}: ` + scorers.map(x => `${x.name}(${x.g})`).join(", ") : `⚽ ${team.name}: -`;
-                const aLine = assists.length ? `🅰️ ${team.name}: ` + assists.map(x => `${x.name}(${x.a})`).join(", ") : `🅰️ ${team.name}: -`;
-                const cLine = clean.length ? `🧤 ${team.name}: ` + clean.map(x => `${x.name}(${x.cs})`).join(", ") : `🧤 ${team.name}: -`;
-
-                lines.push(sLine, aLine, cLine);
+                lines.push(
+                    scorers.length ? `⚽ ${team.name}: ${scorers.map(x => `${x.name}(${x.g})`).join(", ")}` : `⚽ ${team.name}: -`,
+                    assists.length ? `🅰️ ${team.name}: ${assists.map(x => `${x.name}(${x.a})`).join(", ")}` : `🅰️ ${team.name}: -`,
+                    clean.length ? `🧤 ${team.name}: ${clean.map(x => `${x.name}(${x.cs})`).join(", ")}` : `🧤 ${team.name}: -`,
+                );
             }
 
             listForTeam(t1Id);
             listForTeam(t2Id);
-
             return lines;
         }
+
 
         async function addMatchWithDetails() {
             const l = $('match-league-select')?.value || "";
