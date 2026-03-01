@@ -694,8 +694,8 @@
         <section id="standings-section" style="display:none;">
             <h2>Puan Durumu</h2>
             <div class="muted">
-                Tie-breaker: Önce Puan, sonra Averaj (GD), sonra İkili Averaj (H2H Puan, H2H GD), sonra Atılan Gol.
-                <br>Not: Puan durumu sadece <b>Lig Süreci</b> maçlarından hesaplanır. (Playoff maçları tabloya eklenmez.)
+                
+                <br>
             </div>
             <div id="leagues-container"></div>
 
@@ -721,8 +721,6 @@
         <section id="fixture-section" style="display:none;">
             <h2>Fikstür</h2>
             <div class="muted">
-                Bu sayfada:
-                <b>Lig Süreci</b> (rövanşsız round-robin) + <b>Playoff</b> (1-4 / 2-3 / Final) görünür.
             </div>
             <div id="fixture-display-container"></div>
 
@@ -734,7 +732,6 @@
                 <div class="league-card" style="margin-top:10px;">
                     <h3>Lig Süreci (Rövanşsız)</h3>
                     <div class="muted">
-                        Tüm kombinasyonları (her takım birbiriyle 1 kez) üretir. Takım sayısı tek ise BAY ekler.
                     </div>
                     <button onclick="generateFixtureSingleLeg()"
                             style="background:linear-gradient(180deg,#6a1b9a,#4f1471);margin-bottom:6px;">
@@ -746,8 +743,6 @@
                 <div class="league-card" style="margin-top:10px;">
                     <h3>Playoff (Top 4)</h3>
                     <div class="muted">
-                        Varsayılan: Lig sürecindeki güncel sıralamadan <b>ilk 4</b> alınır ve eşleşmeler <b>1-4</b> / <b>2-3</b> olur.
-                        İstersen alttan manuel seed seçebilirsin.
                     </div>
 
                     <div class="grid-2">
@@ -770,8 +765,6 @@
                         Playoff Şablonu Oluştur / Güncelle
                     </button>
                     <div class="muted" style="margin-top:10px">
-                        Not: Playoff maç sonuçlarını <b>Sonuçlar</b> bölümünden girerken hafta seçimini
-                        <b>SF1 / SF2 / FINAL</b> yap.
                     </div>
                 </div>
             </div>
@@ -780,14 +773,14 @@
         <!-- İstatistikler -->
         <section id="stats-section" style="display:none;">
             <h2>İstatistikler</h2>
-            <div class="muted">Krallık sayfaları maç detaylarından otomatik hesaplanır. (Playoff dahil tüm maçlar sayılır.)</div>
+            <div class="muted"></div>
             <div id="stats-display-container"></div>
         </section>
 
         <!-- Maç Sonuçları -->
         <section id="matches-section" style="display:none;">
             <h2>Maç Sonuçları</h2>
-            <div class="muted">Bir maça tıklayınca maç detayları (gol/asist/cs) açılır.</div>
+            <div class="muted"></div>
             <div id="matches-display-container"></div>
 
             <div id="admin-matches-tools" class="league-card" style="display:none;">
@@ -848,7 +841,6 @@
                 </button>
 
                 <div class="muted" style="margin-top:10px">
-                    İpucu: Bir oyuncunun adı “Oyuncu” görünüyorsa önce üstten oyuncu kaydı oluşturup adını gir.
                 </div>
             </div>
 
@@ -1172,16 +1164,16 @@
             const wrap = $('news-container');
             if (!wrap) return;
             wrap.innerHTML = newsData.slice().reverse().map(n => `
-                <div class="news-card">
-                  ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteNews(${n.id})" style="float:right">Sil</button>` : ''}
-                  <h3>${esc(n.title)}</h3>
-                  ${n.image ? `
-                    <img src="${esc(n.image)}" class="news-img" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                         onerror="this.style.display='none'">` : ''}
-                  <p>${renderNewsContent(n.content)}</p>
-                  <small class="muted">${esc(n.date)}</small>
-                </div>
-              `).join('');
+            <div class="news-card">
+              ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteNews(${n.id})" style="float:right">Sil</button>` : ''}
+              <h3>${esc(n.title)}</h3>
+              ${n.image ? `
+                <img src="${esc(n.image)}" class="news-img" loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                     onerror="this.style.display='none'">` : ''}
+              <p>${renderNewsContent(n.content)}</p>
+              <small class="muted">${esc(n.date)}</small>
+            </div>
+          `).join('');
         }
 
         // ---------- League / Team ----------
@@ -1371,29 +1363,29 @@
                 const sorted = teams.slice().sort(standingsComparator(l, teamStats));
 
                 let html = `<div class="league-card"><h3>${esc(displayName)}</h3>
-                  <table>
-                    <tr>
-                      <th>#</th><th>Takım</th><th>O</th><th>G</th><th>B</th><th>M</th><th>AG</th><th>YG</th><th>AV</th><th>P</th>
-                    </tr>`;
+              <table>
+                <tr>
+                  <th>#</th><th>Takım</th><th>O</th><th>G</th><th>B</th><th>M</th><th>AG</th><th>YG</th><th>AV</th><th>P</th>
+                </tr>`;
 
                 sorted.forEach((t, i) => {
                     const st = teamStats[t.id] || { played: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0 };
                     html += `<tr>
-                    <td>${i + 1}</td>
-                    <td class="team-cell">
-                      <img src="${esc(t.logo)}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                           onerror="this.src='https://via.placeholder.com/30?text=?'">
-                      ${esc(t.name)} <span class="pill">${esc(t.teamId)}</span>
-                    </td>
-                    <td>${st.played}</td>
-                    <td>${st.w}</td>
-                    <td>${st.d}</td>
-                    <td>${st.l}</td>
-                    <td>${st.gf}</td>
-                    <td>${st.ga}</td>
-                    <td><b>${st.gd}</b></td>
-                    <td><b>${st.pts}</b></td>
-                  </tr>`;
+                <td>${i + 1}</td>
+                <td class="team-cell">
+                  <img src="${esc(t.logo)}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                       onerror="this.src='https://via.placeholder.com/30?text=?'">
+                  ${esc(t.name)} <span class="pill">${esc(t.teamId)}</span>
+                </td>
+                <td>${st.played}</td>
+                <td>${st.w}</td>
+                <td>${st.d}</td>
+                <td>${st.l}</td>
+                <td>${st.gf}</td>
+                <td>${st.ga}</td>
+                <td><b>${st.gd}</b></td>
+                <td><b>${st.pts}</b></td>
+              </tr>`;
                 });
 
                 container.innerHTML += html + `</table></div>`;
@@ -1509,7 +1501,7 @@
                 // League stage rounds (single leg)
                 const rounds = Array.isArray(fx.rounds) ? fx.rounds : [];
                 if (rounds.length) {
-                    html += `<div class="muted" style="margin-bottom:8px"><b>Lig Süreci</b> (Rövanşsız • Tüm kombinasyonlar)</div>`;
+                    html += `<div class="muted" style="margin-bottom:8px"><b>Lig Süreci</b></div>`;
                     rounds.forEach((round, i) => {
                         html += `<div class="week-title" style="margin-top:10px">${i + 1}. Hafta</div>`;
                         (round || []).forEach(m => {
@@ -1517,20 +1509,20 @@
                             const t1 = lData.find(x => x.name === m.home) || {};
                             const t2 = lData.find(x => x.name === m.away) || {};
                             html += `<div class="fixture-item">
-                        <div></div>
-                        <div class="team-home">
-                          <img src="${esc(t1.logo || '')}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                               onerror="this.src='https://via.placeholder.com/30?text=?'">
-                          <span>${esc(m.home)}</span>
-                        </div>
-                        <div class="tire-container">-</div>
-                        <div class="team-away">
-                          <span>${esc(m.away)}</span>
-                          <img src="${esc(t2.logo || '')}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                               onerror="this.src='https://via.placeholder.com/30?text=?'">
-                        </div>
-                        <div></div>
-                      </div>`;
+                    <div></div>
+                    <div class="team-home">
+                      <img src="${esc(t1.logo || '')}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                           onerror="this.src='https://via.placeholder.com/30?text=?'">
+                      <span>${esc(m.home)}</span>
+                    </div>
+                    <div class="tire-container">-</div>
+                    <div class="team-away">
+                      <span>${esc(m.away)}</span>
+                      <img src="${esc(t2.logo || '')}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                           onerror="this.src='https://via.placeholder.com/30?text=?'">
+                    </div>
+                    <div></div>
+                  </div>`;
                         });
                     });
                 } else {
@@ -1547,45 +1539,45 @@
                     const t4 = getTeamById(l, seeds.seed4) || {};
 
                     html += `<div class="week-title" style="margin-top:18px">Playoff (Top 4)</div>
-                    <div class="muted" style="margin-bottom:10px">
-                      Eşleşmeler: <b>1-4</b> ve <b>2-3</b> • Kazananlar Final oynar.
-                      <br>Sonuç girişi: <b>Sonuçlar</b> bölümünde hafta seçimini <b>SF1 / SF2 / FINAL</b> yap.
+                <div class="muted" style="margin-bottom:10px">
+                  Eşleşmeler: <b>1-4</b> ve <b>2-3</b> • Kazananlar Final oynar.
+                  <br>Sonuç girişi: <b>Sonuçlar</b> bölümünde hafta seçimini <b>SF1 / SF2 / FINAL</b> yap.
+                </div>
+
+                <div class="bracket">
+                  <div class="pair">
+                    <div class="title">SF1 (1 - 4)</div>
+                    <div class="teamline">
+                      <span>${esc(t1.name || '1.')}</span>
+                      <span class="pill">Seed 1</span>
                     </div>
-
-                    <div class="bracket">
-                      <div class="pair">
-                        <div class="title">SF1 (1 - 4)</div>
-                        <div class="teamline">
-                          <span>${esc(t1.name || '1.')}</span>
-                          <span class="pill">Seed 1</span>
-                        </div>
-                        <div class="teamline" style="margin-top:8px">
-                          <span>${esc(t4.name || '4.')}</span>
-                          <span class="pill">Seed 4</span>
-                        </div>
-                      </div>
-
-                      <div class="pair">
-                        <div class="title">SF2 (2 - 3)</div>
-                        <div class="teamline">
-                          <span>${esc(t2.name || '2.')}</span>
-                          <span class="pill">Seed 2</span>
-                        </div>
-                        <div class="teamline" style="margin-top:8px">
-                          <span>${esc(t3.name || '3.')}</span>
-                          <span class="pill">Seed 3</span>
-                        </div>
-                      </div>
-
-                      <div class="pair">
-                        <div class="title">FINAL</div>
-                        <div class="muted">SF1 kazananı vs SF2 kazananı</div>
-                      </div>
+                    <div class="teamline" style="margin-top:8px">
+                      <span>${esc(t4.name || '4.')}</span>
+                      <span class="pill">Seed 4</span>
                     </div>
-                  `;
+                  </div>
+
+                  <div class="pair">
+                    <div class="title">SF2 (2 - 3)</div>
+                    <div class="teamline">
+                      <span>${esc(t2.name || '2.')}</span>
+                      <span class="pill">Seed 2</span>
+                    </div>
+                    <div class="teamline" style="margin-top:8px">
+                      <span>${esc(t3.name || '3.')}</span>
+                      <span class="pill">Seed 3</span>
+                    </div>
+                  </div>
+
+                  <div class="pair">
+                    <div class="title">FINAL</div>
+                    <div class="muted">SF1 kazananı vs SF2 kazananı</div>
+                  </div>
+                </div>
+              `;
                 } else {
                     html += `<div class="week-title" style="margin-top:18px">Playoff</div>
-                           <div class="muted">Playoff şablonu yok. Admin panelinden “Playoff Şablonu Oluştur” yap.</div>`;
+                       <div class="muted">Playoff şablonu yok. Admin panelinden “Playoff Şablonu Oluştur” yap.</div>`;
                 }
 
                 container.innerHTML += html + `</div>`;
@@ -1636,11 +1628,11 @@
             const t2Id = $('team-2-select')?.value || "";
 
             if (!leagueKey || !t1Id || !t2Id) {
-                wrap.innerHTML = `<div class="muted">Takımları seçince kadrolar otomatik listelenir (Gol/Asist/CS girebilirsin).</div>`;
+                wrap.innerHTML = `<div class="muted"></div>`;
                 return;
             }
             if (t1Id === t2Id) {
-                wrap.innerHTML = `<div class="muted">Aynı takımı iki tarafa seçemezsin.</div>`;
+                wrap.innerHTML = `<div class="muted"></div>`;
                 return;
             }
 
@@ -1654,37 +1646,36 @@
                     const safePid = esc(pid);
                     const nm = esc(getPlayerName(pid));
                     return `
-                    <tr>
-                      <td>${nm} <span class="pill">${safePid}</span></td>
-                      <td style="width:80px"><input class="tiny-input" type="number" min="0" value="0" data-side="${side}" data-pid="${safePid}" data-field="g"></td>
-                      <td style="width:80px"><input class="tiny-input" type="number" min="0" value="0" data-side="${side}" data-pid="${safePid}" data-field="a"></td>
-                      <td style="width:80px"><input class="tiny-input" type="number" min="0" value="0" data-side="${side}" data-pid="${safePid}" data-field="cs"></td>
-                    </tr>`;
+                <tr>
+                  <td>${nm} <span class="pill">${safePid}</span></td>
+                  <td style="width:80px"><input class="tiny-input" type="number" min="0" value="0" data-side="${side}" data-pid="${safePid}" data-field="g"></td>
+                  <td style="width:80px"><input class="tiny-input" type="number" min="0" value="0" data-side="${side}" data-pid="${safePid}" data-field="a"></td>
+                  <td style="width:80px"><input class="tiny-input" type="number" min="0" value="0" data-side="${side}" data-pid="${safePid}" data-field="cs"></td>
+                </tr>`;
                 }).join('') : `<tr><td colspan="4" class="muted">Kadro boş.</td></tr>`;
 
                 return `
-                  <div class="roster-card">
-                    <div class="team-cell" style="margin-bottom:8px;">
-                      <img class="team-logo-small" src="${esc(team?.logo || '')}" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                           onerror="this.src='https://via.placeholder.com/30?text=?'">
-                      <div style="font-weight:1000">${esc(team?.name || 'Takım')}</div>
-                    </div>
-                    <table>
-                      <tr><th>Oyuncu</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
-                      ${rows}
-                    </table>
-                  </div>`;
+              <div class="roster-card">
+                <div class="team-cell" style="margin-bottom:8px;">
+                  <img class="team-logo-small" src="${esc(team?.logo || '')}" loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                       onerror="this.src='https://via.placeholder.com/30?text=?'">
+                  <div style="font-weight:1000">${esc(team?.name || 'Takım')}</div>
+                </div>
+                <table>
+                  <tr><th>Oyuncu</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
+                  ${rows}
+                </table>
+              </div>`;
             };
 
             wrap.innerHTML = `
-                <div class="grid-2">
-                  ${renderRosterTable(t1, r1, "home")}
-                  ${renderRosterTable(t2, r2, "away")}
-                </div>
-                <div class="muted" style="margin-top:10px">
-                  İpucu: Sadece bu maçtaki istatistikleri yaz. Krallık otomatik güncellenir.
-                </div>
-              `;
+            <div class="grid-2">
+              ${renderRosterTable(t1, r1, "home")}
+              ${renderRosterTable(t2, r2, "away")}
+            </div>
+            <div class="muted" style="margin-top:10px">
+            </div>
+          `;
         }
 
         function collectMatchDetails(leagueKey, t1Id, t2Id) {
@@ -1799,24 +1790,24 @@
                     const t2 = lData.find(x => x.id !== "dummy" && x.id === m.t2Id) || {};
 
                     html += `<div class="match-row" onclick="openMatchModal(${m.id})">
-                    <div style="display:flex;justify-content:center;">
-                      ${isAdmin ? `<button class="btn-danger btn-small" onclick="event.stopPropagation(); deleteMatch(${m.id})">X</button>` : ''}
-                    </div>
-                    <div class="team-home">
-                      <img src="${esc(t1.logo || '')}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                           onerror="this.src='https://via.placeholder.com/30?text=?'">
-                      <span>${esc(t1.name || '')}</span>
-                    </div>
-                    <div class="score-container">
-                      <div class="score-box">${esc(m.s1)}</div><span>-</span><div class="score-box">${esc(m.s2)}</div>
-                    </div>
-                    <div class="team-away">
-                      <span>${esc(t2.name || '')}</span>
-                      <img src="${esc(t2.logo || '')}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                           onerror="this.src='https://via.placeholder.com/30?text=?'">
-                    </div>
-                    <div></div>
-                  </div>`;
+                <div style="display:flex;justify-content:center;">
+                  ${isAdmin ? `<button class="btn-danger btn-small" onclick="event.stopPropagation(); deleteMatch(${m.id})">X</button>` : ''}
+                </div>
+                <div class="team-home">
+                  <img src="${esc(t1.logo || '')}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                       onerror="this.src='https://via.placeholder.com/30?text=?'">
+                  <span>${esc(t1.name || '')}</span>
+                </div>
+                <div class="score-container">
+                  <div class="score-box">${esc(m.s1)}</div><span>-</span><div class="score-box">${esc(m.s2)}</div>
+                </div>
+                <div class="team-away">
+                  <span>${esc(t2.name || '')}</span>
+                  <img src="${esc(t2.logo || '')}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                       onerror="this.src='https://via.placeholder.com/30?text=?'">
+                </div>
+                <div></div>
+              </div>`;
                 });
                 container.innerHTML += html + `</div>`;
             });
@@ -1864,38 +1855,38 @@
                 }).sort((x, y) => (y.g - x.g) || (y.a - x.a) || (y.cs - x.cs) || String(x.name).localeCompare(String(y.name), 'tr'));
 
                 return `
-                  <div class="roster-card">
-                    <div class="team-cell" style="margin-bottom:8px;">
-                      <img class="team-logo-small" src="${esc(team.logo || '')}" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                           onerror="this.src='https://via.placeholder.com/30?text=?'">
-                      <div style="font-weight:1000">${esc(team.name || 'Takım')}</div>
-                      <span class="pill">${esc(team.teamId || '')}</span>
-                    </div>
-                    <table>
-                      <tr><th>Oyuncu</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
-                      ${merged.length ? merged.map(p => `
-                        <tr>
-                          <td>
-                            ${esc(p.name)} <span class="pill">${esc(p.pid)}</span>
-                            ${p.inRoster ? `` : `<span class="pill" style="border-color:rgba(255,68,68,.35);color:#ffb3b3">Kadro dışı</span>`}
-                          </td>
-                          <td><b>${p.g}</b></td>
-                          <td><b>${p.a}</b></td>
-                          <td><b>${p.cs}</b></td>
-                        </tr>
-                      `).join('') : `<tr><td colspan="4" class="muted">Detay yok.</td></tr>`}
-                    </table>
-                  </div>
-                `;
+              <div class="roster-card">
+                <div class="team-cell" style="margin-bottom:8px;">
+                  <img class="team-logo-small" src="${esc(team.logo || '')}" loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                       onerror="this.src='https://via.placeholder.com/30?text=?'">
+                  <div style="font-weight:1000">${esc(team.name || 'Takım')}</div>
+                  <span class="pill">${esc(team.teamId || '')}</span>
+                </div>
+                <table>
+                  <tr><th>Oyuncu</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
+                  ${merged.length ? merged.map(p => `
+                    <tr>
+                      <td>
+                        ${esc(p.name)} <span class="pill">${esc(p.pid)}</span>
+                        ${p.inRoster ? `` : `<span class="pill" style="border-color:rgba(255,68,68,.35);color:#ffb3b3">Kadro dışı</span>`}
+                      </td>
+                      <td><b>${p.g}</b></td>
+                      <td><b>${p.a}</b></td>
+                      <td><b>${p.cs}</b></td>
+                    </tr>
+                  `).join('') : `<tr><td colspan="4" class="muted">Detay yok.</td></tr>`}
+                </table>
+              </div>
+            `;
             };
 
             const body = `
-                <div class="grid-2">
-                  ${renderTeamDetail(t1, m.t1Id)}
-                  ${renderTeamDetail(t2, m.t2Id)}
-                </div>
-                <div class="muted" style="margin-top:10px">Detaylar maç kaydı içinden gösterilir.</div>
-              `;
+            <div class="grid-2">
+              ${renderTeamDetail(t1, m.t1Id)}
+              ${renderTeamDetail(t2, m.t2Id)}
+            </div>
+            <div class="muted" style="margin-top:10px">Detaylar maç kaydı içinden gösterilir.</div>
+          `;
             $('match-modal-body') && ($('match-modal-body').innerHTML = body);
             $('match-modal-backdrop') && ($('match-modal-backdrop').style.display = 'flex');
         }
@@ -1956,14 +1947,14 @@
 
             const uniq = getAllUniquePlayersIndex();
             wrap.innerHTML = uniq.map(p => `
-                <div class="mini-card" onclick="showPlayersDetail('${esc(p.playerId)}')">
-                  <div class="row">
-                    <div style="font-weight:900">${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></div>
-                    ${isAdmin ? `<button class="btn-danger btn-small" onclick="event.stopPropagation(); deletePlayerById('${esc(p.playerId)}')">Sil</button>` : ``}
-                  </div>
-                  <div class="muted">Detay için tıkla</div>
-                </div>
-              `).join('') || `<div class="muted">Oyuncu bulunamadı.</div>`;
+            <div class="mini-card" onclick="showPlayersDetail('${esc(p.playerId)}')">
+              <div class="row">
+                <div style="font-weight:900">${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></div>
+                ${isAdmin ? `<button class="btn-danger btn-small" onclick="event.stopPropagation(); deletePlayerById('${esc(p.playerId)}')">Sil</button>` : ``}
+              </div>
+              <div class="muted">Detay için tıkla</div>
+            </div>
+          `).join('') || `<div class="muted">Oyuncu bulunamadı.</div>`;
         }
 
         function showPlayersDetail(playerId) {
@@ -1976,31 +1967,31 @@
 
             box.style.display = 'block';
             box.innerHTML = `
-                <div class="row" style="margin-bottom:10px">
-                  <div>
-                    <div style="font-size:1.12rem;font-weight:1000">${esc(name)} <span class="pill">${esc(pid)}</span></div>
-                    <div class="muted">Liglere göre (maçlardan dinamik hesap)</div>
-                  </div>
-                  <div class="row">
-                    <button class="linkbtn" onclick="$('players-detail').style.display='none'">Kapat</button>
-                    ${isAdmin ? `<button class="btn-danger btn-small" onclick="deletePlayerById('${esc(pid)}')">Oyuncuyu Sil</button>` : ``}
-                  </div>
-                </div>
+            <div class="row" style="margin-bottom:10px">
+              <div>
+                <div style="font-size:1.12rem;font-weight:1000">${esc(name)} <span class="pill">${esc(pid)}</span></div>
+                <div class="muted">Liglere göre (maçlardan dinamik hesap)</div>
+              </div>
+              <div class="row">
+                <button class="linkbtn" onclick="$('players-detail').style.display='none'">Kapat</button>
+                ${isAdmin ? `<button class="btn-danger btn-small" onclick="deletePlayerById('${esc(pid)}')">Oyuncuyu Sil</button>` : ``}
+              </div>
+            </div>
 
-                <h3>Lig Bazlı İstatistik</h3>
-                <table>
-                  <tr><th>Lig</th><th>Takım</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
-                  ${leaguesList.map(x => `
-                    <tr>
-                      <td>${esc(leaguesMeta[x.league] || x.league)}</td>
-                      <td>${esc(x.team || '—')}</td>
-                      <td><b>${x.goals}</b></td>
-                      <td><b>${x.assists}</b></td>
-                      <td><b>${x.cs}</b></td>
-                    </tr>
-                  `).join('')}
-                </table>
-              `;
+            <h3>Lig Bazlı İstatistik</h3>
+            <table>
+              <tr><th>Lig</th><th>Takım</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
+              ${leaguesList.map(x => `
+                <tr>
+                  <td>${esc(leaguesMeta[x.league] || x.league)}</td>
+                  <td>${esc(x.team || '—')}</td>
+                  <td><b>${x.goals}</b></td>
+                  <td><b>${x.assists}</b></td>
+                  <td><b>${x.cs}</b></td>
+                </tr>
+              `).join('')}
+            </table>
+          `;
             box.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
@@ -2122,21 +2113,21 @@
             wrap.innerHTML = all.map(x => {
                 const st = (leagueAgg[x.leagueKey] || {})[x.team.id] || { pts: 0, gd: 0 };
                 return `
-                  <div class="mini-card" onclick="showTeamDetail('${esc(x.team.teamId)}')">
-                    <div class="row">
-                      <div class="team-cell">
-                        <img class="team-logo-small" src="${esc(x.team.logo || '')}" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                             onerror="this.src='https://via.placeholder.com/30?text=?'">
-                        <div>
-                          <div style="font-weight:900">${esc(x.team.name)}</div>
-                          <div class="muted">${esc(x.leagueName)} • <span class="pill">${esc(x.team.teamId)}</span></div>
-                        </div>
-                      </div>
-                      <div class="pill">P: ${st.pts} • AV: ${st.gd}</div>
+              <div class="mini-card" onclick="showTeamDetail('${esc(x.team.teamId)}')">
+                <div class="row">
+                  <div class="team-cell">
+                    <img class="team-logo-small" src="${esc(x.team.logo || '')}" loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                         onerror="this.src='https://via.placeholder.com/30?text=?'">
+                    <div>
+                      <div style="font-weight:900">${esc(x.team.name)}</div>
+                      <div class="muted">${esc(x.leagueName)} • <span class="pill">${esc(x.team.teamId)}</span></div>
                     </div>
-                    <div class="muted" style="margin-top:6px">Kadro için tıkla</div>
                   </div>
-                `;
+                  <div class="pill">P: ${st.pts} • AV: ${st.gd}</div>
+                </div>
+                <div class="muted" style="margin-top:6px">Kadro için tıkla</div>
+              </div>
+            `;
             }).join('') || `<div class="muted">Takım bulunamadı.</div>`;
         }
 
@@ -2164,37 +2155,37 @@
 
             box.style.display = 'block';
             box.innerHTML = `
-                <div class="row" style="margin-bottom:10px">
-                  <div class="team-cell">
-                    <img class="team-logo-small" src="${esc(team.logo || '')}" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                         onerror="this.src='https://via.placeholder.com/30?text=?'">
-                    <div>
-                      <div style="font-size:1.12rem;font-weight:1000">${esc(team.name)} <span class="pill">${esc(team.teamId)}</span></div>
-                      <div class="muted">${esc(leagueName)} • P: <b>${st.pts}</b> • AV: <b>${st.gd}</b> • O: ${st.played}</div>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <button class="linkbtn" onclick="$('teams-detail').style.display='none'">Kapat</button>
-                    ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteTeamById('${esc(team.teamId)}')">Takımı Sil</button>` : ``}
-                  </div>
+            <div class="row" style="margin-bottom:10px">
+              <div class="team-cell">
+                <img class="team-logo-small" src="${esc(team.logo || '')}" loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                     onerror="this.src='https://via.placeholder.com/30?text=?'">
+                <div>
+                  <div style="font-size:1.12rem;font-weight:1000">${esc(team.name)} <span class="pill">${esc(team.teamId)}</span></div>
+                  <div class="muted">${esc(leagueName)} • P: <b>${st.pts}</b> • AV: <b>${st.gd}</b> • O: ${st.played}</div>
                 </div>
+              </div>
+              <div class="row">
+                <button class="linkbtn" onclick="$('teams-detail').style.display='none'">Kapat</button>
+                ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteTeamById('${esc(team.teamId)}')">Takımı Sil</button>` : ``}
+              </div>
+            </div>
 
-                <h3>Kadro</h3>
-                ${rosterRows.length ? `
-                  <table>
-                    <tr><th>Oyuncu</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
-                    ${rosterRows.map(r => `
-                      <tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(r.pid)}')">
-                        <td>${esc(r.nm)} <span class="pill">${esc(r.pid)}</span></td>
-                        <td><b>${r.g}</b></td>
-                        <td><b>${r.a}</b></td>
-                        <td><b>${r.cs}</b></td>
-                      </tr>
-                    `).join('')}
-                  </table>
-                  <div class="muted" style="margin-top:8px">Oyuncuya tıklayınca oyuncu detayına gider.</div>
-                ` : `<div class="muted">Kadro boş.</div>`}
-              `;
+            <h3>Kadro</h3>
+            ${rosterRows.length ? `
+              <table>
+                <tr><th>Oyuncu</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
+                ${rosterRows.map(r => `
+                  <tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(r.pid)}')">
+                    <td>${esc(r.nm)} <span class="pill">${esc(r.pid)}</span></td>
+                    <td><b>${r.g}</b></td>
+                    <td><b>${r.a}</b></td>
+                    <td><b>${r.cs}</b></td>
+                  </tr>
+                `).join('')}
+              </table>
+              <div class="muted" style="margin-top:8px">Oyuncuya tıklayınca oyuncu detayına gider.</div>
+            ` : `<div class="muted">Kadro boş.</div>`}
+          `;
             box.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
@@ -2235,9 +2226,9 @@
                 html += `<div class="stats-card"><h3>Gol Krallığı</h3><table>`;
                 goals.forEach(p => {
                     html += `<tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(p.playerId)}')">
-                    <td>${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></td>
-                    <td style="text-align:right"><b>${p.goals}</b></td>
-                  </tr>`;
+                <td>${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></td>
+                <td style="text-align:right"><b>${p.goals}</b></td>
+              </tr>`;
                 });
                 html += `</table></div>`;
 
@@ -2245,9 +2236,9 @@
                 html += `<div class="stats-card"><h3>Asist Krallığı</h3><table>`;
                 assists.forEach(p => {
                     html += `<tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(p.playerId)}')">
-                    <td>${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></td>
-                    <td style="text-align:right"><b>${p.assists}</b></td>
-                  </tr>`;
+                <td>${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></td>
+                <td style="text-align:right"><b>${p.assists}</b></td>
+              </tr>`;
                 });
                 html += `</table></div>`;
 
@@ -2255,9 +2246,9 @@
                 html += `<div class="stats-card"><h3>CS Krallığı</h3><table>`;
                 clean.forEach(p => {
                     html += `<tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(p.playerId)}')">
-                    <td>${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></td>
-                    <td style="text-align:right"><b>${p.cs}</b></td>
-                  </tr>`;
+                <td>${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></td>
+                <td style="text-align:right"><b>${p.cs}</b></td>
+              </tr>`;
                 });
                 html += `</table></div>`;
 
@@ -2336,7 +2327,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             initWeekSelect();
             handleNav('news');
-            $('match-detail-inputs') && ($('match-detail-inputs').innerHTML = `<div class="muted">Takımları seçince kadrolar otomatik listelenir (Gol/Asist/CS girebilirsin).</div>`);
+            $('match-detail-inputs') && ($('match-detail-inputs').innerHTML = `<div class="muted"></div>`);
 
             // when fixture league changes -> refresh seed dropdowns
             $('fixture-league-select')?.addEventListener('change', () => {
