@@ -180,7 +180,7 @@
                     padding: 12px 14px;
                     border-radius: 14px;
                     background: rgba(255,255,255,.05);
-                    border: 1px solid rgba(255,255,255,.10);
+                    border: 1px solid rgba(255,255,255,.10)
                 }
 
                     nav a:hover {
@@ -216,7 +216,7 @@
             margin: 0 0 14px 0;
             font-size: 1.05rem;
             text-transform: uppercase;
-            letter-spacing: .08em;
+            letter-spacing: .08em
         }
 
         input, textarea, select {
@@ -536,7 +536,7 @@
             align-items: center;
             justify-content: center;
             z-index: 5000;
-            padding: 18px;
+            padding: 18px
         }
 
         .modal {
@@ -547,7 +547,7 @@
             border: 1px solid rgba(255,255,255,.16);
             box-shadow: 0 18px 50px rgba(0,0,0,.55);
             border-radius: 18px;
-            padding: 16px;
+            padding: 16px
         }
 
             .modal .close {
@@ -579,8 +579,38 @@
             padding: 8px 10px !important;
             border-radius: 10px !important;
             text-align: center;
-            font-weight: 900;
+            font-weight: 900
         }
+
+        /* Playoff bracket simple */
+        .bracket {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px
+        }
+
+            .bracket .pair {
+                background: rgba(255,255,255,.04);
+                border: 1px solid rgba(255,255,255,.10);
+                border-radius: 14px;
+                padding: 12px
+            }
+
+                .bracket .pair .title {
+                    font-weight: 1000;
+                    margin-bottom: 8px
+                }
+
+            .bracket .teamline {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+                padding: 8px 10px;
+                border-radius: 12px;
+                border: 1px solid rgba(255,255,255,.10);
+                background: rgba(255,255,255,.03)
+            }
     </style>
 </head>
 
@@ -645,10 +675,10 @@
                     <button onclick="publishNews()">Yayınla</button>
 
                     <div class="league-card" style="margin-top:14px;">
-                        <h3>Discord Webhook</h3>
-                        <div class="muted">Aşağıya webhook URL yazarsan; haber/maç sonucu girildiğinde Discord’a otomatik mesaj gider.</div>
-                        <input type="text" id="webhook-input" placeholder="https://discord.com/api/webhooks/....">
-                        <button class="linkbtn" onclick="saveWebhook()">Webhook Kaydet</button>
+                        <h3>Not</h3>
+                        <div class="muted">
+                            ✅ Discord otomatik maç sonucu gönderme kaldırıldı. (Webhook + otomatik gönderim yok.)
+                        </div>
                     </div>
                 </div>
             </div>
@@ -663,7 +693,10 @@
         <!-- Puan Durumu -->
         <section id="standings-section" style="display:none;">
             <h2>Puan Durumu</h2>
-            <div class="muted">Tie-breaker: Önce Puan, sonra Averaj (GD), sonra İkili Averaj (H2H Puan, H2H GD), sonra Atılan Gol.</div>
+            <div class="muted">
+                Tie-breaker: Önce Puan, sonra Averaj (GD), sonra İkili Averaj (H2H Puan, H2H GD), sonra Atılan Gol.
+                <br>Not: Puan durumu sadece <b>Lig Süreci</b> maçlarından hesaplanır. (Playoff maçları tabloya eklenmez.)
+            </div>
             <div id="leagues-container"></div>
 
             <div id="admin-standings-tools" class="league-card" style="display:none;">
@@ -687,20 +720,67 @@
         <!-- Fikstür -->
         <section id="fixture-section" style="display:none;">
             <h2>Fikstür</h2>
+            <div class="muted">
+                Bu sayfada:
+                <b>Lig Süreci</b> (rövanşsız round-robin) + <b>Playoff</b> (1-4 / 2-3 / Final) görünür.
+            </div>
             <div id="fixture-display-container"></div>
 
             <div id="admin-fixture-tools" class="league-card" style="display:none;">
                 <h3>Fikstür Yönetimi</h3>
+
                 <select id="fixture-league-select"><option value="">Lig Seçin</option></select>
-                <button onclick="generateFixture()" style="background:linear-gradient(180deg,#6a1b9a,#4f1471);margin-bottom:6px;">Fikstür Oluştur</button>
-                <button onclick="deleteFixture()" class="btn-danger">Fikstürü Temizle</button>
+
+                <div class="league-card" style="margin-top:10px;">
+                    <h3>Lig Süreci (Rövanşsız)</h3>
+                    <div class="muted">
+                        Tüm kombinasyonları (her takım birbiriyle 1 kez) üretir. Takım sayısı tek ise BAY ekler.
+                    </div>
+                    <button onclick="generateFixtureSingleLeg()"
+                            style="background:linear-gradient(180deg,#6a1b9a,#4f1471);margin-bottom:6px;">
+                        Rövanşsız Fikstür Oluştur
+                    </button>
+                    <button onclick="deleteFixture()" class="btn-danger">Fikstürü Temizle</button>
+                </div>
+
+                <div class="league-card" style="margin-top:10px;">
+                    <h3>Playoff (Top 4)</h3>
+                    <div class="muted">
+                        Varsayılan: Lig sürecindeki güncel sıralamadan <b>ilk 4</b> alınır ve eşleşmeler <b>1-4</b> / <b>2-3</b> olur.
+                        İstersen alttan manuel seed seçebilirsin.
+                    </div>
+
+                    <div class="grid-2">
+                        <div>
+                            <div class="muted" style="margin-bottom:6px">Seed 1 (1.)</div>
+                            <select id="seed1"><option value="">(Otomatik)</option></select>
+                            <div class="muted" style="margin-bottom:6px">Seed 2 (2.)</div>
+                            <select id="seed2"><option value="">(Otomatik)</option></select>
+                        </div>
+                        <div>
+                            <div class="muted" style="margin-bottom:6px">Seed 3 (3.)</div>
+                            <select id="seed3"><option value="">(Otomatik)</option></select>
+                            <div class="muted" style="margin-bottom:6px">Seed 4 (4.)</div>
+                            <select id="seed4"><option value="">(Otomatik)</option></select>
+                        </div>
+                    </div>
+
+                    <button onclick="createPlayoffTemplate()"
+                            style="margin-top:6px;background:linear-gradient(180deg, rgba(0,200,81,1), rgba(0,150,61,1));box-shadow:0 12px 26px rgba(0,200,81,.12);">
+                        Playoff Şablonu Oluştur / Güncelle
+                    </button>
+                    <div class="muted" style="margin-top:10px">
+                        Not: Playoff maç sonuçlarını <b>Sonuçlar</b> bölümünden girerken hafta seçimini
+                        <b>SF1 / SF2 / FINAL</b> yap.
+                    </div>
+                </div>
             </div>
         </section>
 
         <!-- İstatistikler -->
         <section id="stats-section" style="display:none;">
             <h2>İstatistikler</h2>
-            <div class="muted">Artık krallık sayfaları manuel girişten değil, maç detaylarından otomatik hesaplanır.</div>
+            <div class="muted">Krallık sayfaları maç detaylarından otomatik hesaplanır. (Playoff dahil tüm maçlar sayılır.)</div>
             <div id="stats-display-container"></div>
         </section>
 
@@ -735,7 +815,7 @@
                 </button>
 
                 <div class="muted" style="margin-top:10px">
-                    Not: İstatistikler maçın içine gömülür. Krallık & puan durumu tüm maçları tarayarak dinamik hesaplanır.
+                    Not: İstatistikler maçın içine gömülür. Krallık tüm maçları tarayarak dinamik hesaplanır.
                 </div>
             </div>
         </section>
@@ -775,7 +855,6 @@
             <div id="players-list"></div>
             <div id="players-detail" class="league-card" style="display:none;"></div>
         </section>
-
     </div>
 
     <!-- Match Detail Modal -->
@@ -812,35 +891,10 @@
         const db = firebase.database();
         const auth = firebase.auth();
 
-        // ---------- Discord Webhook ----------
-        let DISCORD_WEBHOOK_URL = "";
-
-        async function sendDiscordWebhook(payload) {
-            try {
-                if (!DISCORD_WEBHOOK_URL || !DISCORD_WEBHOOK_URL.startsWith("https://")) return;
-                await fetch(DISCORD_WEBHOOK_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
-            } catch (e) {
-                console.warn("Webhook gönderilemedi:", e);
-            }
-        }
-
-        function saveWebhook() {
-            const v = ($('webhook-input')?.value || "").trim();
-            if (v && !v.startsWith("https://")) return alert("Webhook https ile başlamalı!");
-            DISCORD_WEBHOOK_URL = v;
-            save(); // settings içinde saklanacak
-            alert("Webhook kaydedildi!");
-        }
-
         // ---------- State ----------
         let newsData = [], leagues = {}, leaguesMeta = {}, fixtures = {};
         let players = []; // registry: { id, playerId, name }
-        let matches = []; // { id, league, week, t1Id,t2Id, s1,s2, createdAt, details:{ [teamInternalId]:[{playerId,g,a,cs}] } }
-        let settings = { webhookUrl: "" };
+        let matches = []; // { id, league, week, stage, t1Id,t2Id, s1,s2, createdAt, details:{ [teamInternalId]:[{playerId,g,a,cs}] } }
 
         let isAdmin = false;
 
@@ -863,7 +917,6 @@
             return String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
         }
         function makeSafeKey(s) {
-            // Firebase key güvenli (.[#$/[]] yok)
             return String(s || "").trim().replace(/[.#$\/\[\]]/g, " ").replace(/\s+/g, " ").trim();
         }
         function renderNewsContent(content) {
@@ -871,9 +924,6 @@
             safe = safe.replace(/&lt;br\s*\/?&gt;/gi, '<br>');
             safe = safe.replace(/\n/g, '<br>');
             return safe;
-        }
-        function nowTR() {
-            return new Date().toLocaleString('tr-TR');
         }
 
         // ---------- Menu / Nav ----------
@@ -982,12 +1032,22 @@
                 if (!p.id) p.id = Date.now() + Math.floor(Math.random() * 9999);
             });
 
-            // settings
-            settings = settings && typeof settings === "object" ? settings : { webhookUrl: "" };
-            if (typeof settings.webhookUrl !== "string") settings.webhookUrl = "";
-            DISCORD_WEBHOOK_URL = settings.webhookUrl || "";
+            // fixtures normalize (supports old array format)
+            fixtures = fixtures && typeof fixtures === "object" ? fixtures : {};
+            Object.keys(fixtures || {}).forEach(l => {
+                const v = fixtures[l];
+                if (Array.isArray(v)) {
+                    fixtures[l] = { rounds: v, type: "legacy", playoff: null };
+                } else if (v && typeof v === "object") {
+                    if (!Array.isArray(v.rounds)) v.rounds = [];
+                    if (!("playoff" in v)) v.playoff = null;
+                    if (!v.type) v.type = "league";
+                } else {
+                    fixtures[l] = { rounds: [], type: "league", playoff: null };
+                }
+            });
 
-            // matches normalize
+            // matches normalize (+ stage)
             matches = Array.isArray(matches) ? matches : [];
             matches = matches.map(m => {
                 const nm = Object.assign({}, m);
@@ -997,19 +1057,23 @@
                 nm.s1 = parseInt(nm.s1); nm.s2 = parseInt(nm.s2);
                 if (Number.isNaN(nm.s1)) nm.s1 = 0;
                 if (Number.isNaN(nm.s2)) nm.s2 = 0;
+
+                // stage fallback
+                const wk = String(nm.week ?? "0").toUpperCase();
+                if (!nm.stage) {
+                    nm.stage = (wk.startsWith("SF") || wk === "FINAL") ? "playoff" : "league";
+                }
                 return nm;
             });
 
-            // ✅ IMPORTANT: details migrate (eski object-key format -> yeni array format)
+            // details migrate old format -> new array format
             matches = matches.map(m => {
                 const nm = { ...m };
                 const d = (nm.details && typeof nm.details === "object") ? nm.details : {};
                 const migrated = {};
-
                 Object.keys(d).forEach(teamInternalId => {
                     const v = d[teamInternalId];
 
-                    // already array
                     if (Array.isArray(v)) {
                         migrated[teamInternalId] = v.map(it => ({
                             playerId: normalizeHashId(it.playerId),
@@ -1020,7 +1084,6 @@
                         return;
                     }
 
-                    // old format: { "#pid": {g,a,cs}, ... }
                     if (v && typeof v === "object") {
                         migrated[teamInternalId] = Object.keys(v).map(pidKey => {
                             const r = v[pidKey] || {};
@@ -1033,10 +1096,8 @@
                         });
                         return;
                     }
-
                     migrated[teamInternalId] = [];
                 });
-
                 nm.details = migrated;
                 return nm;
             });
@@ -1045,15 +1106,13 @@
         // ---------- Save / Load ----------
         async function save() {
             try {
-                settings.webhookUrl = DISCORD_WEBHOOK_URL || "";
                 await db.ref('/').set({
                     news: newsData,
                     leagues: leagues,
                     leaguesMeta: leaguesMeta,
                     matches: matches,
                     players: players,
-                    fixtures: fixtures,
-                    settings: settings
+                    fixtures: fixtures
                 });
                 renderAll();
                 updateLeagueSelects();
@@ -1073,7 +1132,6 @@
             matches = data.matches || [];
             players = data.players || [];
             fixtures = data.fixtures || {};
-            settings = data.settings || { webhookUrl: "" };
 
             normalizeData();
 
@@ -1103,33 +1161,27 @@
             if ($('news-image-url')) $('news-image-url').value = "";
 
             await save();
-
-            await sendDiscordWebhook({
-                content: `📰 **Yeni Haber**\n**${t}**\n${c.replace(/\n/g, ' ')}`
-            });
         }
-
         function deleteNews(id) {
             if (confirm("Silinsin mi?")) {
                 newsData = newsData.filter(n => n.id !== id);
                 save();
             }
         }
-
         function renderNews() {
             const wrap = $('news-container');
             if (!wrap) return;
             wrap.innerHTML = newsData.slice().reverse().map(n => `
-            <div class="news-card">
-              ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteNews(${n.id})" style="float:right">Sil</button>` : ''}
-              <h3>${esc(n.title)}</h3>
-              ${n.image ? `
-                <img src="${esc(n.image)}" class="news-img" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                     onerror="this.style.display='none'">` : ''}
-              <p>${renderNewsContent(n.content)}</p>
-              <small class="muted">${esc(n.date)}</small>
-            </div>
-          `).join('');
+                <div class="news-card">
+                  ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteNews(${n.id})" style="float:right">Sil</button>` : ''}
+                  <h3>${esc(n.title)}</h3>
+                  ${n.image ? `
+                    <img src="${esc(n.image)}" class="news-img" loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                         onerror="this.style.display='none'">` : ''}
+                  <p>${renderNewsContent(n.content)}</p>
+                  <small class="muted">${esc(n.date)}</small>
+                </div>
+              `).join('');
         }
 
         // ---------- League / Team ----------
@@ -1146,6 +1198,8 @@
                 id: "dummy", name: "Takım Ekleyin", logo: "", puan: 0, averaj: 0, teamId: "#DUMMY", roster: []
             }];
             leaguesMeta[key] = displayName;
+            fixtures[key] = { rounds: [], type: "leagueSingle", playoff: null };
+
             if (inp) inp.value = "";
             save();
         }
@@ -1211,7 +1265,9 @@
                 teamStats[t.id] = { pts: 0, gd: 0, gf: 0, ga: 0, played: 0, w: 0, d: 0, l: 0 };
             });
 
-            const lMatches = (matches || []).filter(m => m.league === leagueKey);
+            // IMPORTANT: standings only from league stage
+            const lMatches = (matches || []).filter(m => m.league === leagueKey && (m.stage || "league") !== "playoff");
+
             lMatches.forEach(m => {
                 const t1 = m.t1Id, t2 = m.t2Id;
                 if (!teamStats[t1] || !teamStats[t2]) return;
@@ -1228,8 +1284,12 @@
                 if (s1 > s2) { teamStats[t1].pts += 3; teamStats[t1].w++; teamStats[t2].l++; }
                 else if (s2 > s1) { teamStats[t2].pts += 3; teamStats[t2].w++; teamStats[t1].l++; }
                 else { teamStats[t1].pts += 1; teamStats[t2].pts += 1; teamStats[t1].d++; teamStats[t2].d++; }
+            });
 
-                // player aggregation from embedded details (ARRAY FORMAT)
+            // player stats from ALL matches (league + playoff)
+            const allMatches = (matches || []).filter(m => m.league === leagueKey);
+            allMatches.forEach(m => {
+                const t1 = m.t1Id, t2 = m.t2Id;
                 const details = m.details || {};
                 [t1, t2].forEach(teamId => {
                     const list = Array.isArray(details[teamId]) ? details[teamId] : [];
@@ -1255,7 +1315,7 @@
         // ---------- Head-to-head ----------
         function computeH2H(leagueKey, teamAId, teamBId) {
             const out = { aPts: 0, bPts: 0, aGf: 0, bGf: 0, aGd: 0, bGd: 0 };
-            const lMatches = (matches || []).filter(m => m.league === leagueKey);
+            const lMatches = (matches || []).filter(m => m.league === leagueKey && (m.stage || "league") !== "playoff");
             lMatches.forEach(m => {
                 const isAB = (m.t1Id === teamAId && m.t2Id === teamBId) || (m.t1Id === teamBId && m.t2Id === teamAId);
                 if (!isAB) return;
@@ -1311,65 +1371,127 @@
                 const sorted = teams.slice().sort(standingsComparator(l, teamStats));
 
                 let html = `<div class="league-card"><h3>${esc(displayName)}</h3>
-              <table>
-                <tr>
-                  <th>#</th><th>Takım</th><th>O</th><th>G</th><th>B</th><th>M</th><th>AG</th><th>YG</th><th>AV</th><th>P</th>
-                </tr>`;
+                  <table>
+                    <tr>
+                      <th>#</th><th>Takım</th><th>O</th><th>G</th><th>B</th><th>M</th><th>AG</th><th>YG</th><th>AV</th><th>P</th>
+                    </tr>`;
 
                 sorted.forEach((t, i) => {
                     const st = teamStats[t.id] || { played: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0 };
                     html += `<tr>
-                <td>${i + 1}</td>
-                <td class="team-cell">
-                  <img src="${esc(t.logo)}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                       onerror="this.src='https://via.placeholder.com/30?text=?'">
-                  ${esc(t.name)} <span class="pill">${esc(t.teamId)}</span>
-                </td>
-                <td>${st.played}</td>
-                <td>${st.w}</td>
-                <td>${st.d}</td>
-                <td>${st.l}</td>
-                <td>${st.gf}</td>
-                <td>${st.ga}</td>
-                <td><b>${st.gd}</b></td>
-                <td><b>${st.pts}</b></td>
-              </tr>`;
+                    <td>${i + 1}</td>
+                    <td class="team-cell">
+                      <img src="${esc(t.logo)}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                           onerror="this.src='https://via.placeholder.com/30?text=?'">
+                      ${esc(t.name)} <span class="pill">${esc(t.teamId)}</span>
+                    </td>
+                    <td>${st.played}</td>
+                    <td>${st.w}</td>
+                    <td>${st.d}</td>
+                    <td>${st.l}</td>
+                    <td>${st.gf}</td>
+                    <td>${st.ga}</td>
+                    <td><b>${st.gd}</b></td>
+                    <td><b>${st.pts}</b></td>
+                  </tr>`;
                 });
 
                 container.innerHTML += html + `</table></div>`;
             });
         }
 
-        // ---------- Fixture ----------
-        function generateFixture() {
-            const l = $('fixture-league-select')?.value || "";
-            if (!l) return alert("Lig seçin!");
-
-            let teams = (leagues[l] || []).filter(t => t.id !== "dummy").map(t => t.name);
-            if (teams.length < 2) return;
+        // ---------- Fixture (Rövanşsız round-robin + playoff template) ----------
+        function generateRoundRobinNamesSingleLeg(names) {
+            // circle method (names array)
+            let teams = names.slice();
+            if (teams.length < 2) return [];
             if (teams.length % 2 !== 0) teams.push("BAY");
-
-            let totalRounds = teams.length - 1, rounds = [];
+            const totalRounds = teams.length - 1;
+            const rounds = [];
             for (let r = 0; r < totalRounds; r++) {
-                let roundMatches = [];
+                const roundMatches = [];
                 for (let m = 0; m < teams.length / 2; m++) {
-                    let h = teams[m], a = teams[teams.length - 1 - m];
+                    const h = teams[m], a = teams[teams.length - 1 - m];
                     if (h !== "BAY" && a !== "BAY") roundMatches.push({ home: h, away: a });
                 }
                 rounds.push(roundMatches);
                 teams.splice(1, 0, teams.pop());
             }
-            fixtures[l] = [...rounds, ...rounds.map(rd => rd.map(m => ({ home: m.away, away: m.home })))];
+            return rounds;
+        }
+
+        function generateFixtureSingleLeg() {
+            const l = $('fixture-league-select')?.value || "";
+            if (!l) return alert("Lig seçin!");
+
+            const teams = (leagues[l] || []).filter(t => t.id !== "dummy").map(t => t.name);
+            if (teams.length < 2) return alert("En az 2 takım olmalı.");
+
+            const rr = generateRoundRobinNamesSingleLeg(teams);
+            fixtures[l] = fixtures[l] && typeof fixtures[l] === "object" ? fixtures[l] : { rounds: [], type: "leagueSingle", playoff: null };
+            fixtures[l].rounds = rr;
+            fixtures[l].type = "leagueSingle";
+            if (!fixtures[l].playoff) fixtures[l].playoff = null;
+
             save();
-            alert("Fikstür Hazır!");
+            alert("Rövanşsız fikstür hazır!");
         }
 
         function deleteFixture() {
             const l = $('fixture-league-select')?.value || "";
-            if (l && confirm("Silinsin mi?")) {
-                delete fixtures[l];
+            if (l && confirm("Fikstür + playoff şablonu temizlensin mi?")) {
+                fixtures[l] = { rounds: [], type: "leagueSingle", playoff: null };
                 save();
             }
+        }
+
+        function getCurrentSortedTeamsForLeague(leagueKey) {
+            const teams = (leagues[leagueKey] || []).filter(t => t.id !== "dummy");
+            const { teamStats } = buildLeagueAggregates(leagueKey);
+            return teams.slice().sort(standingsComparator(leagueKey, teamStats));
+        }
+
+        function createPlayoffTemplate() {
+            const l = $('fixture-league-select')?.value || "";
+            if (!l) return alert("Lig seçin!");
+
+            const teams = (leagues[l] || []).filter(t => t.id !== "dummy");
+            if (teams.length < 4) return alert("Playoff için en az 4 takım olmalı.");
+
+            // get seeds (manual if selected else auto from standings)
+            const sorted = getCurrentSortedTeamsForLeague(l);
+
+            function getTeamByInternalId(internalId) {
+                return (leagues[l] || []).find(t => t && t.id !== "dummy" && t.id === internalId) || null;
+            }
+            const s1v = $('seed1')?.value || "";
+            const s2v = $('seed2')?.value || "";
+            const s3v = $('seed3')?.value || "";
+            const s4v = $('seed4')?.value || "";
+
+            const auto1 = sorted[0]?.id, auto2 = sorted[1]?.id, auto3 = sorted[2]?.id, auto4 = sorted[3]?.id;
+
+            const seed1 = s1v || auto1;
+            const seed2 = s2v || auto2;
+            const seed3 = s3v || auto3;
+            const seed4 = s4v || auto4;
+
+            const uniq = new Set([seed1, seed2, seed3, seed4].filter(Boolean));
+            if (uniq.size !== 4) return alert("Seed seçimlerinde tekrar var (4 farklı takım olmalı).");
+
+            fixtures[l] = fixtures[l] && typeof fixtures[l] === "object" ? fixtures[l] : { rounds: [], type: "leagueSingle", playoff: null };
+            fixtures[l].playoff = {
+                createdAt: Date.now(),
+                seeds: { seed1, seed2, seed3, seed4 },  // internal team ids
+                semis: [
+                    { code: "SF1", homeSeed: "seed1", awaySeed: "seed4" }, // 1 vs 4
+                    { code: "SF2", homeSeed: "seed2", awaySeed: "seed3" }  // 2 vs 3
+                ],
+                final: { code: "FINAL", homeFrom: "W_SF1", awayFrom: "W_SF2" }
+            };
+
+            save();
+            alert("Playoff şablonu oluşturuldu/güncellendi!");
         }
 
         function renderFixture() {
@@ -1378,30 +1500,94 @@
             container.innerHTML = "";
 
             Object.keys(fixtures || {}).forEach(l => {
-                let html = `<div class="league-card"><h3>${esc((leaguesMeta[l] || l))} Fikstürü</h3>`;
-                (fixtures[l] || []).forEach((round, i) => {
-                    html += `<div class="week-title" style="margin-top:10px">${i + 1}. Hafta</div>`;
-                    (round || []).forEach(m => {
-                        const lData = leagues[l] || [];
-                        const t1 = lData.find(x => x.name === m.home) || {};
-                        const t2 = lData.find(x => x.name === m.away) || {};
-                        html += `<div class="fixture-item">
-                  <div></div>
-                  <div class="team-home">
-                    <img src="${esc(t1.logo || '')}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                         onerror="this.src='https://via.placeholder.com/30?text=?'">
-                    <span>${esc(m.home)}</span>
-                  </div>
-                  <div class="tire-container">-</div>
-                  <div class="team-away">
-                    <span>${esc(m.away)}</span>
-                    <img src="${esc(t2.logo || '')}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                         onerror="this.src='https://via.placeholder.com/30?text=?'">
-                  </div>
-                  <div></div>
-                </div>`;
+                const fx = fixtures[l];
+                if (!fx || typeof fx !== "object") return;
+
+                const display = leaguesMeta[l] || l;
+                let html = `<div class="league-card"><h3>${esc(display)} Fikstürü</h3>`;
+
+                // League stage rounds (single leg)
+                const rounds = Array.isArray(fx.rounds) ? fx.rounds : [];
+                if (rounds.length) {
+                    html += `<div class="muted" style="margin-bottom:8px"><b>Lig Süreci</b> (Rövanşsız • Tüm kombinasyonlar)</div>`;
+                    rounds.forEach((round, i) => {
+                        html += `<div class="week-title" style="margin-top:10px">${i + 1}. Hafta</div>`;
+                        (round || []).forEach(m => {
+                            const lData = leagues[l] || [];
+                            const t1 = lData.find(x => x.name === m.home) || {};
+                            const t2 = lData.find(x => x.name === m.away) || {};
+                            html += `<div class="fixture-item">
+                        <div></div>
+                        <div class="team-home">
+                          <img src="${esc(t1.logo || '')}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                               onerror="this.src='https://via.placeholder.com/30?text=?'">
+                          <span>${esc(m.home)}</span>
+                        </div>
+                        <div class="tire-container">-</div>
+                        <div class="team-away">
+                          <span>${esc(m.away)}</span>
+                          <img src="${esc(t2.logo || '')}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                               onerror="this.src='https://via.placeholder.com/30?text=?'">
+                        </div>
+                        <div></div>
+                      </div>`;
+                        });
                     });
-                });
+                } else {
+                    html += `<div class="muted">Lig süreci fikstürü yok.</div>`;
+                }
+
+                // Playoff section
+                if (fx.playoff) {
+                    const p = fx.playoff;
+                    const seeds = p.seeds || {};
+                    const t1 = getTeamById(l, seeds.seed1) || {};
+                    const t2 = getTeamById(l, seeds.seed2) || {};
+                    const t3 = getTeamById(l, seeds.seed3) || {};
+                    const t4 = getTeamById(l, seeds.seed4) || {};
+
+                    html += `<div class="week-title" style="margin-top:18px">Playoff (Top 4)</div>
+                    <div class="muted" style="margin-bottom:10px">
+                      Eşleşmeler: <b>1-4</b> ve <b>2-3</b> • Kazananlar Final oynar.
+                      <br>Sonuç girişi: <b>Sonuçlar</b> bölümünde hafta seçimini <b>SF1 / SF2 / FINAL</b> yap.
+                    </div>
+
+                    <div class="bracket">
+                      <div class="pair">
+                        <div class="title">SF1 (1 - 4)</div>
+                        <div class="teamline">
+                          <span>${esc(t1.name || '1.')}</span>
+                          <span class="pill">Seed 1</span>
+                        </div>
+                        <div class="teamline" style="margin-top:8px">
+                          <span>${esc(t4.name || '4.')}</span>
+                          <span class="pill">Seed 4</span>
+                        </div>
+                      </div>
+
+                      <div class="pair">
+                        <div class="title">SF2 (2 - 3)</div>
+                        <div class="teamline">
+                          <span>${esc(t2.name || '2.')}</span>
+                          <span class="pill">Seed 2</span>
+                        </div>
+                        <div class="teamline" style="margin-top:8px">
+                          <span>${esc(t3.name || '3.')}</span>
+                          <span class="pill">Seed 3</span>
+                        </div>
+                      </div>
+
+                      <div class="pair">
+                        <div class="title">FINAL</div>
+                        <div class="muted">SF1 kazananı vs SF2 kazananı</div>
+                      </div>
+                    </div>
+                  `;
+                } else {
+                    html += `<div class="week-title" style="margin-top:18px">Playoff</div>
+                           <div class="muted">Playoff şablonu yok. Admin panelinden “Playoff Şablonu Oluştur” yap.</div>`;
+                }
+
                 container.innerHTML += html + `</div>`;
             });
         }
@@ -1468,37 +1654,37 @@
                     const safePid = esc(pid);
                     const nm = esc(getPlayerName(pid));
                     return `
-                <tr>
-                  <td>${nm} <span class="pill">${safePid}</span></td>
-                  <td style="width:80px"><input class="tiny-input" type="number" min="0" value="0" data-side="${side}" data-pid="${safePid}" data-field="g"></td>
-                  <td style="width:80px"><input class="tiny-input" type="number" min="0" value="0" data-side="${side}" data-pid="${safePid}" data-field="a"></td>
-                  <td style="width:80px"><input class="tiny-input" type="number" min="0" value="0" data-side="${side}" data-pid="${safePid}" data-field="cs"></td>
-                </tr>`;
+                    <tr>
+                      <td>${nm} <span class="pill">${safePid}</span></td>
+                      <td style="width:80px"><input class="tiny-input" type="number" min="0" value="0" data-side="${side}" data-pid="${safePid}" data-field="g"></td>
+                      <td style="width:80px"><input class="tiny-input" type="number" min="0" value="0" data-side="${side}" data-pid="${safePid}" data-field="a"></td>
+                      <td style="width:80px"><input class="tiny-input" type="number" min="0" value="0" data-side="${side}" data-pid="${safePid}" data-field="cs"></td>
+                    </tr>`;
                 }).join('') : `<tr><td colspan="4" class="muted">Kadro boş.</td></tr>`;
 
                 return `
-              <div class="roster-card">
-                <div class="team-cell" style="margin-bottom:8px;">
-                  <img class="team-logo-small" src="${esc(team?.logo || '')}" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                       onerror="this.src='https://via.placeholder.com/30?text=?'">
-                  <div style="font-weight:1000">${esc(team?.name || 'Takım')}</div>
-                </div>
-                <table>
-                  <tr><th>Oyuncu</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
-                  ${rows}
-                </table>
-              </div>`;
+                  <div class="roster-card">
+                    <div class="team-cell" style="margin-bottom:8px;">
+                      <img class="team-logo-small" src="${esc(team?.logo || '')}" loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                           onerror="this.src='https://via.placeholder.com/30?text=?'">
+                      <div style="font-weight:1000">${esc(team?.name || 'Takım')}</div>
+                    </div>
+                    <table>
+                      <tr><th>Oyuncu</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
+                      ${rows}
+                    </table>
+                  </div>`;
             };
 
             wrap.innerHTML = `
-            <div class="grid-2">
-              ${renderRosterTable(t1, r1, "home")}
-              ${renderRosterTable(t2, r2, "away")}
-            </div>
-            <div class="muted" style="margin-top:10px">
-              İpucu: Sadece bu maçtaki istatistikleri yaz. Krallık otomatik güncellenir.
-            </div>
-          `;
+                <div class="grid-2">
+                  ${renderRosterTable(t1, r1, "home")}
+                  ${renderRosterTable(t2, r2, "away")}
+                </div>
+                <div class="muted" style="margin-top:10px">
+                  İpucu: Sadece bu maçtaki istatistikleri yaz. Krallık otomatik güncellenir.
+                </div>
+              `;
         }
 
         function collectMatchDetails(leagueKey, t1Id, t2Id) {
@@ -1532,40 +1718,10 @@
             return details;
         }
 
-        function formatTopLinesFromDetails(leagueKey, t1Id, t2Id, details) {
-            const lines = [];
-            const t1 = getTeamById(leagueKey, t1Id);
-            const t2 = getTeamById(leagueKey, t2Id);
-
-            function listForTeam(teamId) {
-                const team = (teamId === t1Id) ? t1 : t2;
-                const arr = (Array.isArray(details[teamId]) ? details[teamId] : []).map(item => ({
-                    pid: normalizeHashId(item.playerId),
-                    name: getPlayerName(item.playerId),
-                    g: parseInt(item.g) || 0,
-                    a: parseInt(item.a) || 0,
-                    cs: parseInt(item.cs) || 0
-                }));
-
-                const scorers = arr.filter(x => x.g > 0).sort((a, b) => b.g - a.g).slice(0, 6);
-                const assists = arr.filter(x => x.a > 0).sort((a, b) => b.a - a.a).slice(0, 6);
-                const clean = arr.filter(x => x.cs > 0).sort((a, b) => b.cs - a.cs).slice(0, 6);
-
-                lines.push(
-                    scorers.length ? `⚽ ${team.name}: ${scorers.map(x => `${x.name}(${x.g})`).join(", ")}` : `⚽ ${team.name}: -`,
-                    assists.length ? `🅰️ ${team.name}: ${assists.map(x => `${x.name}(${x.a})`).join(", ")}` : `🅰️ ${team.name}: -`,
-                    clean.length ? `🧤 ${team.name}: ${clean.map(x => `${x.name}(${x.cs})`).join(", ")}` : `🧤 ${team.name}: -`,
-                );
-            }
-
-            listForTeam(t1Id);
-            listForTeam(t2Id);
-            return lines;
-        }
-
         async function addMatchWithDetails() {
             const l = $('match-league-select')?.value || "";
-            const w = $('match-week-select')?.value || "";
+            const wRaw = $('match-week-select')?.value || "";
+            const w = String(wRaw || "0").toUpperCase();
             const t1Id = $('team-1-select')?.value || "";
             const t2Id = $('team-2-select')?.value || "";
             const s1 = parseInt($('score-1')?.value);
@@ -1581,11 +1737,14 @@
 
             const details = collectMatchDetails(l, t1Id, t2Id);
 
+            const stage = (w.startsWith("SF") || w === "FINAL") ? "playoff" : "league";
+
             const matchObj = {
                 id: Date.now(),
                 createdAt: Date.now(),
                 league: l,
                 week: w || "0",
+                stage,
                 t1Id, t2Id,
                 s1, s2,
                 details
@@ -1594,16 +1753,6 @@
             matches.push(matchObj);
             await save();
             alert("Maç + istatistikler kaydedildi!");
-
-            const lines = formatTopLinesFromDetails(l, t1Id, t2Id, details);
-            await sendDiscordWebhook({
-                content:
-                    `🏁 **Maç Sonucu** (${leaguesMeta[l] || l} • ${w}. Hafta)
-**${t1.name} ${s1} - ${s2} ${t2.name}**
-⏱️ ${nowTR()}
-
-${lines.join('\n')}`
-            });
 
             if ($('score-1')) $('score-1').value = "";
             if ($('score-2')) $('score-2').value = "";
@@ -1623,37 +1772,51 @@ ${lines.join('\n')}`
             container.innerHTML = "";
 
             const grouped = (matches || []).reduce((acc, m) => {
-                const wk = String(m.week ?? "0");
+                const wk = String(m.week ?? "0").toUpperCase();
                 (acc[wk] = acc[wk] || []).push(m);
                 return acc;
             }, {});
 
-            Object.keys(grouped).sort((a, b) => parseInt(b) - parseInt(a)).forEach(w => {
-                let html = `<div class="week-container"><div class="week-title">${esc(w)}. Hafta</div>`;
+            const orderKey = (k) => {
+                const kk = String(k).toUpperCase();
+                if (kk === "FINAL") return 999999;
+                if (kk === "SF2") return 999998;
+                if (kk === "SF1") return 999997;
+                const n = parseInt(kk);
+                return Number.isFinite(n) ? n : 0;
+            };
+
+            Object.keys(grouped).sort((a, b) => orderKey(b) - orderKey(a)).forEach(w => {
+                let label = w;
+                if (w === "SF1") label = "Playoff • SF1 (1-4)";
+                if (w === "SF2") label = "Playoff • SF2 (2-3)";
+                if (w === "FINAL") label = "Playoff • FINAL";
+
+                let html = `<div class="week-container"><div class="week-title">${esc(label)}</div>`;
                 grouped[w].slice().reverse().forEach(m => {
                     const lData = leagues[m.league] || [];
                     const t1 = lData.find(x => x.id !== "dummy" && x.id === m.t1Id) || {};
                     const t2 = lData.find(x => x.id !== "dummy" && x.id === m.t2Id) || {};
 
                     html += `<div class="match-row" onclick="openMatchModal(${m.id})">
-                <div style="display:flex;justify-content:center;">
-                  ${isAdmin ? `<button class="btn-danger btn-small" onclick="event.stopPropagation(); deleteMatch(${m.id})">X</button>` : ''}
-                </div>
-                <div class="team-home">
-                  <img src="${esc(t1.logo || '')}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                       onerror="this.src='https://via.placeholder.com/30?text=?'">
-                  <span>${esc(t1.name || '')}</span>
-                </div>
-                <div class="score-container">
-                  <div class="score-box">${esc(m.s1)}</div><span>-</span><div class="score-box">${esc(m.s2)}</div>
-                </div>
-                <div class="team-away">
-                  <span>${esc(t2.name || '')}</span>
-                  <img src="${esc(t2.logo || '')}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                       onerror="this.src='https://via.placeholder.com/30?text=?'">
-                </div>
-                <div></div>
-              </div>`;
+                    <div style="display:flex;justify-content:center;">
+                      ${isAdmin ? `<button class="btn-danger btn-small" onclick="event.stopPropagation(); deleteMatch(${m.id})">X</button>` : ''}
+                    </div>
+                    <div class="team-home">
+                      <img src="${esc(t1.logo || '')}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                           onerror="this.src='https://via.placeholder.com/30?text=?'">
+                      <span>${esc(t1.name || '')}</span>
+                    </div>
+                    <div class="score-container">
+                      <div class="score-box">${esc(m.s1)}</div><span>-</span><div class="score-box">${esc(m.s2)}</div>
+                    </div>
+                    <div class="team-away">
+                      <span>${esc(t2.name || '')}</span>
+                      <img src="${esc(t2.logo || '')}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                           onerror="this.src='https://via.placeholder.com/30?text=?'">
+                    </div>
+                    <div></div>
+                  </div>`;
                 });
                 container.innerHTML += html + `</div>`;
             });
@@ -1676,12 +1839,11 @@ ${lines.join('\n')}`
             const title = `${t1.name || ''} ${m.s1} - ${m.s2} ${t2.name || ''}`;
 
             $('match-modal-title') && ($('match-modal-title').innerHTML = esc(title));
-            $('match-modal-sub') && ($('match-modal-sub').innerHTML = `${esc(lName)} • ${esc(m.week)}. Hafta`);
+            $('match-modal-sub') && ($('match-modal-sub').innerHTML = `${esc(lName)} • ${esc(String(m.week || "0").toUpperCase())} • ${esc(m.stage || "league")}`);
 
             const details = m.details || {};
 
             const renderTeamDetail = (team, teamId) => {
-                // ✅ array format
                 const list = Array.isArray(details[teamId]) ? details[teamId] : [];
                 const arr = list.map(item => ({
                     pid: normalizeHashId(item.playerId),
@@ -1693,7 +1855,6 @@ ${lines.join('\n')}`
 
                 const roster = getTeamRosterPlayerIds(leagueKey, teamId);
                 const rosterSet = new Set(roster.map(normalizeHashId));
-
                 const mergedIds = new Set([...arr.map(x => normalizeHashId(x.pid)), ...roster.map(normalizeHashId)]);
 
                 const merged = Array.from(mergedIds).map(pid => {
@@ -1703,40 +1864,39 @@ ${lines.join('\n')}`
                 }).sort((x, y) => (y.g - x.g) || (y.a - x.a) || (y.cs - x.cs) || String(x.name).localeCompare(String(y.name), 'tr'));
 
                 return `
-              <div class="roster-card">
-                <div class="team-cell" style="margin-bottom:8px;">
-                  <img class="team-logo-small" src="${esc(team.logo || '')}" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                       onerror="this.src='https://via.placeholder.com/30?text=?'">
-                  <div style="font-weight:1000">${esc(team.name || 'Takım')}</div>
-                  <span class="pill">${esc(team.teamId || '')}</span>
-                </div>
-                <table>
-                  <tr><th>Oyuncu</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
-                  ${merged.length ? merged.map(p => `
-                    <tr>
-                      <td>
-                        ${esc(p.name)} <span class="pill">${esc(p.pid)}</span>
-                        ${p.inRoster ? `` : `<span class="pill" style="border-color:rgba(255,68,68,.35);color:#ffb3b3">Kadro dışı</span>`}
-                      </td>
-                      <td><b>${p.g}</b></td>
-                      <td><b>${p.a}</b></td>
-                      <td><b>${p.cs}</b></td>
-                    </tr>
-                  `).join('') : `<tr><td colspan="4" class="muted">Detay yok.</td></tr>`}
-                </table>
-              </div>
-            `;
+                  <div class="roster-card">
+                    <div class="team-cell" style="margin-bottom:8px;">
+                      <img class="team-logo-small" src="${esc(team.logo || '')}" loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                           onerror="this.src='https://via.placeholder.com/30?text=?'">
+                      <div style="font-weight:1000">${esc(team.name || 'Takım')}</div>
+                      <span class="pill">${esc(team.teamId || '')}</span>
+                    </div>
+                    <table>
+                      <tr><th>Oyuncu</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
+                      ${merged.length ? merged.map(p => `
+                        <tr>
+                          <td>
+                            ${esc(p.name)} <span class="pill">${esc(p.pid)}</span>
+                            ${p.inRoster ? `` : `<span class="pill" style="border-color:rgba(255,68,68,.35);color:#ffb3b3">Kadro dışı</span>`}
+                          </td>
+                          <td><b>${p.g}</b></td>
+                          <td><b>${p.a}</b></td>
+                          <td><b>${p.cs}</b></td>
+                        </tr>
+                      `).join('') : `<tr><td colspan="4" class="muted">Detay yok.</td></tr>`}
+                    </table>
+                  </div>
+                `;
             };
 
             const body = `
-            <div class="grid-2">
-              ${renderTeamDetail(t1, m.t1Id)}
-              ${renderTeamDetail(t2, m.t2Id)}
-            </div>
-            <div class="muted" style="margin-top:10px">Detaylar maç kaydı içinden gösterilir.</div>
-          `;
+                <div class="grid-2">
+                  ${renderTeamDetail(t1, m.t1Id)}
+                  ${renderTeamDetail(t2, m.t2Id)}
+                </div>
+                <div class="muted" style="margin-top:10px">Detaylar maç kaydı içinden gösterilir.</div>
+              `;
             $('match-modal-body') && ($('match-modal-body').innerHTML = body);
-
             $('match-modal-backdrop') && ($('match-modal-backdrop').style.display = 'flex');
         }
 
@@ -1796,14 +1956,14 @@ ${lines.join('\n')}`
 
             const uniq = getAllUniquePlayersIndex();
             wrap.innerHTML = uniq.map(p => `
-            <div class="mini-card" onclick="showPlayersDetail('${esc(p.playerId)}')">
-              <div class="row">
-                <div style="font-weight:900">${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></div>
-                ${isAdmin ? `<button class="btn-danger btn-small" onclick="event.stopPropagation(); deletePlayerById('${esc(p.playerId)}')">Sil</button>` : ``}
-              </div>
-              <div class="muted">Detay için tıkla</div>
-            </div>
-          `).join('') || `<div class="muted">Oyuncu bulunamadı.</div>`;
+                <div class="mini-card" onclick="showPlayersDetail('${esc(p.playerId)}')">
+                  <div class="row">
+                    <div style="font-weight:900">${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></div>
+                    ${isAdmin ? `<button class="btn-danger btn-small" onclick="event.stopPropagation(); deletePlayerById('${esc(p.playerId)}')">Sil</button>` : ``}
+                  </div>
+                  <div class="muted">Detay için tıkla</div>
+                </div>
+              `).join('') || `<div class="muted">Oyuncu bulunamadı.</div>`;
         }
 
         function showPlayersDetail(playerId) {
@@ -1816,31 +1976,31 @@ ${lines.join('\n')}`
 
             box.style.display = 'block';
             box.innerHTML = `
-            <div class="row" style="margin-bottom:10px">
-              <div>
-                <div style="font-size:1.12rem;font-weight:1000">${esc(name)} <span class="pill">${esc(pid)}</span></div>
-                <div class="muted">Liglere göre (maçlardan dinamik hesap)</div>
-              </div>
-              <div class="row">
-                <button class="linkbtn" onclick="$('players-detail').style.display='none'">Kapat</button>
-                ${isAdmin ? `<button class="btn-danger btn-small" onclick="deletePlayerById('${esc(pid)}')">Oyuncuyu Sil</button>` : ``}
-              </div>
-            </div>
+                <div class="row" style="margin-bottom:10px">
+                  <div>
+                    <div style="font-size:1.12rem;font-weight:1000">${esc(name)} <span class="pill">${esc(pid)}</span></div>
+                    <div class="muted">Liglere göre (maçlardan dinamik hesap)</div>
+                  </div>
+                  <div class="row">
+                    <button class="linkbtn" onclick="$('players-detail').style.display='none'">Kapat</button>
+                    ${isAdmin ? `<button class="btn-danger btn-small" onclick="deletePlayerById('${esc(pid)}')">Oyuncuyu Sil</button>` : ``}
+                  </div>
+                </div>
 
-            <h3>Lig Bazlı İstatistik</h3>
-            <table>
-              <tr><th>Lig</th><th>Takım</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
-              ${leaguesList.map(x => `
-                <tr>
-                  <td>${esc(leaguesMeta[x.league] || x.league)}</td>
-                  <td>${esc(x.team || '—')}</td>
-                  <td><b>${x.goals}</b></td>
-                  <td><b>${x.assists}</b></td>
-                  <td><b>${x.cs}</b></td>
-                </tr>
-              `).join('')}
-            </table>
-          `;
+                <h3>Lig Bazlı İstatistik</h3>
+                <table>
+                  <tr><th>Lig</th><th>Takım</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
+                  ${leaguesList.map(x => `
+                    <tr>
+                      <td>${esc(leaguesMeta[x.league] || x.league)}</td>
+                      <td>${esc(x.team || '—')}</td>
+                      <td><b>${x.goals}</b></td>
+                      <td><b>${x.assists}</b></td>
+                      <td><b>${x.cs}</b></td>
+                    </tr>
+                  `).join('')}
+                </table>
+              `;
             box.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
@@ -1912,12 +2072,10 @@ ${lines.join('\n')}`
             const team = getTeamById(l, teamInternalId);
             if (!team) return alert("Takım bulunamadı!");
 
-            // registry yoksa oluştur
             if (!(players || []).some(p => normalizeHashId(p.playerId) === pid)) {
                 players.push({ id: Date.now(), playerId: pid, name: "Oyuncu" });
             }
 
-            // diğer takımlardan çıkar (aynı lig içinde)
             (leagues[l] || []).forEach(t => {
                 if (t.id !== "dummy" && Array.isArray(t.roster)) {
                     t.roster = t.roster.map(normalizeHashId).filter(x => x && x !== pid);
@@ -1964,21 +2122,21 @@ ${lines.join('\n')}`
             wrap.innerHTML = all.map(x => {
                 const st = (leagueAgg[x.leagueKey] || {})[x.team.id] || { pts: 0, gd: 0 };
                 return `
-              <div class="mini-card" onclick="showTeamDetail('${esc(x.team.teamId)}')">
-                <div class="row">
-                  <div class="team-cell">
-                    <img class="team-logo-small" src="${esc(x.team.logo || '')}" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                         onerror="this.src='https://via.placeholder.com/30?text=?'">
-                    <div>
-                      <div style="font-weight:900">${esc(x.team.name)}</div>
-                      <div class="muted">${esc(x.leagueName)} • <span class="pill">${esc(x.team.teamId)}</span></div>
+                  <div class="mini-card" onclick="showTeamDetail('${esc(x.team.teamId)}')">
+                    <div class="row">
+                      <div class="team-cell">
+                        <img class="team-logo-small" src="${esc(x.team.logo || '')}" loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                             onerror="this.src='https://via.placeholder.com/30?text=?'">
+                        <div>
+                          <div style="font-weight:900">${esc(x.team.name)}</div>
+                          <div class="muted">${esc(x.leagueName)} • <span class="pill">${esc(x.team.teamId)}</span></div>
+                        </div>
+                      </div>
+                      <div class="pill">P: ${st.pts} • AV: ${st.gd}</div>
                     </div>
+                    <div class="muted" style="margin-top:6px">Kadro için tıkla</div>
                   </div>
-                  <div class="pill">P: ${st.pts} • AV: ${st.gd}</div>
-                </div>
-                <div class="muted" style="margin-top:6px">Kadro için tıkla</div>
-              </div>
-            `;
+                `;
             }).join('') || `<div class="muted">Takım bulunamadı.</div>`;
         }
 
@@ -2006,37 +2164,37 @@ ${lines.join('\n')}`
 
             box.style.display = 'block';
             box.innerHTML = `
-            <div class="row" style="margin-bottom:10px">
-              <div class="team-cell">
-                <img class="team-logo-small" src="${esc(team.logo || '')}" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-                     onerror="this.src='https://via.placeholder.com/30?text=?'">
-                <div>
-                  <div style="font-size:1.12rem;font-weight:1000">${esc(team.name)} <span class="pill">${esc(team.teamId)}</span></div>
-                  <div class="muted">${esc(leagueName)} • P: <b>${st.pts}</b> • AV: <b>${st.gd}</b> • O: ${st.played}</div>
+                <div class="row" style="margin-bottom:10px">
+                  <div class="team-cell">
+                    <img class="team-logo-small" src="${esc(team.logo || '')}" loading="lazy" decoding="async" referrerpolicy="no-referrer"
+                         onerror="this.src='https://via.placeholder.com/30?text=?'">
+                    <div>
+                      <div style="font-size:1.12rem;font-weight:1000">${esc(team.name)} <span class="pill">${esc(team.teamId)}</span></div>
+                      <div class="muted">${esc(leagueName)} • P: <b>${st.pts}</b> • AV: <b>${st.gd}</b> • O: ${st.played}</div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <button class="linkbtn" onclick="$('teams-detail').style.display='none'">Kapat</button>
+                    ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteTeamById('${esc(team.teamId)}')">Takımı Sil</button>` : ``}
+                  </div>
                 </div>
-              </div>
-              <div class="row">
-                <button class="linkbtn" onclick="$('teams-detail').style.display='none'">Kapat</button>
-                ${isAdmin ? `<button class="btn-danger btn-small" onclick="deleteTeamById('${esc(team.teamId)}')">Takımı Sil</button>` : ``}
-              </div>
-            </div>
 
-            <h3>Kadro</h3>
-            ${rosterRows.length ? `
-              <table>
-                <tr><th>Oyuncu</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
-                ${rosterRows.map(r => `
-                  <tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(r.pid)}')">
-                    <td>${esc(r.nm)} <span class="pill">${esc(r.pid)}</span></td>
-                    <td><b>${r.g}</b></td>
-                    <td><b>${r.a}</b></td>
-                    <td><b>${r.cs}</b></td>
-                  </tr>
-                `).join('')}
-              </table>
-              <div class="muted" style="margin-top:8px">Oyuncuya tıklayınca oyuncu detayına gider.</div>
-            ` : `<div class="muted">Kadro boş.</div>`}
-          `;
+                <h3>Kadro</h3>
+                ${rosterRows.length ? `
+                  <table>
+                    <tr><th>Oyuncu</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
+                    ${rosterRows.map(r => `
+                      <tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(r.pid)}')">
+                        <td>${esc(r.nm)} <span class="pill">${esc(r.pid)}</span></td>
+                        <td><b>${r.g}</b></td>
+                        <td><b>${r.a}</b></td>
+                        <td><b>${r.cs}</b></td>
+                      </tr>
+                    `).join('')}
+                  </table>
+                  <div class="muted" style="margin-top:8px">Oyuncuya tıklayınca oyuncu detayına gider.</div>
+                ` : `<div class="muted">Kadro boş.</div>`}
+              `;
             box.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
@@ -2077,9 +2235,9 @@ ${lines.join('\n')}`
                 html += `<div class="stats-card"><h3>Gol Krallığı</h3><table>`;
                 goals.forEach(p => {
                     html += `<tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(p.playerId)}')">
-                <td>${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></td>
-                <td style="text-align:right"><b>${p.goals}</b></td>
-              </tr>`;
+                    <td>${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></td>
+                    <td style="text-align:right"><b>${p.goals}</b></td>
+                  </tr>`;
                 });
                 html += `</table></div>`;
 
@@ -2087,9 +2245,9 @@ ${lines.join('\n')}`
                 html += `<div class="stats-card"><h3>Asist Krallığı</h3><table>`;
                 assists.forEach(p => {
                     html += `<tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(p.playerId)}')">
-                <td>${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></td>
-                <td style="text-align:right"><b>${p.assists}</b></td>
-              </tr>`;
+                    <td>${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></td>
+                    <td style="text-align:right"><b>${p.assists}</b></td>
+                  </tr>`;
                 });
                 html += `</table></div>`;
 
@@ -2097,9 +2255,9 @@ ${lines.join('\n')}`
                 html += `<div class="stats-card"><h3>CS Krallığı</h3><table>`;
                 clean.forEach(p => {
                     html += `<tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(p.playerId)}')">
-                <td>${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></td>
-                <td style="text-align:right"><b>${p.cs}</b></td>
-              </tr>`;
+                    <td>${esc(p.name)} <span class="pill">${esc(p.playerId)}</span></td>
+                    <td style="text-align:right"><b>${p.cs}</b></td>
+                  </tr>`;
                 });
                 html += `</table></div>`;
 
@@ -2123,11 +2281,30 @@ ${lines.join('\n')}`
                 s.value = val;
             });
 
-            if ($('webhook-input')) $('webhook-input').value = DISCORD_WEBHOOK_URL || "";
+            // seed selects update (based on currently selected fixture league)
+            updateSeedSelects();
 
             if ($('match-league-select') && $('match-league-select').value) {
                 updateMatchTeams();
             }
+            if ($('player-assign-league') && $('player-assign-league').value) {
+                updateAssignTeams();
+            }
+        }
+
+        function updateSeedSelects() {
+            const l = $('fixture-league-select')?.value || "";
+            const seedIds = ['seed1', 'seed2', 'seed3', 'seed4'];
+            seedIds.forEach(id => {
+                const s = $(id);
+                if (!s) return;
+                const prev = s.value;
+                s.innerHTML = `<option value="">(Otomatik)</option>`;
+                (leagues[l] || []).filter(t => t.id !== "dummy").forEach(t => {
+                    s.innerHTML += `<option value="${esc(t.id)}">${esc(t.name)}</option>`;
+                });
+                s.value = prev;
+            });
         }
 
         // ---------- Render all ----------
@@ -2145,15 +2322,26 @@ ${lines.join('\n')}`
             if (!s) return;
             if (s.dataset.inited === "1") return;
             s.dataset.inited = "1";
+
+            // league weeks
             for (let i = 1; i <= 30; i++) {
                 s.innerHTML += `<option value="${i}">${i}</option>`;
             }
+            // playoffs
+            s.innerHTML += `<option value="SF1">SF1 (Playoff • 1-4)</option>`;
+            s.innerHTML += `<option value="SF2">SF2 (Playoff • 2-3)</option>`;
+            s.innerHTML += `<option value="FINAL">FINAL (Playoff)</option>`;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             initWeekSelect();
             handleNav('news');
             $('match-detail-inputs') && ($('match-detail-inputs').innerHTML = `<div class="muted">Takımları seçince kadrolar otomatik listelenir (Gol/Asist/CS girebilirsin).</div>`);
+
+            // when fixture league changes -> refresh seed dropdowns
+            $('fixture-league-select')?.addEventListener('change', () => {
+                updateSeedSelects();
+            });
         });
     </script>
 </body>
