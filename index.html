@@ -611,6 +611,125 @@
                 border: 1px solid rgba(255,255,255,.10);
                 background: rgba(255,255,255,.03)
             }
+    
+/* ==========================================================
+   MOBILE OPTIMIZATION (added)
+   - Fix overflow / make all sections phone-friendly
+   ========================================================== */
+
+html { -webkit-text-size-adjust: 100%; }
+
+/* Prevent long IDs/text from blowing layout */
+.pill { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+
+/* Make tables safe (mobile will scroll horizontally if needed) */
+@media (max-width: 768px) {
+    table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 900px) {
+    .container { width: min(1200px, 94%); }
+
+    /* Header: allow wrapping and prevent overflow */
+    .header-content { flex-wrap: wrap; }
+    .logo-box { min-width: 0; flex: 1 1 auto; }
+}
+
+@media (max-width: 768px) {
+    .page { padding: 12px 0 52px; }
+
+    /* Grids -> single column */
+    .admin-grid,
+    .news-grid,
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Cards tighter */
+    .admin-section, .league-card, .news-card, .stats-card, .week-container {
+        padding: 14px;
+        margin-top: 14px;
+        border-radius: 14px;
+    }
+
+    /* Header: smaller brand + logo */
+    .main-logo { width: 40px; height: 40px; }
+    .brand h1 { font-size: .92rem; }
+    .brand span { font-size: .72rem; }
+
+    th, td { padding: 9px 7px; }
+
+    /* Puan Durumu: hide less critical cols on phone (AG/YG) */
+    #standings-section th:nth-child(7),
+    #standings-section th:nth-child(8),
+    #standings-section td:nth-child(7),
+    #standings-section td:nth-child(8) {
+        display: none;
+    }
+
+    /* Team cell: truncate long names nicely */
+    .team-cell { min-width: 220px; gap: 8px; overflow: hidden; }
+    .team-logo-small { width: 26px; height: 26px; border-radius: 7px; flex: 0 0 auto; }
+
+    /* Match row / fixture: tighter */
+    .match-row, .fixture-item {
+        grid-template-columns: 26px 1fr 60px 1fr 8px;
+        gap: 8px;
+        padding: 10px;
+    }
+    .score-box { width: 30px; height: 30px; font-size: .9rem; }
+    .score-container, .tire-container { font-size: .95rem; }
+
+    /* Modal more usable on phone */
+    .modal-backdrop { padding: 12px; }
+    .modal { width: min(980px, 98%); max-height: 88vh; padding: 12px; border-radius: 16px; }
+
+    /* Inputs: smaller vertical rhythm */
+    input, textarea, select { padding: 11px 11px; border-radius: 12px; }
+    button { padding: 12px 12px; border-radius: 12px; }
+}
+
+@media (max-width: 560px) {
+    /* Even tighter header */
+    .brand h1 { font-size: .88rem; letter-spacing: .04em; }
+    .brand span { display: none; }
+
+    /* Puan Durumu: hide B column too (keep O,G,M,AV,P) */
+    #standings-section th:nth-child(5),
+    #standings-section td:nth-child(5) {
+        display: none;
+    }
+
+    .pill { font-size: 11px; padding: 3px 8px; }
+    .team-cell { min-width: 200px; }
+
+    .match-row, .fixture-item {
+        grid-template-columns: 22px 1fr 54px 1fr 6px;
+        padding: 9px;
+        gap: 6px;
+    }
+    .team-logo-small { width: 24px; height: 24px; }
+    .score-box { width: 28px; height: 28px; }
+}
+
+@media (max-width: 420px) {
+    /* Very small phones: hide M column (keep O,G,AV,P) */
+    #standings-section th:nth-child(6),
+    #standings-section td:nth-child(6) {
+        display: none;
+    }
+
+    h2 { font-size: 1.02rem; }
+    h3 { font-size: .92rem; }
+
+    .team-cell { min-width: 180px; gap: 6px; }
+    .pill { max-width: 110px; }
+}
     </style>
 </head>
 
