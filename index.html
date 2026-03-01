@@ -808,7 +808,6 @@
                 </button>
 
                 <div class="muted" style="margin-top:10px">
-                    Not: İstatistikler maçın içine gömülür. Krallık tüm maçları tarayarak dinamik hesaplanır.
                 </div>
             </div>
         </section>
@@ -1577,7 +1576,7 @@
               `;
                 } else {
                     html += `<div class="week-title" style="margin-top:18px">Playoff</div>
-                       <div class="muted">Playoff şablonu yok. Admin panelinden “Playoff Şablonu Oluştur” yap.</div>`;
+                       <div class="muted"></div>`;
                 }
 
                 container.innerHTML += html + `</div>`;
@@ -1970,7 +1969,7 @@
             <div class="row" style="margin-bottom:10px">
               <div>
                 <div style="font-size:1.12rem;font-weight:1000">${esc(name)} <span class="pill">${esc(pid)}</span></div>
-                <div class="muted">Liglere göre (maçlardan dinamik hesap)</div>
+                <div class="muted"></div>
               </div>
               <div class="row">
                 <button class="linkbtn" onclick="$('players-detail').style.display='none'">Kapat</button>
@@ -2183,7 +2182,7 @@
                   </tr>
                 `).join('')}
               </table>
-              <div class="muted" style="margin-top:8px">Oyuncuya tıklayınca oyuncu detayına gider.</div>
+              <div class="muted" style="margin-top:8px"></div>
             ` : `<div class="muted">Kadro boş.</div>`}
           `;
             box.scrollIntoView({ behavior: 'smooth', block: 'start' });
