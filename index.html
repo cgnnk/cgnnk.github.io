@@ -730,7 +730,84 @@ html { -webkit-text-size-adjust: 100%; }
     .team-cell { min-width: 180px; gap: 6px; }
     .pill { max-width: 110px; }
 }
-    </style>
+    
+/* ============================= */
+/* ✅ EXTRA MOBILE FIX (TABLES)  */
+/* ============================= */
+
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Make any table safely scroll instead of overflowing the card */
+@media (max-width: 768px) {
+  table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 12px;
+  }
+
+  thead, tbody, tr {
+    width: 100%;
+  }
+
+  th, td {
+    white-space: nowrap;
+  }
+
+  /* tighter numeric columns */
+  th:not(:nth-child(2)), td:not(:nth-child(2)) {
+    width: 36px;
+    text-align: center;
+  }
+
+  /* Team column gets the remaining space */
+  th:nth-child(2), td:nth-child(2) {
+    width: auto;
+    text-align: left;
+  }
+
+  /* Team cell: allow ellipsis */
+  .team-cell {
+    min-width: 220px; /* keeps team column readable */
+    flex-wrap: nowrap;
+  }
+
+  .team-name {
+    display: inline-block;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: bottom;
+  }
+
+  .team-id-pill {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+}
+
+@media (max-width: 420px) {
+  /* even smaller phones: hide Team ID pill to gain space */
+  .team-id-pill { display: none; }
+  .team-name { max-width: 180px; }
+}
+
+/* Standings: hide extra columns on smaller phones */
+@media (max-width: 520px) {
+  /* Hide B and M on very small screens to prevent crowding */
+  th:nth-child(5), td:nth-child(5),
+  th:nth-child(6), td:nth-child(6) {
+    display: none;
+  }
+}
+
+</style>
 </head>
 
 <body>
@@ -1481,7 +1558,7 @@ html { -webkit-text-size-adjust: 100%; }
                 const sorted = teams.slice().sort(standingsComparator(l, teamStats));
 
                 let html = `<div class="league-card"><h3>${esc(displayName)}</h3>
-              <table>
+              <div class="table-scroll"><table>
                 <tr>
                   <th>#</th><th>Takım</th><th>O</th><th>G</th><th>B</th><th>M</th><th>AG</th><th>YG</th><th>AV</th><th>P</th>
                 </tr>`;
@@ -1493,7 +1570,7 @@ html { -webkit-text-size-adjust: 100%; }
                 <td class="team-cell">
                   <img src="${esc(t.logo)}" class="team-logo-small" loading="lazy" decoding="async" referrerpolicy="no-referrer"
                        onerror="this.src='https://via.placeholder.com/30?text=?'">
-                  ${esc(t.name)} <span class="pill">${esc(t.teamId)}</span>
+                  <span class="team-name">${esc(t.name)}</span> <span class="pill team-id-pill">${esc(t.teamId)}</span>
                 </td>
                 <td>${st.played}</td>
                 <td>${st.w}</td>
@@ -1506,7 +1583,7 @@ html { -webkit-text-size-adjust: 100%; }
               </tr>`;
                 });
 
-                container.innerHTML += html + `</table></div>`;
+                container.innerHTML += html + `</table></div></div>`;
             });
         }
 
@@ -2290,7 +2367,7 @@ html { -webkit-text-size-adjust: 100%; }
 
             <h3>Kadro</h3>
             ${rosterRows.length ? `
-              <table>
+              <div class="table-scroll"><table>
                 <tr><th>Oyuncu</th><th>Gol</th><th>Asist</th><th>CS</th></tr>
                 ${rosterRows.map(r => `
                   <tr style="cursor:pointer" onclick="handleNav('players'); showPlayersDetail('${esc(r.pid)}')">
